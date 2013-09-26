@@ -1,0 +1,35 @@
+{
+    "name": "musketeer-client",
+    "version": "0.0.1",
+    "description": "",
+    "main": "Gruntfile.js",
+    "directories": {
+        "doc": "doc",
+        "test": "test"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Matthieu Holzer",
+    "license": "WTFPL",
+    "devDependencies": {
+        "chai": "~1.7.2",
+        "grunt": "~0.4.1",
+        "grunt-contrib-watch": "~0.5.3",
+        "grunt-contrib-jshint": "~0.6.4",
+        "grunt-contrib-connect": "~0.3.0",
+        "grunt-contrib-yuidoc": "~0.5.0",
+        "grunt-karma": "~0.6.2",
+        "mocha": "~1.12.1",
+        "karma-chrome-launcher": "~0.1.0",
+        "karma-firefox-launcher": "~0.1.0",
+        "karma-phantomjs-launcher": "~0.1.0",
+        "karma": "~0.10.2",
+        "karma-mocha": "~0.1.0",
+        "karma-chai-plugins": "~0.1.3",
+        "karma-ie-launcher": "~0.1.1",
+        "karma-opera-launcher": "~0.1.0",
+        "yuidocjs": "~0.3.45",
+        "karma-browserstack-launcher": "0.0.4"
+    }
+}
