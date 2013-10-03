@@ -15,6 +15,9 @@
          *  .then(m.connection.connectToAllPeers)
          *  .then(m.computation.start);
          */
+
+        Musketeer.storage.save('files', {id: 12345678910, foo: 'bar'})
+                .then(Musketeer.storage.read('files', 12345678910));
     </script>
 </head>
 <body>

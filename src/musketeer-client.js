@@ -34,21 +34,34 @@
     };
 
     /**
+     * Store for User-Settings which will be saved/read from
+     * localStorage
+     *
      * @module Settings
+     * @constructor
+     * @param storeName String Keyname for the settings object in localStorage
      */
-    musketeer.settings = function () {
+    musketeer.settings = function (storeName) {
 
-        var _settings = readSettingsFromLocalStorage();
+        var _storeName = storeName || 'settings',
+            _settings = readSettingsFromLocalStorage();
 
+        //Defaults
+        _settings.projects = _settings.projects || [];
+
+        //Register Oberserver
         Object.observe(_settings, storeSettingsToLocalStorage);
+        //Even for all keys
+        Object.keys(_settings).forEach(function (key) {
+            Object.observe(_settings[key], storeSettingsToLocalStorage)
+        });
 
         function readSettingsFromLocalStorage() {
-            return JSON.parse(localStorage.getItem('settings')) || {};
+            return JSON.parse(localStorage.getItem(_storeName)) || {};
         }
 
         function storeSettingsToLocalStorage() {
-            console.log('settings update');
-            localStorage.setItem('settings', JSON.stringify(_settings));
+            localStorage.setItem(_storeName, JSON.stringify(_settings));
         }
 
         return _settings;
@@ -59,13 +72,7 @@
      * @module Projects
      */
     musketeer.projects = function () {
-        var _list;
-
-        //create list if not existent
-        if (!musketeer.settings.projects) {
-            musketeer.settings.projects = [];
-        }
-        _list = musketeer.settings.projects;
+        var _list = musketeer.settings.projects;
 
         return {
             list: _list,
@@ -161,59 +168,96 @@
     };
 
     /**
-     *
+     * FileStorage
      * @module Storage
      *
+     * http://www.peterkroener.de/indexed-db-die-neue-html5-datenbank-im-browser-teil-1-ein-kurzer-ueberblick/
      */
-    musketeer.storage = function () {
+    musketeer.storage = function (dbName) {
 
-        function isValidKey(key) {
-            //TODO define standard for keys
-            return key.length === 12;
-        }
+        var _dbName = dbName || 'musketeer',
+            _db,
+            _request;
 
-        var db, request, stores = [];
+        //Open/Create Database
+        _request = indexedDB.open(_dbName);
 
+        _request.onsuccess = function (e) {
+            _db = e.target.result;
+        };
 
-        //open db
-        request = indexedDB.open("musketeer");
-        request.onsuccess = function (e) {
-            console.log('db open');
-            db = e.target.result;
-            // createStore('files', 'id');
+        _request.onupgradeneeded = function () {
+            _db = this.result;
+            if (!hasStore('files')) createStore('files', 'id');
+        };
+
+        _request.onerror = _request.onblocked = function () {
+            console.error('Can\'t create/open database');
+        };
+
+        var hasStore = function (storeName) {
+            return _db && _db.objectStoreNames.contains(storeName);
         };
 
         function createStore(title, keypath) {
-            console.log('store create', db.objectStoreNames);
-
-            //does the objectstore already exist?
-            if (db.objectStoreNames.contains(title)) {
-                return;
-            }
-
-            stores.push(db.createObjectStore(title, {keyPath: keypath}));
+            _db.createObjectStore(title, {keyPath: keypath});
 
         }
 
+
         return {
-            read: function (key) {
+            isValidKey: function (key) {
+                //TODO define standard for keys
+                return true;
+            },
+            read: function (storeName, key) {
                 if (!key) throw Error('File-Key is missing');
-                if (!isValidKey(key)) throw new TypeError('File-Key is invalid');
+                if (!this.isValidKey(key)) throw new TypeError('File-Key is invalid');
 
                 var deferred = Q.defer();
 
                 //local stuff
                 //if locally not found, ask the network
-                console.log(musketeer.network.broadcast('DATA_NEEDED', {id: '0815' }));
+                //console.log(musketeer.network.broadcast('DATA_NEEDED', {id: '0815' }));
                 return deferred.promise;
 
             },
-            store: function (storeName, data) {
-                console.log(stores);
-                stores[0].put({title: "Quarry Memories", author: "Fred", id: 123456});
-                var deferred = Q.defer();
+            save: function (storeName, data) {
+                var deferred = Q.defer(),
+                    transaction,
+                    request,
+                    store;
+
+                console.log(_db, hasStore(storeName));
+
+                if (!hasStore(storeName) || !data.hasOwnProperty('id') || !this.isValidKey(data.id)) {
+                    console.log(data, data.id, 'fail');
+                    deferred.reject();
+                    return deferred.promise;
+                }
+
+                //Create a transaction with RW-rights
+                transaction = _db.transaction([storeName], 'readwrite');
+
+
+                //Get the object-store
+                store = transaction.objectStore(storeName);
+                request = store.put(data);
+
+                console.log('saved');
+                request.onsuccess = function (e) {
+                    deferred.resolve()
+                };
+                request.onerror = function (e) {
+                    deferred.reject()
+                };
+
                 return deferred.promise;
 
+            },
+            remove: function () {
+            },
+            update: function () {
             }
 
         }
