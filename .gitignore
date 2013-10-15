@@ -1,3 +1,4 @@
 # Ignore those
 .idea
 node_modules
+src/lib
