@@ -1,0 +1,24 @@
+{
+  "name": "musketeer-client",
+  "version": "0.0.1",
+  "authors": [
+    "casatt <matthieuholzer@gmx.de>"
+  ],
+  "description": "Connects to a musketeer-node via WebSocket, then creates connections to other musketeer-clients via WebRTC.",
+  "license": "WTFPL",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "src/lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "requirejs": "~2.1.9",
+    "observe-shim": "~0.3.0",
+    "q": "~0.9.7",
+    "eventemitter2": "~0.4.13",
+    "lodash": "~2.2.1"
+  }
+}

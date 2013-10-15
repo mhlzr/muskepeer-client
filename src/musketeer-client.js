@@ -14,11 +14,10 @@ define([
 
     "use strict";
 
-    console.log(computation);
 
     var musketeer = {
 
-        init: function (bridge) {
+        init: function () {
 
             function testRequirements() {
                 return JSON && localStorage && Object.observe && indexedDB;
@@ -36,23 +35,11 @@ define([
     };
 
 
-    /**
-     * EXPORT
+    musketeer.computation.on('task:start', function (e) {
+        console.log('start');
+    });
 
-
-     //allow this to be used in node, amd or global
-
-     if (typeof module != 'undefined' && module.exports && process) {
-        module.exports = musketeer;
-    }
-     else if (typeof define == 'function' && define.amd) {
-        return musketeer;
-
-    }
-     else if (typeof window != 'undefined') {
-        window.Musketeer = musketeer;
-    }
-     */
 
     return musketeer;
-}());
+
+});
