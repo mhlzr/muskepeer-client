@@ -3,8 +3,12 @@ require.config({
         'lodash': 'lib/lodash/dist/lodash',
         'eventemitter2': 'lib/eventemitter2/lib/eventemitter2',
         'observe-shim': 'lib/oberserve-shim/lib/observe-shim',
-        'q': 'lib/q/q'
+        'q': 'lib/q/q',
+        'sjcl': 'lib/sjcl/sjcl'
 
+    },
+    shim: {
+        'sjcl': {exports: window.sjcl}
     }
 });
 

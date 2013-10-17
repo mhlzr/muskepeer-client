@@ -7,7 +7,8 @@ define(['musketeer-module', './tasks'], function (MusketeerModule, tasks) {
 
     var MAX_WORKERS = 2;
 
-    var workers = [];
+    var module = new MusketeerModule(),
+        workers = [];
 
 
     function createWorkers(uri) {
@@ -43,7 +44,7 @@ define(['musketeer-module', './tasks'], function (MusketeerModule, tasks) {
     }
 
 
-    return MusketeerModule.extend({
+    return module.extend({
 
         isRunning: false,
         isPaused: false,

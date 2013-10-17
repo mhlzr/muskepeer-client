@@ -14,9 +14,14 @@
          *  .then(m.computation.start);
 
 
-        Musketeer.storage.save('files', {id: 12345678910, foo: 'bar'})
-                .then(Musketeer.storage.read('files', 12345678910));
+         Musketeer.storage.save('files', {id: 12345678910, foo: 'bar'})
+         .then(Musketeer.storage.read('files', 12345678910));
 
+
+        Musketeer.init({
+            projectId: 34567,
+            node: '127.0.0.1'
+        });
          */
     </script>
 </head>

@@ -4,15 +4,35 @@
  *
  */
 
-define(function (require) {
+define(['musketeer-module'], function (MusketeerModule) {
 
-    var nodes = [],
+    var module = new MusketeerModule(),
+        nodes = [],
         peers = [];
 
-    return{
+    // Detect network change
+    // http://www.html5rocks.com/en/mobile/workingoffthegrid/
+    window.addEventListener('offline', networkConnectivityStateChangeHandler);
+    window.addEventListener('online', networkConnectivityStateChangeHandler);
+
+    function networkConnectivityStateChangeHandler(e) {
+        if (e.type === 'online') {
+            console.log('online');
+            module.emit('node:connected');
+        }
+        else {
+            console.log('offline');
+            module.emit('node:disconnected');
+        }
+    }
+
+    module.emit('node:disconnected');
+
+    return module.extend({
 
         uid: null,
 
+        isOnline: window.navigator.onLine,
 
         connectToNode: function (host, port) {
 
@@ -41,5 +61,5 @@ define(function (require) {
          */
         broadcast: function (key, data) {
         }
-    }
+    });
 });

@@ -6,11 +6,12 @@
 
 define([
     './computation/index',
+    './crypto/index',
     './network/index',
     './settings',
     './states',
     './storage/index'
-], function (computation, network, settings, states, storage) {
+], function (computation, crypto, network, settings, states, storage) {
 
     "use strict";
 
@@ -27,6 +28,7 @@ define([
         },
 
         computation: computation,
+        crypto: crypto,
         network: network,
         settings: settings,
         states: states,
@@ -37,6 +39,23 @@ define([
 
     musketeer.computation.on('task:start', function (e) {
         console.log('start');
+    });
+
+
+    musketeer.network.on('node:connected', function (e) {
+        console.log('node:connected');
+    });
+
+    musketeer.network.on('node:disconnected', function (e) {
+        console.log('node:disconnected');
+    });
+
+    musketeer.network.on('p2p:connected', function (e) {
+        console.log('p2p:connected');
+    });
+
+    musketeer.network.on('p2p:disconnected', function (e) {
+        console.log('p2p:disconnected');
     });
 
 
