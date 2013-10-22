@@ -4,10 +4,10 @@
  *
  */
 
-define(['q', 'lodash', 'geolocation', 'musketeer-module', './model/node'], function (Q, _, geolocation, MusketeerModule, Node) {
+define(['q', 'lodash', 'geolocation', 'project', 'musketeer-module', './model/node'], function (Q, _, geolocation, project, MusketeerModule, Node) {
 
-    var module = new MusketeerModule(),
-        project,
+    var geoLocation,
+        module = new MusketeerModule(),
         nodes = [],
         peers = [];
 
@@ -34,9 +34,7 @@ define(['q', 'lodash', 'geolocation', 'musketeer-module', './model/node'], funct
         isOnline: window.navigator.onLine,
         nodes: nodes,
 
-        start: function (projectSettings, nodeSettings) {
-
-            project = projectSettings;
+        start: function (nodeSettings) {
 
             //no need to do anything here if we are not online
             if (!this.isOnline) return;
@@ -44,7 +42,7 @@ define(['q', 'lodash', 'geolocation', 'musketeer-module', './model/node'], funct
             //detect geoLocation if needed
             if (project.network.useGeoLocation) {
                 geolocation.getGeoLocation().then(function (location) {
-                    console.log(location);
+                    geoLocation = location;
                 });
             }
 
@@ -92,7 +90,7 @@ define(['q', 'lodash', 'geolocation', 'musketeer-module', './model/node'], funct
 
         },
 
-        getAllProjectRelatedPeersFromConnectedNodes: function (projectUuid) {
+        getAllProjectRelatedPeersFromConnectedNodes: function () {
             var promises = [];
 
             var deferred;

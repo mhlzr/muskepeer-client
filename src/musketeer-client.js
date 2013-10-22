@@ -5,6 +5,7 @@
  */
 
 define([
+    'lodash',
     './computation/index',
     './crypto/index',
     './network/index',
@@ -12,7 +13,7 @@ define([
     './settings',
     './states',
     './storage/index'
-], function (computation, crypto, network, Project, settings, states, storage) {
+], function (_, computation, crypto, network, project, settings, states, storage) {
 
     "use strict";
 
@@ -44,10 +45,11 @@ define([
          */
         start: function (config) {
 
-            this.project = Project.create(config.project);
+            //combine project settings with defaults
+            project = _.defaults(project, config.project);
 
-            network.start(this.project, config.nodes);
-            computation.start(this.project);
+            network.start(config.nodes);
+            computation.start();
 
             return this;
         },
@@ -55,6 +57,7 @@ define([
         computation: computation,
         crypto: crypto,
         network: network,
+        project: project,
         settings: settings,
         states: states,
         storage: storage
