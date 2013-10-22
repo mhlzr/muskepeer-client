@@ -1,43 +1,26 @@
 /**
- * FileStorage
+ * Storage
  * @module Storage
  *
+ * https://github.com/jensarps/IDBWrapper
  * http://www.peterkroener.de/indexed-db-die-neue-html5-datenbank-im-browser-teil-1-ein-kurzer-ueberblick/
  */
 
-define(function (require) {
+define(['musketeer-module', 'idbwrapper'], function (MusketeerModule, IDBStore) {
 
 
-    var _dbName = 'musketeer',
-        _db,
-        _request;
+    var module = new MusketeerModule(),
+        store = new IDBStore({
+            storeName: 'Musketeer',
+            storePrefix: ''
+        }, function storeReadyHandler() {
+            console.log('done');
+        }, function storeErrorHandler(err) {
 
-    //Open/Create Database
-    _request = indexedDB.open(_dbName);
+        });
 
-    _request.onsuccess = function (e) {
-        _db = e.target.result;
-    };
 
-    _request.onupgradeneeded = function () {
-        _db = this.result;
-        if (!hasStore('files')) createStore('files', 'id');
-    };
-
-    _request.onerror = _request.onblocked = function () {
-        console.error('Can\'t create/open database');
-    };
-
-    var hasStore = function (storeName) {
-        return _db && _db.objectStoreNames.contains(storeName);
-    };
-
-    function createStore(title, keypath) {
-        _db.createObjectStore(title, {keyPath: keypath});
-
-    }
-
-    return {
+    return module.extend({
         isValidKey: function (key) {
             //TODO define standard for keys
             return true;
@@ -92,5 +75,5 @@ define(function (require) {
         update: function () {
         }
 
-    }
+    });
 });

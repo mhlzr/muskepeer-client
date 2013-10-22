@@ -8,21 +8,46 @@ define([
     './computation/index',
     './crypto/index',
     './network/index',
+    './project',
     './settings',
     './states',
     './storage/index'
-], function (computation, crypto, network, settings, states, storage) {
+], function (computation, crypto, network, Project, settings, states, storage) {
 
     "use strict";
+
+    function browserFitsRequirements() {
+        return JSON && localStorage && Object.observe && indexedDB && navigator.geolocation;
+    }
 
 
     var musketeer = {
 
+
+        /**
+         * Initiate Musketeer
+         * Tests if browser-requirements are fulfilled.
+         * @returns {musketeer}
+         */
         init: function () {
 
-            function testRequirements() {
-                return JSON && localStorage && Object.observe && indexedDB;
+            if (!browserFitsRequirements()) {
+                throw new Error('Your browser does not fit the requirements');
             }
+
+            return this;
+        },
+        /**
+         * Starts als modules
+         * @param config Configuration-Object
+         * @returns {musketeer}
+         */
+        start: function (config) {
+
+            this.project = Project.create(config.project);
+
+            network.start(this.project, config.nodes);
+            computation.start(this.project);
 
             return this;
         },

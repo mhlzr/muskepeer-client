@@ -4,9 +4,10 @@
  *
  */
 
-define(['musketeer-module'], function (MusketeerModule) {
+define(['q', 'lodash', 'geolocation', 'musketeer-module', './model/node'], function (Q, _, geolocation, MusketeerModule, Node) {
 
     var module = new MusketeerModule(),
+        project,
         nodes = [],
         peers = [];
 
@@ -30,12 +31,57 @@ define(['musketeer-module'], function (MusketeerModule) {
 
     return module.extend({
 
-        uid: null,
-
         isOnline: window.navigator.onLine,
+        nodes: nodes,
 
-        connectToNode: function (host, port) {
+        start: function (projectSettings, nodeSettings) {
 
+            project = projectSettings;
+
+            //no need to do anything here if we are not online
+            if (!this.isOnline) return;
+
+            //detect geoLocation if needed
+            if (project.network.useGeoLocation) {
+                geolocation.getGeoLocation().then(function (location) {
+                    console.log(location);
+                });
+            }
+
+            /*this.connectToNodes(nodeSettings)
+             //then registerForProject(project.uuid)
+             .then(this.getAllProjectRelatedPeersFromConnectedNodes(project.uuid))
+             .then(function (peers) {
+             console.log(peers)
+             });
+             */
+            //then
+            /*
+             node.push(node);
+
+             */
+
+        },
+
+        connectToNodes: function (nodes) {
+            var promises = [];
+
+            var deferred, n;
+            nodes.forEach(function (node) {
+                deferred = Q.defer();
+
+                //create new node
+                n = new Node(node.host, node.port).connect(function () {
+                    deferred.resolve();
+                });
+
+                console.log(n);
+                //push to nodes
+                nodes.push(n);
+                promises.push(deferred.promise);
+            });
+
+            return Q.all(promises);
         },
 
         connectToPeer: function (uid) {
@@ -46,8 +92,19 @@ define(['musketeer-module'], function (MusketeerModule) {
 
         },
 
-        getPeerListFromConnectedNodes: function () {
+        getAllProjectRelatedPeersFromConnectedNodes: function (projectUuid) {
+            var promises = [];
 
+            var deferred;
+            nodes.forEach(function (node) {
+                deferred = Q.defer();
+                node.getAllPeers(function (peers) {
+                    deferred.resolve(peers);
+                });
+                promises.push(deferred.promise);
+
+            });
+            return Q.all(promises);
         },
 
         sendToPeer: function (peerId, key, data) {
@@ -61,5 +118,7 @@ define(['musketeer-module'], function (MusketeerModule) {
          */
         broadcast: function (key, data) {
         }
+
+
     });
 });

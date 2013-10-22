@@ -7,19 +7,19 @@
  * @param storeName String Keyname for the settings object in localStorage
  */
 
-define(function (require) {
+define(['lodash', './uuid'], function (_, uuid) {
 
     var _storeName = 'settings',
         _settings = readSettingsFromLocalStorage();
 
-    //Defaults
-    _settings.projects = _settings.projects || [];
+    //Register Observer
+    Object.observe(_settings, storeSettingsToLocalStorage);
 
-    //Register Oberserver
-   // Object.observe(_settings, storeSettingsToLocalStorage);
-    //Even for all keys
-    Object.keys(_settings).forEach(function (key) {
-       // Object.observe(_settings[key], storeSettingsToLocalStorage)
+    //Defaults
+    _.defaults(_settings, {
+        i18n: 'en_GB',
+        uuid: uuid.generate(),
+        maxWorkers: 2
     });
 
     function readSettingsFromLocalStorage() {
