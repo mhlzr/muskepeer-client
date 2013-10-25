@@ -29,7 +29,7 @@
         "karma-chai-plugins": "~0.1.3",
         "karma-ie-launcher": "~0.1.1",
         "karma-opera-launcher": "~0.1.0",
-        "yuidocjs": "~0.3.45",
+        "yuidocjs": "~0.3.46",
         "karma-browserstack-launcher": "0.0.4"
     }
 }

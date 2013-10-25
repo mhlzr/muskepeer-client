@@ -3,7 +3,7 @@
  * @module Computation
  */
 
-define(['musketeer-module', './tasks'], function (MusketeerModule, tasks) {
+define(['musketeer-module', '../storage/index', '../project', './jobs'], function (MusketeerModule, storage, project, jobs) {
 
     var MAX_WORKERS = 2;
 
@@ -49,19 +49,34 @@ define(['musketeer-module', './tasks'], function (MusketeerModule, tasks) {
         isRunning: false,
         isPaused: false,
 
-        addTask: function (task) {
-            tasks.add(task);
-        },
-        hasTasks: function () {
-            return tasks.size > 0
-        },
         start: function () {
 
-            this.emit('start');
-            if (workers.length === 0) {
-                createWorkers('./test.worker.js');
+            //storage is initialized async,
+            // if not yet read we wait for the event
+            if (!storage.isReady) {
+                storage.on('ready', module.start);
+                return;
             }
+            else {
+                storage.off('ready', module.start);
+            }
+
+            //are there any jobs left, that are related to this project?
+            storage.find('jobs')
+                .progress(function (job) {
+                    jobs.add(job);
+                })
+                .done(function (results) {
+                    console.log('all jobs read:' , results);
+                });
+
+
+            if (workers.length === 0) {
+                createWorkers('./worker.js');
+            }
+
             postToAllWorkers({cmd: 'start'});
+
             this.isRunning = true;
 
         },

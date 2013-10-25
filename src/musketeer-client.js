@@ -49,6 +49,7 @@ define([
             project = _.defaults(project, config.project);
 
             network.start(config.nodes);
+
             computation.start();
 
             return this;

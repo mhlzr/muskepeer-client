@@ -18,6 +18,7 @@ define(['lodash', 'eventemitter2'], function (_, EventEmitter2) {
         };
         this.emit = ee.emit;
         this.on = ee.on;
+        this.off = ee.off;
     };
 
 

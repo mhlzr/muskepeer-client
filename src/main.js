@@ -1,5 +1,6 @@
 require.config({
     paths: {
+        'domready': 'lib/requirejs-domready/domReady',
         'lodash': 'lib/lodash/dist/lodash',
         'eventemitter2': 'lib/eventemitter2/lib/eventemitter2',
         'idbwrapper': 'lib/idbwrapper/idbstore',
@@ -15,7 +16,7 @@ require.config({
     }
 });
 
-require(['musketeer-client'], function (Musketeer) {
+require(['musketeer-client', 'domready'], function (Musketeer) {
 
     window.Musketeer = Musketeer.init();
 
@@ -32,6 +33,7 @@ require(['musketeer-client'], function (Musketeer) {
             },
 
             computation: {
+                hasDependingTasks: false,
                 hasFiniteTasks: true,
                 hasDataFiles: false,
                 validationIterations: -1 //-1 : Inifinite, 0 : None; >0 : Amount,
