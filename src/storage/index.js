@@ -28,7 +28,7 @@ define(['lodash', 'q', 'uuid', 'project', 'musketeer-module', 'idbwrapper'], fun
 
 
         function createStores() {
-            var storeNames = ['results', 'jobs', 'files'],
+            var storeNames = ['results', 'jobs', 'files', 'nodes'],
                 promises = [];
 
             var deferred;
@@ -119,16 +119,17 @@ define(['lodash', 'q', 'uuid', 'project', 'musketeer-module', 'idbwrapper'], fun
             },
 
             /**
-             * Executes a query object
+             * LIst all items from a store
              * @param storeName
-             * @param queryObject
+             * @param options
+             * @param keyRangeOptions
              * @returns {Promise}
              */
-            find: function (storeName, queryObject) {
+            list: function (storeName, options, keyRangeOptions, filterObject) {
                 var deferred = Q.defer(),
                     store = getStoreByName(storeName),
                     results = [],
-                    queryDefaults = {
+                    defaultOptions = {
                         index: 'project',
                         order: 'ASC',
                         filterDuplicates: false,
@@ -141,27 +142,72 @@ define(['lodash', 'q', 'uuid', 'project', 'musketeer-module', 'idbwrapper'], fun
                         }
                     };
 
+
                 //if nothing was passed
-                queryObject = queryObject || {};
+                options = options || {};
 
                 //disallow overwriting callbacks from the outside
-                if (queryObject && queryObject.onEnd) queryObject.onEnd = undefined;
-                if (queryObject && queryObject.onError) queryObject.onError = undefined;
+                if (options && options.onEnd) options.onEnd = undefined;
+                if (options && options.onError) options.onError = undefined;
 
                 //merge with defaults
-                queryObject = _.defaults(queryObject, queryDefaults);
+                options = _.defaults(options, defaultOptions);
 
+                //add keyRange if passed
+                if (keyRangeOptions) {
+                    options.keyRange = store.makeKeyRange(keyRangeOptions);
+                }
 
                 store.iterate(function onItem(item) {
+
+                    //test/reduce the found objects
+                    if (filterObject) {
+                        for (var key in filterObject) {
+                            //does the property exist?
+                            if (!item.hasOwnProperty(key)) {
+                                return;
+                            }
+                            else {
+                                //do the values match?
+                                if (item[key] !== filterObject[key]) {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+
                     deferred.notify(item);
                     results.push(item);
-                }, queryObject);
+
+                }, options);
 
                 return deferred.promise;
             },
 
             /**
-             * Save data to indexedDb
+             * Uses list() and reduces matches by indexedDB.keyranges
+             * @param storeName
+             * @param options
+             * @param keyRangeOptions
+             * @returns {Promise}
+             */
+            findAndReduceByKeyRange: function (storeName, options, keyRangeOptions) {
+                return this.list(storeName, options, keyRangeOptions);
+            },
+
+            /**
+             * Uses list() and reduces matches by a filterObject
+             * @param storeName
+             * @param options
+             * @param filterObject
+             * @returns {Promise}
+             */
+            findAndReduceByObject: function (storeName, options, filterObject) {
+                return this.list(storeName, options, null, filterObject);
+            },
+
+            /**
+             * Save data to indexedDb, if not uuid is set it will be added automatically
              * @param storeName
              * @param data
              * @returns {Promise}
@@ -206,7 +252,23 @@ define(['lodash', 'q', 'uuid', 'project', 'musketeer-module', 'idbwrapper'], fun
             },
 
             /**
-             *
+             * Save Mutiple objects to a shared store
+             * @param storeName
+             * @param datasets Array
+             * @returns {Promise}
+             */
+            saveMultiple: function (storeName, datasets) {
+                var promises = [];
+
+                datasets.forEach(function (dataset) {
+                    promises.push(module.save(storeName, dataset));
+                });
+
+                return Q.all(promises);
+            },
+
+            /**
+             * Remove an existing dataset
              * @param storeName
              * @param key
              * @returns {Promise}

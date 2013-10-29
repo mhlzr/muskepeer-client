@@ -21,9 +21,15 @@ define([
         return JSON && localStorage && Object.observe && indexedDB && navigator.geolocation;
     }
 
-
     var musketeer = {
 
+        computation: computation,
+        crypto: crypto,
+        network: network,
+        project: project,
+        settings: settings,
+        states: states,
+        storage: storage,
 
         /**
          * Initiate Musketeer
@@ -36,58 +42,79 @@ define([
                 throw new Error('Your browser does not fit the requirements');
             }
 
-            return this;
+            return musketeer;
         },
         /**
-         * Starts als modules
+         * Start Musketeer
          * @param config Configuration-Object
          * @returns {musketeer}
          */
         start: function (config) {
 
+            if (config) {
+                musketeer.config = config;
+            }
+
+            //storage is initialized async,
+            //if not yet read, we wait for the event
+            if (!storage.isReady) {
+                storage.on('ready', musketeer.start);
+                return this;
+            }
+            else {
+                storage.off('ready', musketeer.start);
+            }
+
             //combine project settings with defaults
-            project = _.defaults(project, config.project);
+            project = _.defaults(project, musketeer.config.project);
 
-            network.start(config.nodes);
+            //store node configuration
+            storage.saveMultiple('nodes', musketeer.config.nodes)
+                .then(function () {
+                    network.start();
+                    computation.start();
+                });
 
-            computation.start();
 
-            return this;
+            return musketeer;
         },
 
-        computation: computation,
-        crypto: crypto,
-        network: network,
-        project: project,
-        settings: settings,
-        states: states,
-        storage: storage
+        /**
+         * Stop Musketeer
+         */
+        stop: function () {
+            musketeer.computation.stop();
+            musketeer.network.stop();
+            return musketeer;
+
+        }
+
 
     };
 
-
-    musketeer.computation.on('task:start', function (e) {
-        console.log('start');
-    });
-
-
-    musketeer.network.on('node:connected', function (e) {
-        console.log('node:connected');
-    });
-
-    musketeer.network.on('node:disconnected', function (e) {
-        console.log('node:disconnected');
-    });
-
-    musketeer.network.on('p2p:connected', function (e) {
-        console.log('p2p:connected');
-    });
-
-    musketeer.network.on('p2p:disconnected', function (e) {
-        console.log('p2p:disconnected');
-    });
+    /*
+     musketeer.computation.on('task:start', function (e) {
+     console.log('start');
+     });
 
 
+     musketeer.network.on('node:connected', function (e) {
+     console.log('node:connected');
+     });
+
+     musketeer.network.on('node:disconnected', function (e) {
+     console.log('node:disconnected');
+     });
+
+     musketeer.network.on('p2p:connected', function (e) {
+     console.log('p2p:connected');
+     });
+
+     musketeer.network.on('p2p:disconnected', function (e) {
+     console.log('p2p:disconnected');
+     });
+
+     */
     return musketeer;
 
 });
