@@ -23,7 +23,7 @@
     "modernizr": "~2.6.2",
     "idbwrapper": "~1.4.0",
     "node-uuid": "~1.4.1",
-    "socket.io-client": "~0.9.16",
-    "requirejs-domready": "~2.0.1"
+    "requirejs-domready": "~2.0.1",
+    "sockjs": "~0.3.4"
   }
 }

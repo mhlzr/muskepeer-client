@@ -8,7 +8,7 @@ require.config({
         'observe-shim': 'lib/observe-shim/lib/observe-shim',
         'q': 'lib/q/q',
         'sjcl': 'lib/sjcl/sjcl',
-        'socket-io': 'lib/socket.io-client/dist/socket.io'
+        'sockjs': 'lib/sockjs/sockjs'
 
     },
     shim: {

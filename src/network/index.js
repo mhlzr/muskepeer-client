@@ -4,12 +4,12 @@
  *
  */
 
-define(['q', 'lodash', 'geolocation', 'project', 'musketeer-module', './model/node'], function (Q, _, geolocation, project, MusketeerModule, Node) {
+define(['q', 'lodash', 'storage/index', 'geolocation', 'project', 'settings', 'musketeer-module', './model/node'], function (Q, _, storage, geolocation, project, settings, MusketeerModule, Node) {
 
-    var geoLocation,
-        module = new MusketeerModule(),
-        nodes = [],
-        peers = [];
+    var _geoLocation,
+        _module = new MusketeerModule(),
+        _nodes = [],
+        _peers = [];
 
     // Detect network change
     // http://www.html5rocks.com/en/mobile/workingoffthegrid/
@@ -19,32 +19,48 @@ define(['q', 'lodash', 'geolocation', 'project', 'musketeer-module', './model/no
     function networkConnectivityStateChangeHandler(e) {
         if (e.type === 'online') {
             console.log('online');
-            module.emit('node:connected');
+            _module.emit('node:connected');
         }
         else {
             console.log('offline');
-            module.emit('node:disconnected');
+            _module.emit('node:disconnected');
         }
     }
 
-    module.emit('node:disconnected');
 
-    return module.extend({
+    return _module.extend({
 
         isOnline: window.navigator.onLine,
-        nodes: nodes,
+        nodes: _nodes,
 
-        start: function (nodeSettings) {
+        start: function () {
 
-            //no need to do anything here if we are not online
-            if (!this.isOnline) return;
+
+
+            //no need to do anything more if we are not online
+            if (!_module.isOnline) return;
 
             //detect geoLocation if needed
             if (project.network.useGeoLocation) {
                 geolocation.getGeoLocation().then(function (location) {
-                    geoLocation = location;
+                    _geoLocation = location;
                 });
             }
+
+            //get all nodes related to this project via proectUuid
+            storage.findAndReduceByObject('nodes', {filterDuplicates: true}, {projectUuid: project.uuid}).
+                then(function (nodeSettings) {
+                    return _module.createAndConnectToNodes(nodeSettings);
+                })
+                .then(function (nodes) {
+                    _nodes = nodes;
+                    return _module.sendAuthenticationToNodes(_nodes);
+                })
+
+                .done(function () {
+                    console.log('COMPLETE')
+                });
+
 
             /*this.connectToNodes(nodeSettings)
              //then registerForProject(project.uuid)
@@ -61,25 +77,45 @@ define(['q', 'lodash', 'geolocation', 'project', 'musketeer-module', './model/no
 
         },
 
-        connectToNodes: function (nodes) {
+        stop: function () {
+
+        },
+
+        createAndConnectToNodes: function (settings) {
             var promises = [];
 
-            var deferred, n;
-            nodes.forEach(function (node) {
+            var deferred, node;
+            settings.forEach(function (setting) {
                 deferred = Q.defer();
 
                 //create new node
-                n = new Node(node.host, node.port).connect(function () {
-                    deferred.resolve();
+                node = new Node(setting.host, setting.port).connect(function () {
+                    deferred.resolve(node);
                 });
 
-                console.log(n);
-                //push to nodes
-                nodes.push(n);
                 promises.push(deferred.promise);
             });
 
             return Q.all(promises);
+        },
+
+        sendAuthenticationToNodes: function (nodes) {
+
+            var promises = [];
+
+            var deferred;
+            nodes.forEach(function (node) {
+                deferred = Q.defer();
+                node.sendAuthentication()
+                    .then(function () {
+                        return node.getAllPeers()
+                    }).then(deferred.resolve);
+                promises.push(deferred.promise);
+
+            });
+
+            return Q.all(promises);
+
         },
 
         connectToPeer: function (uid) {

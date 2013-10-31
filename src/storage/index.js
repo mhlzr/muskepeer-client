@@ -123,6 +123,7 @@ define(['lodash', 'q', 'uuid', 'project', 'musketeer-module', 'idbwrapper'], fun
              * @param storeName
              * @param options
              * @param keyRangeOptions
+             * @param filterObject
              * @returns {Promise}
              */
             list: function (storeName, options, keyRangeOptions, filterObject) {
@@ -134,7 +135,7 @@ define(['lodash', 'q', 'uuid', 'project', 'musketeer-module', 'idbwrapper'], fun
                         order: 'ASC',
                         filterDuplicates: false,
                         writeAccess: false,
-                        onEnd: function (results) {
+                        onEnd: function () {
                             deferred.resolve(results)
                         },
                         onError: function (error) {

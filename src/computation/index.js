@@ -22,7 +22,7 @@ define(['musketeer-module', '../storage/index', '../project', './jobs'], functio
     }
 
     function workerMessageHandler(e) {
-        console.log(e.data);
+        //console.log(e.data);
     }
 
     function workerErrorHandler(e) {
@@ -51,23 +51,13 @@ define(['musketeer-module', '../storage/index', '../project', './jobs'], functio
 
         start: function () {
 
-            //storage is initialized async,
-            // if not yet read we wait for the event
-            if (!storage.isReady) {
-                storage.on('ready', module.start);
-                return;
-            }
-            else {
-                storage.off('ready', module.start);
-            }
-
             //are there any jobs left, that are related to this project?
             storage.find('jobs')
                 .progress(function (job) {
                     jobs.add(job);
                 })
                 .done(function (results) {
-                    console.log('all jobs read:' , results);
+                    console.log('all jobs read:', results);
                 });
 
 
