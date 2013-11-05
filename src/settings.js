@@ -18,7 +18,8 @@ define(['lodash', './uuid'], function (_, uuid) {
     //Defaults
     _.defaults(_settings, {
         i18n: 'en_GB',
-        uuid: uuid.generate(),
+        uuid: uuid.generate(), //everyone will know (public)
+        authToken: uuid.generate(), //will never be sent to any peer (private)
         maxWorkers: 2
     });
 

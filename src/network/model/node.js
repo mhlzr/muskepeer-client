@@ -10,19 +10,22 @@ define(['lodash', 'q', 'settings', 'project'], function (_, Q, settings, project
 
     function messageHandler(e) {
         var data = JSON.parse(e.data);
-        console.log(data);
+        console.log('RECEIVED:', data);
     }
 
-    var Node = function (host, port) {
+    var Node = function (config) {
 
         _self = this;
+
+        this.host = config.host || 'localhost';
+        this.port = config.port || 8080;
+        this.uuid = config.uuid;
 
         this.isConnected = false;
 
         this.connect = function (callback) {
 
-
-            _socket = new WebSocket('ws://' + host + ':' + port);
+            _socket = new WebSocket('ws://' + this.host + ':' + this.port);
 
             //add listeners
             _socket.addEventListener('message', messageHandler);
@@ -31,11 +34,10 @@ define(['lodash', 'q', 'settings', 'project'], function (_, Q, settings, project
                 callback();
             });
 
-            _socket.addEventListener('close', function () {
-                _self.isConnected = false;
-                console.log('CLOSED');
+            _socket.addEventListener('close', function (e) {
+                _self.disconnect();
+                console.info('Connection closed.', e.reason);
             });
-
 
             return this;
         };
@@ -46,7 +48,9 @@ define(['lodash', 'q', 'settings', 'project'], function (_, Q, settings, project
             return _self;
         };
 
-        this.send = function (cmd, data) {
+        this.send = function (cmd, data, waitForResponse) {
+
+
             var deferred = Q.defer();
 
             if (!_self.isConnected) {
@@ -67,21 +71,30 @@ define(['lodash', 'q', 'settings', 'project'], function (_, Q, settings, project
             //add cmd to data
             data.cmd = cmd;
 
+            //send data to websocket as String
             _socket.send(JSON.stringify(data));
 
-            deferred.resolve();
+
+            //if we need to wait for the answer
+            if (waitForResponse) {
+                _socket.addEventListener('message', function (e) {
+                    //TODO change this to be abale to unregister eventListener
+                    var response = JSON.parse(e.data);
+                    if (response.cmd === cmd) deferred.resolve(response.data);
+                })
+            } else {
+                deferred.resolve();
+            }
 
             return deferred.promise;
         };
 
         this.sendAuthentication = function () {
-            return this.send('peer:auth', {uuid: settings.uuid, location: {lat: 0, long: 0}});
-
-
+            return this.send('peer:auth', {uuid: settings.uuid, authToken: settings.authToken, location: {lat: 0, long: 0}}, true);
         };
 
-        this.getAllPeers = function () {
-            return this.send('peer:list', {projectUuid: project.uuid});
+        this.getAllRelatedPeers = function () {
+            return this.send('peer:list', {projectUuid: project.uuid}, true);
         }
 
     };

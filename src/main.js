@@ -46,7 +46,11 @@ require(['musketeer-client', 'domready'], function (Musketeer) {
             {
                 host: '127.0.0.1',
                 port: 8080
-            }
+            }/*,
+            {
+                host: '192.168.178.21',
+                port: 8080
+            }*/
         ]
     });
 
