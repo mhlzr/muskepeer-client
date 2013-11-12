@@ -3,14 +3,16 @@
  * @date 05.11.13
  */
 
-define(['q', 'lodash', 'settings', '../model/peer'], function (Q, _, settings, Peer) {
-    var _peers = [],
+define(['q', 'lodash', 'settings', '../../musketeer-module', '../model/peer'], function (Q, _, settings, MusketeerModule, Peer) {
+
+    var module = new MusketeerModule(),
+        _peers = [],
         _nextPeer,
-        _previousPeer,
-        _ownPeer;
+        _previousPeer;
 
     function findNextPeer() {
         //TODO algorithm
+
         return _peers.shift();
     }
 
@@ -19,40 +21,45 @@ define(['q', 'lodash', 'settings', '../model/peer'], function (Q, _, settings, P
         return _peers.pop();
     }
 
-    return {
+    return module.extend({
 
-        hasConnections: false,
+        list: _peers,
+        add: function (peer) {
+            //TODO check if no already existsent
+            _peers.push(peer);
+        },
+
         connect: function (peers) {
 
-            //pass peers, elsewhise will take all
+            //pass peers, otherwise will take all
             peers = peers || _peers;
 
             var promises = [];
 
             peers.forEach(function (peer) {
-                promises.push(peer.connect());
+                promises.push(peer.createConnection());
             });
 
             return Q.all(promises);
         },
 
-        connectToNeighbours: function () {
-            return this.connect([_nextPeer, _previousPeer]);
-        },
-        getOwnPeer: function () {
-            return _ownPeer;
+        connectToNeighbourPeers: function () {
+            return module.connect([_nextPeer, _previousPeer]);
         },
 
-        getById: function () {
-            return null;
+
+        getPeerByUuid: function (uuid) {
+            return _.find(_peers, function (peer) {
+                return peer.uuid === uuid;
+            });
         },
 
-        getNext: function () {
+        getNextPeer: function () {
             if (!_nextPeer) _nextPeer = findNextPeer();
             return _nextPeer;
         },
 
-        getPrevious: function () {
+        getPreviousPeer: function () {
             if (!_previousPeer) _previousPeer = findPreviousPeer();
             return _previousPeer;
         },
@@ -60,25 +67,25 @@ define(['q', 'lodash', 'settings', '../model/peer'], function (Q, _, settings, P
 
         update: function (peerData) {
 
-            //multidimensional array form multple nodes
+            //multidimensional array form multiple nodes
             peerData = _.flatten(peerData);
 
             //TODO save nodeUuid for multiple
 
             peerData.forEach(function (data) {
 
-                //maken sure it's not self
+                //make sure it's not self
                 if (data.uuid !== settings.uuid) {
                     _peers.push(new Peer(data));
-                }
-                //self
-                else if (!_ownPeer) {
-                    _ownPeer = new Peer(data);
                 }
 
             });
 
             //TODO sort peers
         }
-    };
+
+
+
+
+    });
 });

@@ -3,22 +3,46 @@
  * @date 17.10.13
  */
 
-define(['lodash', 'q', 'settings', 'project'], function (_, Q, settings, project) {
+define(['lodash', 'q', 'eventemitter2', 'settings', 'project'], function (_, Q, EventEmitter2, settings, project) {
 
     var _self,
-        _socket;
+        _socket,
+        ee = new EventEmitter2({
+            wildcard: true,
+            delimiter: ':',
+            newListener: false,
+            maxListeners: 10
+        });
 
     function messageHandler(e) {
-        var data = JSON.parse(e.data);
-        console.log('RECEIVED:', data);
+        var data = JSON.parse(e.data),
+            cmd = data.cmd;
+
+        logger.log('Node received', data);
+
+        switch (cmd.toLowerCase()) {
+            case 'peer:offer' :
+                _self.emit('peer:offer', {nodeUuid: _self.uuid, targetPeerUuid: data.data.targetPeerUuid, offer: data.data.offer});
+                break;
+            case 'peer:answer' :
+                _self.emit('peer:answer', {nodeUuid: _self.uuid, targetPeerUuid: data.data.targetPeerUuid, answer: data.data.answer});
+                break;
+        }
     }
 
     var Node = function (config) {
 
         _self = this;
 
+        //events
+        this.emit = ee.emit;
+        this.on = ee.on;
+        this.off = ee.off;
+        this.onAny = ee.onAny;
+
         this.host = config.host || 'localhost';
         this.port = config.port || 8080;
+        this.url = null; //set via WS
         this.uuid = config.uuid;
 
         this.isConnected = false;
@@ -26,6 +50,8 @@ define(['lodash', 'q', 'settings', 'project'], function (_, Q, settings, project
         this.connect = function (callback) {
 
             _socket = new WebSocket('ws://' + this.host + ':' + this.port);
+
+            _self.url = _socket.url;
 
             //add listeners
             _socket.addEventListener('message', messageHandler);
@@ -70,6 +96,8 @@ define(['lodash', 'q', 'settings', 'project'], function (_, Q, settings, project
 
             //add cmd to data
             data.cmd = cmd;
+            //add auth token
+            data.authToken = settings.authToken;
 
             //send data to websocket as String
             _socket.send(JSON.stringify(data));
@@ -90,7 +118,15 @@ define(['lodash', 'q', 'settings', 'project'], function (_, Q, settings, project
         };
 
         this.sendAuthentication = function () {
-            return this.send('peer:auth', {uuid: settings.uuid, authToken: settings.authToken, location: {lat: 0, long: 0}}, true);
+            return this.send('peer:auth', {uuid: settings.uuid, location: {lat: 0, long: 0}}, true);
+        };
+
+        this.sendPeerOffer = function (targetPeerUuid, offer) {
+            return this.send('peer:offer', {uuid: settings.uuid, targetPeerUuid: targetPeerUuid, offer: offer}, false);
+        };
+
+        this.sendPeerAnswer = function (targetPeerUuid, answer) {
+            return this.send('peer:answer', {uuid: settings.uuid, targetPeerUuid: targetPeerUuid, answer: answer}, false);
         };
 
         this.getAllRelatedPeers = function () {

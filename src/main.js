@@ -16,9 +16,11 @@ require.config({
     }
 });
 
-require(['musketeer-client', 'domready'], function (Musketeer) {
+require(['musketeer-client', 'util/logger', 'domready'], function (Musketeer, Logger) {
 
     window.Musketeer = Musketeer.init();
+
+    window.logger = Logger;
 
     Musketeer.start({
         project: {
