@@ -40,6 +40,11 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'musketeer-module
             peer.acceptConnection(data);
         }
 
+        function peerCandidateHandler(data) {
+            var peer = peers.getPeerByUuid(data.targetPeerUuid);
+            peer.addCandidate(data);
+        }
+
 
         return _module.extend({
 
@@ -56,6 +61,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'musketeer-module
                 //peer listeners
                 nodes.on('peer:offer', peerOfferHandler);
                 nodes.on('peer:answer', peerAnswerHandler);
+                nodes.on('peer:candidate', peerCandidateHandler);
 
                 //get all nodes related to this project via proectUuid
                 storage.findAndReduceByObject('nodes', {filterDuplicates: true}, {projectUuid: project.uuid}).

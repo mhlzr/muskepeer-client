@@ -24,24 +24,55 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
             }
         };
 
-    var _self, _connection;
+    var _self, _connection, _channel;
 
 
-    /* EVENT HANDLER */
     function iceCandidateHandler(e) {
+        //II. The handler is called when network candidates become available.
+        if (!e || !e.candidate) return;
+
+        // III. In the handler, Alice sends stringified candidate data to Eve, via their signaling channel.
+        var signal = getSignalChannel(_self);
+        signal.sendPeerCandidate(_self.uuid, e.candidate);
+
     }
 
     function iceConnectionStateChangeHandler(e) {
-
+        //logger.log('Peer:iceConnectionStateChangeHandler', e);
     }
 
     function negotiationNeededHandler(e) {
+        //logger.log('Peer:negotiationNeededHandler', e);
     }
 
     function dataChannelHandler(e) {
+        //logger.log('Peer:dataChannelHandler', e);
     }
 
-    function createAnswer() {
+    function channelMessageHandler(e) {
+        logger.log('Peer received', e.data);
+    }
+
+    function channelOpenHandler(e) {
+        logger.log('Peer: Channel to ' + _self.uuid + ' is open');
+        _self.isConnected = true;
+
+        if (_self.isSource) {
+            _channel.send('message send to target');
+        }
+
+        if (_self.isTarget) {
+            _channel.send('message send to source');
+        }
+
+
+    }
+
+    function channelErrorHandler(e) {
+    }
+
+    function channelCloseHandler(e) {
+        _self.isConnected = false;
     }
 
 
@@ -92,13 +123,32 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
         //1.Alice creates an RTCPeerConnection object.
         _connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, OPTIONAL_SETTINGS);
 
+        //I. Alice creates an RTCPeerConnection object with an onicecandidate handler.
+
+        //add listeners to connection
+        _connection.ondatachannel = dataChannelHandler;
+        _connection.onicecandidate = iceCandidateHandler;
+        _connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
+        _connection.onnegotiationneeded = negotiationNeededHandler;
+
+        //create  data-channel
+        _channel = _connection.createDataChannel('RTCDataChannel', {
+            reliable: false
+        });
+
+        //add listeners to channel
+        _channel.onclose = channelCloseHandler;
+        _channel.onerror = channelErrorHandler;
+        _channel.onmessage = channelMessageHandler;
+        _channel.onopen = channelOpenHandler;
+
+
         /**
          * Create a WebRTC-Connection
-         * @param targetPeer
          */
         this.createConnection = function () {
-            this.isSource = true;
-            this.isTarget = false;
+            _self.isSource = true;
+            _self.isTarget = false;
 
             var deferred = Q.defer,
                 signal = getSignalChannel(_self);
@@ -116,7 +166,7 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
             }, null, MEDIA_CONSTRAINTS);
 
 
-            return deferred.promise
+            return deferred.promise;
 
         };
 
@@ -127,8 +177,6 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
          * @returns {promise|*}
          */
         this.answerOffer = function (data) {
-
-            _self.isTarget = true;
 
             var deferred = Q.defer,
                 signal = getSignalChannel(_self);
@@ -166,6 +214,14 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
             _connection.setRemoteDescription(new RTCSessionDescription(data.answer));
 
         };
+
+        /**
+         * Add candidate info to connection
+         * @param data
+         */
+        this.addCandidate = function (data) {
+            _connection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
     };
 
     return Peer;

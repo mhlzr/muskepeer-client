@@ -27,6 +27,9 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project'], function (_, Q, 
             case 'peer:answer' :
                 _self.emit('peer:answer', {nodeUuid: _self.uuid, targetPeerUuid: data.data.targetPeerUuid, answer: data.data.answer});
                 break;
+            case 'peer:candidate' :
+                _self.emit('peer:candidate', {nodeUuid: _self.uuid, targetPeerUuid: data.data.targetPeerUuid, candidate: data.data.candidate});
+                break;
         }
     }
 
@@ -127,6 +130,10 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project'], function (_, Q, 
 
         this.sendPeerAnswer = function (targetPeerUuid, answer) {
             return this.send('peer:answer', {uuid: settings.uuid, targetPeerUuid: targetPeerUuid, answer: answer}, false);
+        };
+
+        this.sendPeerCandidate = function (targetPeerUuid, candidate) {
+            return this.send('peer:candidate', {uuid: settings.uuid, targetPeerUuid: targetPeerUuid, candidate: candidate}, false);
         };
 
         this.getAllRelatedPeers = function () {
