@@ -46,7 +46,7 @@ require(['musketeer-client', 'util/logger', 'domready'], function (Musketeer, Lo
             }},
         nodes: [
             {
-                host: '127.0.0.1',
+                host: '192.168.178.26',
                 port: 8080
             }/*,
             {
@@ -56,6 +56,9 @@ require(['musketeer-client', 'util/logger', 'domready'], function (Musketeer, Lo
         ]
     });
 
+
     console.log(Musketeer);
+
+    document.write(Musketeer.settings.uuid);
 });
 

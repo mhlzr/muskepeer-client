@@ -92,7 +92,10 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'musketeer-module
              * @param key
              * @param data
              */
-            broadcast: function (key, data) {
+            broadcast: function (data) {
+                peers.list.forEach(function (peer) {
+                    peer.send(data);
+                });
             }
 
 

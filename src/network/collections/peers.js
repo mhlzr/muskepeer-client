@@ -24,8 +24,9 @@ define(['q', 'lodash', 'settings', '../../musketeer-module', '../model/peer'], f
     return module.extend({
 
         list: _peers,
+
         add: function (peer) {
-            //TODO check if no already existsent
+            //TODO check if no already existent
             _peers.push(peer);
         },
 
@@ -36,7 +37,7 @@ define(['q', 'lodash', 'settings', '../../musketeer-module', '../model/peer'], f
 
             var promises = [];
 
-            peers.forEach(function (peer) {
+            _.each(peers, function (peer) {
                 promises.push(peer.createConnection());
             });
 
@@ -76,7 +77,7 @@ define(['q', 'lodash', 'settings', '../../musketeer-module', '../model/peer'], f
 
                 //make sure it's not self
                 if (data.uuid !== settings.uuid) {
-                    _peers.push(new Peer(data));
+                    module.add(new Peer(data));
                 }
 
             });

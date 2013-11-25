@@ -65,7 +65,7 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project'], function (_, Q, 
 
             _socket.addEventListener('close', function (e) {
                 _self.disconnect();
-                console.info('Connection closed.', e.reason);
+                logger.log('Node connection closed', e.reason);
             });
 
             return this;
@@ -109,7 +109,7 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project'], function (_, Q, 
             //if we need to wait for the answer
             if (waitForResponse) {
                 _socket.addEventListener('message', function (e) {
-                    //TODO change this to be abale to unregister eventListener
+                    //TODO change this to be able to unregister eventListener
                     var response = JSON.parse(e.data);
                     if (response.cmd === cmd) deferred.resolve(response.data);
                 })

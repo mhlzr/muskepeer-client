@@ -24,79 +24,6 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
             }
         };
 
-    var _self, _connection, _channel;
-
-
-    function iceCandidateHandler(e) {
-        //II. The handler is called when network candidates become available.
-        if (!e || !e.candidate) return;
-
-        // III. In the handler, Alice sends stringified candidate data to Eve, via their signaling channel.
-        var signal = getSignalChannel(_self);
-        signal.sendPeerCandidate(_self.uuid, e.candidate);
-
-    }
-
-    function iceConnectionStateChangeHandler(e) {
-        //logger.log('Peer:iceConnectionStateChangeHandler', e);
-    }
-
-    function negotiationNeededHandler(e) {
-        //logger.log('Peer:negotiationNeededHandler', e);
-    }
-
-    function dataChannelHandler(e) {
-        //logger.log('Peer:dataChannelHandler', e);
-    }
-
-    function channelMessageHandler(e) {
-        logger.log('Peer received', e.data);
-    }
-
-    function channelOpenHandler(e) {
-        logger.log('Peer: Channel to ' + _self.uuid + ' is open');
-        _self.isConnected = true;
-
-        if (_self.isSource) {
-            _channel.send('message send to target');
-        }
-
-        if (_self.isTarget) {
-            _channel.send('message send to source');
-        }
-
-
-    }
-
-    function channelErrorHandler(e) {
-    }
-
-    function channelCloseHandler(e) {
-        _self.isConnected = false;
-    }
-
-
-    /**
-     * Find a signaling-channel two a given peer
-     * @param peer
-     * @returns Node
-     */
-    function getSignalChannel(peer) {
-        var signal;
-
-        //TODO create signaling via p2p network if possible, so no need for a node
-
-        signal = _.intersection(nodes.getNodeUuidsAsArray(), peer.nodes);
-
-        //get a sharedNode that we are connected to
-        do {
-            signal = nodes.getNodeByUuid(signal.shift());
-        }
-        while (!signal.isConnected);
-
-        return signal;
-    }
-
 
     /**
      * Factory for RTCPeerConnection
@@ -111,7 +38,7 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
 
     var Peer = function (config) {
 
-        _self = this;
+        var _connection, _channel;
 
         this.isConnected = false;
         this.isSource = config.isSource || false;
@@ -120,39 +47,113 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
         this.location = config.location;
         this.nodes = config.nodes || [];
 
+
+        this.channelErrorHandler = function (e) {
+        };
+
+        this.channelCloseHandler = function (e) {
+            this.isConnected = false;
+        };
+
+        this.iceCandidateHandler = function (e) {
+            //II. The handler is called when network candidates become available.
+            if (!e || !e.candidate) return;
+
+            // III. In the handler, Alice sends stringified candidate data to Eve, via their signaling channel.
+            var signal = this.getSignalChannel();
+            signal.sendPeerCandidate(this.uuid, e.candidate);
+
+        };
+
+        this.iceConnectionStateChangeHandler = function (e) {
+            //logger.log('Peer:iceConnectionStateChangeHandler', e);
+        };
+
+        this.negotiationNeededHandler = function (e) {
+            //logger.log('Peer:negotiationNeededHandler', e);
+        };
+
+        this.dataChannelHandler = function (e) {
+            //logger.log('Peer:dataChannelHandler', e);
+        };
+
+        this.channelMessageHandler = function (e) {
+            logger.log('Peer received', e.data);
+        };
+
+        this.channelOpenHandler = function (e) {
+            logger.log('Peer: Channel to ' + this.uuid + ' is open');
+            this.isConnected = true;
+
+            if (this.isSource) {
+                _channel.send('message send to target');
+            }
+
+            if (this.isTarget) {
+                _channel.send('message send to source');
+            }
+
+        };
+
+        /**
+         * Find a signaling-channel two a given peer
+         * @returns Node
+         */
+        this.getSignalChannel = function () {
+            var signal;
+
+            //TODO create signaling via p2p network if possible, so no need for a node
+
+            signal = _.intersection(nodes.getNodeUuidsAsArray(), this.nodes);
+
+            //get a sharedNode that we are connected to
+            do {
+                signal = nodes.getNodeByUuid(signal.shift());
+            }
+            while (!signal.isConnected);
+
+            return signal;
+        };
+
+
         //1.Alice creates an RTCPeerConnection object.
         _connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, OPTIONAL_SETTINGS);
 
         //I. Alice creates an RTCPeerConnection object with an onicecandidate handler.
 
+        //bind this for event-handlers
+        _.bindAll(this, 'iceCandidateHandler', 'iceConnectionStateChangeHandler', 'negotiationNeededHandler',
+            'dataChannelHandler', 'channelMessageHandler', 'channelOpenHandler', 'channelErrorHandler', 'channelCloseHandler');
+
         //add listeners to connection
-        _connection.ondatachannel = dataChannelHandler;
-        _connection.onicecandidate = iceCandidateHandler;
-        _connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
-        _connection.onnegotiationneeded = negotiationNeededHandler;
+        _connection.ondatachannel = this.dataChannelHandler;
+        _connection.onicecandidate = this.iceCandidateHandler;
+        _connection.oniceconnectionstatechange = this.iceConnectionStateChangeHandler;
+        _connection.onnegotiationneeded = this.negotiationNeededHandler;
 
         //create  data-channel
-        _channel = _connection.createDataChannel('RTCDataChannel', {
+        _channel = _connection.createDataChannel('RTCDataChannel' + Math.random() * 1000 | 0, {
             reliable: false
         });
 
         //add listeners to channel
-        _channel.onclose = channelCloseHandler;
-        _channel.onerror = channelErrorHandler;
-        _channel.onmessage = channelMessageHandler;
-        _channel.onopen = channelOpenHandler;
+        _channel.onclose = this.channelCloseHandler;
+        _channel.onerror = this.channelErrorHandler;
+        _channel.onmessage = this.channelMessageHandler;
+        _channel.onopen = this.channelOpenHandler;
 
 
         /**
          * Create a WebRTC-Connection
          */
         this.createConnection = function () {
-            _self.isSource = true;
-            _self.isTarget = false;
+            var uuid = this.uuid;
+
+            this.isSource = true;
+            this.isTarget = false;
 
             var deferred = Q.defer,
-                signal = getSignalChannel(_self);
-
+                signal = this.getSignalChannel();
 
             //2. Alice creates an offer (an SDP session description) with the RTCPeerConnection createOffer() method.
             _connection.createOffer(function (sessionDescription) {
@@ -161,7 +162,7 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
                 _connection.setLocalDescription(sessionDescription);
 
                 //4. Alice stringifies the offer and uses a signaling mechanism to send it to Eve.
-                signal.sendPeerOffer(_self.uuid, sessionDescription);
+                signal.sendPeerOffer(uuid, sessionDescription);
 
             }, null, MEDIA_CONSTRAINTS);
 
@@ -178,8 +179,9 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
          */
         this.answerOffer = function (data) {
 
-            var deferred = Q.defer,
-                signal = getSignalChannel(_self);
+            var uuid = this.uuid,
+                deferred = Q.defer,
+                signal = this.getSignalChannel();
 
             //5. Eve calls setRemoteDescription() with Alice's offer, so that her RTCPeerConnection knows about Alice's setup.
             _connection.setRemoteDescription(new RTCSessionDescription(data.offer), function () {
@@ -191,7 +193,7 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
                     _connection.setLocalDescription(sessionDescription);
 
                     //8. Eve then uses the signaling mechanism to send her stringified answer back to Alice.
-                    signal.sendPeerAnswer(_self.uuid, sessionDescription);
+                    signal.sendPeerAnswer(uuid, sessionDescription);
 
                 }, null, MEDIA_CONSTRAINTS);
 
@@ -221,7 +223,20 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
          */
         this.addCandidate = function (data) {
             _connection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        };
+
+
+        /**
+         * Send data via WebRTC-Channelm to peer
+         * @param data
+         */
+        this.send = function (data) {
+            if (!this.isConnected) return;
+
+            _channel.send(data);
+
         }
+
     };
 
     return Peer;
