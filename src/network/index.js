@@ -63,7 +63,6 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                 nodes.on('peer:answer', peerAnswerHandler);
                 nodes.on('peer:candidate', peerCandidateHandler);
 
-
                 //detect geoLocation if needed
                 geolocation.getGeoLocation()
                     .then(function (location) {
@@ -93,12 +92,17 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
 
             /**
              * Send data to all nodes and peers
-             * @param key
+             * @param cmd defines type of data
              * @param data
              */
-            broadcast: function (data) {
+            broadcast: function (cmd, data) {
+
+                nodes.list.forEach(function (node) {
+                    node.send(cmd, data);
+                });
+
                 peers.list.forEach(function (peer) {
-                    peer.send(data);
+                    peer.send(cmd, data);
                 });
             }
 

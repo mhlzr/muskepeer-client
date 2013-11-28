@@ -47,13 +47,13 @@ require(['muskepeer-client', 'util/logger', 'domready'], function (Muskepeer, Lo
             }
         },
         nodes: [
-            {
+            /*{
                 host: 'muskepeer-node01.herokuapp.com',
                 isSecure: true,
                 port: 8080
-            },
+            },*/
             {
-                host: '192.168.178.21',
+                host: '192.168.178.26',
                 isSecure: false,
                 port: 8080
             }

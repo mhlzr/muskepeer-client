@@ -3,7 +3,7 @@
  * @date 17.10.13
  */
 
-define(['lodash', 'q', 'eventemitter2', 'settings', 'project'], function (_, Q, EventEmitter2, settings, project) {
+define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], function (_, Q, EventEmitter2, settings, project, geolocation) {
 
     var _self,
         _socket,
@@ -80,7 +80,6 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project'], function (_, Q, 
 
         this.send = function (cmd, data, waitForResponse) {
 
-
             var deferred = Q.defer();
 
             if (!_self.isConnected) {
@@ -122,7 +121,13 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project'], function (_, Q, 
         };
 
         this.sendAuthentication = function () {
-            return this.send('peer:auth', {uuid: settings.uuid, location: {lat: 0, long: 0}}, true);
+            var self = this;
+
+            return geolocation.getGeoLocation()
+                .then(function (location) {
+                    return self.send('peer:auth', {uuid: settings.uuid, location: location}, true);
+                });
+
         };
 
         this.sendPeerOffer = function (targetPeerUuid, offer) {
