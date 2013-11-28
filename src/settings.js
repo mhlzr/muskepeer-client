@@ -7,13 +7,15 @@
  * @param storeName String Keyname for the settings object in localStorage
  */
 
-define(['lodash', './uuid'], function (_, uuid) {
+define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
 
     var _storeName = 'settings',
         _settings = readSettingsFromLocalStorage();
 
-    //Register Observer
-    Object.observe(_settings, storeSettingsToLocalStorage);
+    //Chrome is currently the only one supporting
+    //Object.observe(_settings, storeSettingsToLocalStorage);
+
+    var observer = new PathObserver(_settings, storeSettingsToLocalStorage);
 
     //Defaults
     _.defaults(_settings, {

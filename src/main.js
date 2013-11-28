@@ -5,7 +5,7 @@ require.config({
         'eventemitter2': 'lib/eventemitter2/lib/eventemitter2',
         'idbwrapper': 'lib/idbwrapper/idbstore',
         'node-uuid': 'lib/node-uuid/uuid',
-        'observe-shim': 'lib/observe-shim/lib/observe-shim',
+        'observe-js': 'lib/observe-js/src/observe',
         'q': 'lib/q/q',
         'sjcl': 'lib/sjcl/sjcl',
         'sockjs': 'lib/sockjs/sockjs'
@@ -60,6 +60,6 @@ require(['muskepeer-client', 'util/logger', 'domready'], function (Muskepeer, Lo
         ]
     });
 
-    document.write(Muskepeer.settings.uuid);
+    console.log(Muskepeer.settings.uuid);
 });
 

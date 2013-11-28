@@ -18,7 +18,8 @@ define([
     "use strict";
 
     function browserFitsRequirements() {
-        return JSON && localStorage && Object.observe && indexedDB && navigator.geolocation;
+        //Object.observe is handled via observe-js, as too many browser yet don't support it
+        return !!JSON && !!localStorage && !!indexedDB && !!navigator.geolocation;
     }
 
     var muskepeer = {

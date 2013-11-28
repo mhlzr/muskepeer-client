@@ -27,12 +27,31 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
 
     /**
      * Factory for RTCPeerConnection
-     * @param configuration
      * @constructor
      */
     function MRTCPeerConnection(ice, optional) {
         //TODO browser vendor fix
-        return new webkitRTCPeerConnection(ice, optional);
+        if (window.mozRTCPeerConnection) return new mozRTCPeerConnection(ice, optional);
+        else if (window.webkitRTCPeerConnection) return new webkitRTCPeerConnection(ice, optional);
+        else return new RTCPeerConnection(ice, optional);
+    }
+
+    /**
+     * Factory for RTCIceCandidate
+     * @constructor
+     */
+    function MRTCIceCandidate(candidate) {
+        if (window.mozRTCIceCandidate) return new mozRTCIceCandidate(candidate);
+        else return new RTCIceCandidate(candidate);
+    }
+
+    /**
+     * Factory for RTCSessionDescription
+     * @constructor
+     */
+    function MRTCSessionDescription(sdp) {
+        if (window.mozRTCSessionDescription) return new mozRTCSessionDescription(sdp);
+        else return new RTCSessionDescription(sdp);
     }
 
 
@@ -158,13 +177,17 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
             //2. Alice creates an offer (an SDP session description) with the RTCPeerConnection createOffer() method.
             _connection.createOffer(function (sessionDescription) {
 
-                //3. Alice calls setLocalDescription() with his offer.)
-                _connection.setLocalDescription(sessionDescription);
+                    //3. Alice calls setLocalDescription() with his offer.)
+                    _connection.setLocalDescription(sessionDescription);
 
-                //4. Alice stringifies the offer and uses a signaling mechanism to send it to Eve.
-                signal.sendPeerOffer(uuid, sessionDescription);
+                    //4. Alice stringifies the offer and uses a signaling mechanism to send it to Eve.
+                    signal.sendPeerOffer(uuid, sessionDescription);
 
-            }, null, MEDIA_CONSTRAINTS);
+                },
+                function (err) {
+                    logger.log(err);
+                },
+                MEDIA_CONSTRAINTS);
 
 
             return deferred.promise;
@@ -184,18 +207,22 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
                 signal = this.getSignalChannel();
 
             //5. Eve calls setRemoteDescription() with Alice's offer, so that her RTCPeerConnection knows about Alice's setup.
-            _connection.setRemoteDescription(new RTCSessionDescription(data.offer), function () {
+            _connection.setRemoteDescription(new MRTCSessionDescription(data.offer), function () {
 
                 //6. Eve calls createAnswer(), and the success callback for this is passed a local session description: Eve's answer.
                 _connection.createAnswer(function (sessionDescription) {
 
-                    //7. Eve sets her answer as the local description by calling setLocalDescription().
-                    _connection.setLocalDescription(sessionDescription);
+                        //7. Eve sets her answer as the local description by calling setLocalDescription().
+                        _connection.setLocalDescription(sessionDescription);
 
-                    //8. Eve then uses the signaling mechanism to send her stringified answer back to Alice.
-                    signal.sendPeerAnswer(uuid, sessionDescription);
+                        //8. Eve then uses the signaling mechanism to send her stringified answer back to Alice.
+                        signal.sendPeerAnswer(uuid, sessionDescription);
 
-                }, null, MEDIA_CONSTRAINTS);
+                    },
+                    function (err) {
+                        logger.log(err);
+                    },
+                    MEDIA_CONSTRAINTS);
 
             });
 
@@ -213,7 +240,7 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
             this.isSource = false;
 
             //9. Alice sets Eve's answer as the remote session description using setRemoteDescription().
-            _connection.setRemoteDescription(new RTCSessionDescription(data.answer));
+            _connection.setRemoteDescription(new MRTCSessionDescription(data.answer));
 
         };
 
@@ -222,7 +249,7 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
          * @param data
          */
         this.addCandidate = function (data) {
-            _connection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            _connection.addIceCandidate(new MRTCIceCandidate(data.candidate));
         };
 
 
