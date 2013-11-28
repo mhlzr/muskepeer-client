@@ -45,6 +45,7 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project'], function (_, Q, 
 
         this.host = config.host || 'localhost';
         this.port = config.port || 8080;
+        this.isSecure = config.isSecure || false;
         this.url = null; //set via WS
         this.uuid = config.uuid;
 
@@ -52,7 +53,7 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project'], function (_, Q, 
 
         this.connect = function (callback) {
 
-            _socket = new WebSocket('ws://' + this.host + ':' + this.port);
+            _socket = new WebSocket((this.isSecure ? 'wss' : 'ws') + '://' + this.host + ':' + this.port);
 
             _self.url = _socket.url;
 

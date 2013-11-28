@@ -3,12 +3,14 @@
  * @date 05.11.13
  */
 
-define(['q', '../model/node', '../../musketeer-module'], function (Q, Node, MusketeerModule) {
+define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, MuskepeerModule) {
     var _nodes = [],
-        module = new MusketeerModule();
+        module = new MuskepeerModule();
 
     return module.extend(
         {
+            list: _nodes,
+
             connect: function () {
                 var promises = [];
 

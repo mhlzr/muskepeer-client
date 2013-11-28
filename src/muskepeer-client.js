@@ -21,7 +21,7 @@ define([
         return JSON && localStorage && Object.observe && indexedDB && navigator.geolocation;
     }
 
-    var musketeer = {
+    var muskepeer = {
 
         computation: computation,
         crypto: crypto,
@@ -32,9 +32,9 @@ define([
         storage: storage,
 
         /**
-         * Initiate Musketeer
+         * Initiate muskepeer
          * Tests if browser-requirements are fulfilled.
-         * @returns {musketeer}
+         * @returns {muskepeer}
          */
         init: function () {
 
@@ -51,56 +51,56 @@ define([
              }
              */
 
-            return musketeer;
+            return muskepeer;
         },
         /**
-         * Start Musketeer
+         * Start muskepeer
          * @param config Configuration-Object
-         * @returns {musketeer}
+         * @returns {muskepeer}
          */
         start: function (config) {
 
             if (config) {
-                musketeer.config = config;
+                muskepeer.config = config;
             }
 
             //storage is initialized async,
             //if not yet read, we wait for the event
             if (!storage.isReady) {
-                storage.on('ready', musketeer.start);
+                storage.on('ready', muskepeer.start);
                 return this;
             }
             else {
-                storage.off('ready', musketeer.start);
+                storage.off('ready', muskepeer.start);
             }
 
             //combine project settings with defaults
-            project = _.defaults(project, musketeer.config.project);
+            project = _.defaults(project, muskepeer.config.project);
 
             //store node configuration
-            storage.saveMultiple('nodes', musketeer.config.nodes)
+            storage.saveMultiple('nodes', muskepeer.config.nodes, {allowDuplicates: false})
                 .then(function () {
                     network.start();
                     computation.start();
                 });
 
 
-            return musketeer;
+            return muskepeer;
         },
 
         /**
-         * Stop Musketeer
+         * Stop muskepeer
          */
         stop: function () {
-            musketeer.computation.stop();
-            musketeer.network.stop();
-            return musketeer;
+            muskepeer.computation.stop();
+            muskepeer.network.stop();
+            return muskepeer;
 
         }
 
 
     };
 
-    return musketeer;
+    return muskepeer;
 
 });

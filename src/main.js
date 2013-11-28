@@ -16,14 +16,15 @@ require.config({
     }
 });
 
-require(['musketeer-client', 'util/logger', 'domready'], function (Musketeer, Logger) {
+require(['muskepeer-client', 'util/logger', 'domready'], function (Muskepeer, Logger) {
 
-    window.Musketeer = Musketeer.init();
+    window.Muskepeer = Muskepeer.init();
 
     window.logger = Logger;
 
-    Musketeer.start({
+    Muskepeer.start({
         project: {
+
             uuid: '2345678902765456789',
             title: 'TestProject',
             active: true,
@@ -43,22 +44,22 @@ require(['musketeer-client', 'util/logger', 'domready'], function (Musketeer, Lo
 
             network: {
                 useGeoLocation: true
-            }},
+            }
+        },
         nodes: [
             {
-                host: '192.168.178.26',
+                host: 'muskepeer-node01.herokuapp.com',
+                isSecure: true,
                 port: 8080
-            }/*,
+            },
             {
                 host: '192.168.178.21',
+                isSecure: false,
                 port: 8080
-            }*/
+            }
         ]
     });
 
-
-    console.log(Musketeer);
-
-    document.write(Musketeer.settings.uuid);
+    document.write(Muskepeer.settings.uuid);
 });
 

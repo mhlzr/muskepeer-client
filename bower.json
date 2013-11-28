@@ -1,10 +1,10 @@
 {
-  "name": "musketeer-client",
+  "name": "muskepeer-client",
   "version": "0.0.1",
   "authors": [
     "casatt <matthieuholzer@gmx.de>"
   ],
-  "description": "Connects to a musketeer-node via WebSocket, then creates connections to other musketeer-clients via WebRTC.",
+  "description": "Connects to a muskepeer-node via WebSocket, then creates connections to other muskepeer-clients via WebRTC.",
   "license": "WTFPL",
   "ignore": [
     "**/.*",

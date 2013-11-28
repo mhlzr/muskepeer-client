@@ -3,11 +3,11 @@
  * @module Computation
  */
 
-define(['musketeer-module', '../storage/index', '../project', './jobs'], function (MusketeerModule, storage, project, jobs) {
+define(['muskepeer-module', '../storage/index', '../project', './jobs'], function (MuskepeerModule, storage, project, jobs) {
 
     var MAX_WORKERS = 2;
 
-    var module = new MusketeerModule(),
+    var module = new MuskepeerModule(),
         workers = [];
 
 

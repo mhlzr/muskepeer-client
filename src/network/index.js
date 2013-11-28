@@ -4,11 +4,11 @@
  *
  */
 
-define(['q', 'lodash', 'storage/index', 'project', 'settings', 'musketeer-module', './collections/nodes', './collections/peers', './model/peer'],
+define(['q', 'lodash', 'storage/index', 'project', 'settings', 'muskepeer-module', './collections/nodes', './collections/peers', './model/peer'],
 
-    function (Q, _, storage, project, settings, MusketeerModule, nodes, peers, Peer) {
+    function (Q, _, storage, project, settings, MuskepeerModule, nodes, peers, Peer) {
 
-        var _module = new MusketeerModule();
+        var _module = new MuskepeerModule();
 
         // Detect network change
         // http://www.html5rocks.com/en/mobile/workingoffthegrid/

@@ -3,9 +3,9 @@
  * @date 05.11.13
  */
 
-define(['q', 'lodash', 'settings', '../../musketeer-module', '../model/peer'], function (Q, _, settings, MusketeerModule, Peer) {
+define(['q', 'lodash', 'settings', '../../muskepeer-module', '../model/peer'], function (Q, _, settings, MuskepeerModule, Peer) {
 
-    var module = new MusketeerModule(),
+    var module = new MuskepeerModule(),
         _peers = [],
         _nextPeer,
         _previousPeer;

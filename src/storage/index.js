@@ -2,12 +2,12 @@
  * Storage
  * @class Storage
  *
- * https://github.com/jensarps/IDBWrapper
+ * @see https://github.com/jensarps/IDBWrapper
  */
 
-define(['lodash', 'q', 'uuid', 'project', 'musketeer-module', 'idbwrapper'], function (_, Q, uuid, project, MusketeerModule, IDBStore) {
+define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], function (_, Q, uuid, project, MuskepeerModule, IDBStore) {
 
-        var STORE_PREFIX = 'Musketeer-',
+        var STORE_PREFIX = 'Muskepeer-',
             EVENT_READY = 'ready',
             ERRORS = {
                 DATA_MISSING: 'Data is missing!',
@@ -18,7 +18,7 @@ define(['lodash', 'q', 'uuid', 'project', 'musketeer-module', 'idbwrapper'], fun
                 STORE_NOT_FOUND: 'Store not found!'
             };
 
-        var module = new MusketeerModule(),
+        var module = new MuskepeerModule(),
             stores = [];
 
         createStores().done(function () {
@@ -211,9 +211,10 @@ define(['lodash', 'q', 'uuid', 'project', 'musketeer-module', 'idbwrapper'], fun
              * Save data to indexedDb, if not uuid is set it will be added automatically
              * @param storeName
              * @param data
+             * @param options
              * @returns {Promise}
              */
-            save: function (storeName, data) {
+            save: function (storeName, data, options) {
                 var deferred = Q.defer(),
                     store;
 
@@ -245,8 +246,34 @@ define(['lodash', 'q', 'uuid', 'project', 'musketeer-module', 'idbwrapper'], fun
                     return deferred.promise;
                 }
 
-                //save
-                store.put(data, deferred.resolve, deferred.reject);
+                //search if data is already existent
+                if (!options.allowDuplicates) {
+                    var clone = {};
+
+                    //can't just Object.create/clone here, because you
+                    //can't delete the uuid
+                    for (var key in data) {
+                        if (key !== 'uuid' && data.hasOwnProperty(key)) {
+                            clone[key] = data[key];
+                        }
+                    }
+                    module.findAndReduceByObject(storeName, null, clone).then(function (results) {
+                        //not found in db
+                        if (_.isEmpty(results)) {
+                            //save
+                            store.put(data, deferred.resolve, deferred.reject)
+                        }
+                        //already got such an entry
+                        else {
+                            deferred.reject();
+                        }
+                    });
+                }
+                else {
+                    //save without check
+                    store.put(data, deferred.resolve, deferred.reject);
+                }
+
 
                 return deferred.promise;
 
@@ -256,13 +283,14 @@ define(['lodash', 'q', 'uuid', 'project', 'musketeer-module', 'idbwrapper'], fun
              * Save Mutiple objects to a shared store
              * @param storeName
              * @param datasets Array
+             * @param options
              * @returns {Promise}
              */
-            saveMultiple: function (storeName, datasets) {
+            saveMultiple: function (storeName, datasets, options) {
                 var promises = [];
 
                 datasets.forEach(function (dataset) {
-                    promises.push(module.save(storeName, dataset));
+                    promises.push(module.save(storeName, dataset, options));
                 });
 
                 return Q.all(promises);
@@ -335,6 +363,8 @@ define(['lodash', 'q', 'uuid', 'project', 'musketeer-module', 'idbwrapper'], fun
                 return deferred.promise;
             }
 
-        });
+        })
+            ;
     }
-);
+)
+;
