@@ -42,15 +42,6 @@ define([
                 throw new Error('Your browser does not fit the requirements');
             }
 
-            /*
-             //detect geoLocation if needed
-             if (project.network.useGeoLocation) {
-             geolocation.getGeoLocation().then(function (location) {
-             _self.location = location;
-             });
-             }
-             */
-
             return muskepeer;
         },
         /**

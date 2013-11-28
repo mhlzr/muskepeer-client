@@ -4,9 +4,11 @@
  * @class GeoLocation
  */
 
-define(['q'], function (Q) {
+define(['q', 'project'], function (Q, project) {
 
     var EARTH_RADIUS = 6371; // Radius of the earth in km
+
+    var _location;
 
 
     function deg2rad(deg) {
@@ -14,6 +16,7 @@ define(['q'], function (Q) {
     }
 
     return {
+
         /**
          * Asynchronously get the latitude/longitude of the device using the W3C-API
          * @returns {promise|*}
@@ -22,17 +25,33 @@ define(['q'], function (Q) {
 
             var deferred = Q.defer();
 
-            navigator.geolocation.getCurrentPosition(
-                function (position) {
-                    deferred.resolve({
-                        lat: position.coords.latitude,
-                        long: position.coords.longitude
-                    });
-                },
-                function () {
-                    deferred.reject();
-                }, { enableHighAccuracy: true }
-            );
+            //don't return the actual location
+            if (!project.network.useGeoLocation) {
+                deferred.resolve(null);
+            }
+
+            //already cached?
+            else if (project.network.useGeoLocation && _location) {
+                deferred.resolve(_location);
+            }
+
+            //ask for it
+            else {
+                navigator.geolocation.getCurrentPosition(
+                    function success(position) {
+                        //caching
+                        _location = {
+                            lat: position.coords.latitude,
+                            long: position.coords.longitude
+                        };
+                        deferred.resolve(_location);
+                    },
+                    function error() {
+                        deferred.resolve(_location ? _location : null);
+                    },
+                    { enableHighAccuracy: true }
+                );
+            }
 
             return deferred.promise;
         },

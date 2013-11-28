@@ -4,9 +4,9 @@
  *
  */
 
-define(['q', 'lodash', 'storage/index', 'project', 'settings', 'muskepeer-module', './collections/nodes', './collections/peers', './model/peer'],
+define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', './model/peer'],
 
-    function (Q, _, storage, project, settings, MuskepeerModule, nodes, peers, Peer) {
+    function (Q, _, storage, project, settings, geolocation, MuskepeerModule, nodes, peers, Peer) {
 
         var _module = new MuskepeerModule();
 
@@ -63,9 +63,13 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'muskepeer-module
                 nodes.on('peer:answer', peerAnswerHandler);
                 nodes.on('peer:candidate', peerCandidateHandler);
 
-                //get all nodes related to this project via proectUuid
-                storage.findAndReduceByObject('nodes', {filterDuplicates: true}, {projectUuid: project.uuid}).
-                    then(function (nodeData) {
+
+                //detect geoLocation if needed
+                geolocation.getGeoLocation()
+                    .then(function (location) {
+                        return storage.findAndReduceByObject('nodes', {filterDuplicates: true}, {projectUuid: project.uuid})
+                    })
+                    .then(function (nodeData) {
                         //creates objects of type model/node
                         nodes.update(nodeData);
                     })

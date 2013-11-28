@@ -265,7 +265,8 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
                         }
                         //already got such an entry
                         else {
-                            deferred.reject();
+                            //nothing saved, but still not an error
+                            deferred.resolve();
                         }
                     });
                 }
