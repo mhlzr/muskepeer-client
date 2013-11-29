@@ -15,11 +15,16 @@ define([], function () {
     }
 
     return {
-        log: function (msg, data) {
-            if (data)
-                console.log(getPrettyTimeStamp(), msg + ':', data);
-            else
+        log: function (msg, desc, data) {
+            if (desc && !data) {
+                console.log(getPrettyTimeStamp(), msg + ':', desc);
+            }
+            else if (desc && data) {
+                console.log(getPrettyTimeStamp(), msg, desc, ':', data);
+            }
+            else {
                 console.log(getPrettyTimeStamp(), msg);
+            }
         },
         warn: function (msg, data) {
             console.warn(getPrettyTimeStamp(), msg + ':', data);

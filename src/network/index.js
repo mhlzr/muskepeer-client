@@ -66,7 +66,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                 //detect geoLocation if needed
                 geolocation.getGeoLocation()
                     .then(function (location) {
-                        return storage.findAndReduceByObject('nodes', {filterDuplicates: true}, {projectUuid: project.uuid})
+                        return storage.findAndReduceByObject('nodes', {filterDuplicates: false}, {projectUuid: project.uuid})
                     })
                     .then(function (nodeData) {
                         //creates objects of type model/node

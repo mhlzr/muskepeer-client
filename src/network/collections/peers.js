@@ -3,7 +3,7 @@
  * @date 05.11.13
  */
 
-define(['q', 'lodash', 'settings', '../../muskepeer-module', '../model/peer'], function (Q, _, settings, MuskepeerModule, Peer) {
+define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../model/peer'], function (Q, _, settings, geolocation, MuskepeerModule, Peer) {
 
     var module = new MuskepeerModule(),
         _peers = [],
@@ -74,7 +74,6 @@ define(['q', 'lodash', 'settings', '../../muskepeer-module', '../model/peer'], f
             //TODO save nodeUuid for multiple
 
             peerData.forEach(function (data) {
-
                 //make sure it's not self
                 if (data.uuid !== settings.uuid) {
                     module.add(new Peer(data));
@@ -82,7 +81,10 @@ define(['q', 'lodash', 'settings', '../../muskepeer-module', '../model/peer'], f
 
             });
 
-            //TODO sort peers
+            //sort peers by their geolocation-distance
+            _peers = _.sortBy(_peers, function (peer) {
+                return geolocation.getDistanceBetweenTwoLocations(peer.location)
+            });
         }
 
 

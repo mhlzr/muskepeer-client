@@ -14,12 +14,12 @@ define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, Musk
             connect: function () {
                 var promises = [];
 
-                var deferred;
-                _nodes.forEach(function (node) {
-                    deferred = Q.defer();
+                logger.log('Nodes', 'connect');
 
+                _nodes.forEach(function (node) {
+                    var deferred = Q.defer();
                     node.connect(function () {
-                        deferred.resolve(node);
+                        deferred.resolve();
                     });
 
                     promises.push(deferred.promise);
@@ -61,9 +61,10 @@ define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, Musk
             authenticate: function () {
                 var promises = [];
 
-                var deferred;
+                logger.log('Nodes', 'authenticate');
+
                 _nodes.forEach(function (node) {
-                    deferred = Q.defer();
+                    var deferred = Q.defer();
                     node.sendAuthentication()
                         .then(function () {
                             deferred.resolve();
@@ -79,9 +80,8 @@ define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, Musk
             getRelatedPeers: function () {
                 var promises = [];
 
-                var deferred;
                 _nodes.forEach(function (node) {
-                    deferred = Q.defer();
+                    var deferred = Q.defer();
                     node.getAllRelatedPeers().then(function (peers) {
                         //add reference to node, to know where the peer is connected
                         peers.forEach(function (peer) {

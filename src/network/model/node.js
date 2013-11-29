@@ -5,37 +5,17 @@
 
 define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], function (_, Q, EventEmitter2, settings, project, geolocation) {
 
-    var _self,
-        _socket,
-        ee = new EventEmitter2({
-            wildcard: true,
-            delimiter: ':',
-            newListener: false,
-            maxListeners: 10
-        });
+    var ee = new EventEmitter2({
+        wildcard: true,
+        delimiter: ':',
+        newListener: false,
+        maxListeners: 10
+    });
 
-    function messageHandler(e) {
-        var data = JSON.parse(e.data),
-            cmd = data.cmd;
-
-        logger.log('Node received', data);
-
-        switch (cmd.toLowerCase()) {
-            case 'peer:offer' :
-                _self.emit('peer:offer', {nodeUuid: _self.uuid, targetPeerUuid: data.data.targetPeerUuid, offer: data.data.offer});
-                break;
-            case 'peer:answer' :
-                _self.emit('peer:answer', {nodeUuid: _self.uuid, targetPeerUuid: data.data.targetPeerUuid, answer: data.data.answer});
-                break;
-            case 'peer:candidate' :
-                _self.emit('peer:candidate', {nodeUuid: _self.uuid, targetPeerUuid: data.data.targetPeerUuid, candidate: data.data.candidate});
-                break;
-        }
-    }
 
     var Node = function (config) {
 
-        _self = this;
+        var self = this;
 
         //events
         this.emit = ee.emit;
@@ -48,41 +28,52 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
         this.isSecure = config.isSecure || false;
         this.url = null; //set via WS
         this.uuid = config.uuid;
+        this.socket = null;
 
         this.isConnected = false;
 
         this.connect = function (callback) {
 
-            _socket = new WebSocket((this.isSecure ? 'wss' : 'ws') + '://' + this.host + ':' + this.port);
+            try {
+                this.socket = new WebSocket((this.isSecure ? 'wss' : 'ws') + '://' + this.host + ':' + this.port);
+                this.url = this.socket.url;
 
-            _self.url = _socket.url;
+                //add listeners
+                this.socket.addEventListener('message', this.messageHandler);
+                this.socket.addEventListener('open', function () {
+                    logger.log('Node ' + self.url, 'connected');
+                    self.isConnected = true;
+                    callback();
+                });
 
-            //add listeners
-            _socket.addEventListener('message', messageHandler);
-            _socket.addEventListener('open', function () {
-                _self.isConnected = true;
-                callback();
-            });
+                this.socket.addEventListener('error', function (e) {
+                    self.disconnect();
+                    logger.log('Node ' + self.url, 'error');
+                });
 
-            _socket.addEventListener('close', function (e) {
-                _self.disconnect();
-                logger.log('Node connection closed', e.reason);
-            });
+                this.socket.addEventListener('close', function (e) {
+                    self.disconnect();
+                    logger.log('Node ' + self.url, 'disconnected', e.reason);
+                });
+            }
+            catch (e) {
+                self.disconnect();
+            }
 
             return this;
         };
 
         this.disconnect = function () {
-            _socket = null;
-            _self.isConnected = false;
-            return _self;
+            this.socket = null;
+            this.isConnected = false;
+            return this;
         };
 
         this.send = function (cmd, data, waitForResponse) {
 
             var deferred = Q.defer();
 
-            if (!_self.isConnected) {
+            if (!this.isConnected) {
                 deferred.reject('Not connected to node!');
                 return deferred.promise;
             }
@@ -103,12 +94,12 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
             data.authToken = settings.authToken;
 
             //send data to websocket as String
-            _socket.send(JSON.stringify(data));
+            this.socket.send(JSON.stringify(data));
 
 
             //if we need to wait for the answer
             if (waitForResponse) {
-                _socket.addEventListener('message', function (e) {
+                this.socket.addEventListener('message', function (e) {
                     //TODO change this to be able to unregister eventListener
                     var response = JSON.parse(e.data);
                     if (response.cmd === cmd) deferred.resolve(response.data);
@@ -121,8 +112,6 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
         };
 
         this.sendAuthentication = function () {
-            var self = this;
-
             return geolocation.getGeoLocation()
                 .then(function (location) {
                     return self.send('peer:auth', {uuid: settings.uuid, location: location}, true);
@@ -144,6 +133,26 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
 
         this.getAllRelatedPeers = function () {
             return this.send('peer:list', {projectUuid: project.uuid}, true);
+        };
+
+
+        this.messageHandler = function (e) {
+            var data = JSON.parse(e.data),
+                cmd = data.cmd;
+
+            logger.log('Node', 'received', data);
+
+            switch (cmd.toLowerCase()) {
+                case 'peer:offer' :
+                    self.emit('peer:offer', {nodeUuid: self.uuid, targetPeerUuid: data.data.targetPeerUuid, offer: data.data.offer});
+                    break;
+                case 'peer:answer' :
+                    self.emit('peer:answer', {nodeUuid: self.uuid, targetPeerUuid: data.data.targetPeerUuid, answer: data.data.answer});
+                    break;
+                case 'peer:candidate' :
+                    self.emit('peer:candidate', {nodeUuid: self.uuid, targetPeerUuid: data.data.targetPeerUuid, candidate: data.data.candidate});
+                    break;
+            }
         }
 
     };

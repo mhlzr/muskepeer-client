@@ -59,11 +59,13 @@ define(['q', 'project'], function (Q, project) {
         /**
          * Uses the Haversine formula to calculate the distance between two locations
          * @param position1
-         * @param position2
+         * @param position2 (optional)
          *
          * @returns distance Float distance in kilometers
          */
         getDistanceBetweenTwoLocations: function (position1, position2) {
+
+            position2 = position2 || _location;
 
             var dLat = deg2rad(position2.lat - position2.lat),
                 dLon = deg2rad(position2.long - position1.long),
