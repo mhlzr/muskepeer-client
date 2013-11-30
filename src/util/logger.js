@@ -7,10 +7,15 @@ define([], function () {
 
     function getPrettyTimeStamp() {
         var current = new Date(),
-            date = [];
-        date.push(current.getHours());
-        date.push(current.getMinutes());
-        date.push(current.getSeconds());
+            date = [],
+            hours = current.getHours() < 10 ? ('0' + current.getHours()) : current.getHours(),
+            minutes = current.getMinutes() < 10 ? ('0' + current.getMinutes()) : current.getMinutes(),
+            seconds = current.getSeconds() < 10 ? ('0' + current.getSeconds()) : current.getSeconds();
+
+        date.push(hours);
+        date.push(minutes);
+        date.push(seconds);
+
         return date.join(':');
     }
 

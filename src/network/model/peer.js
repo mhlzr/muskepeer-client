@@ -262,6 +262,22 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
 
             _channel.send(data);
 
+        };
+
+        /**
+         * Save a reference to a node
+         * @param nodeUuids Array of nodeUuids
+         */
+        this.addNodes = function (nodeUuids) {
+            var self = this;
+
+            nodeUuids.forEach(function (nodeUuid) {
+                //store only if needed, no redundancy
+                if (self.nodes.indexOf(nodeUuid) < 0) {
+                    self.nodes.push(nodeUuid);
+                }
+            });
+
         }
 
     };

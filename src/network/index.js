@@ -81,7 +81,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                     })
                     .then(peers.connect)
                     .done(function () {
-                        logger.log('Network start complete')
+                        logger.log('Network', 'Start complete');
                     });
 
             },

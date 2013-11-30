@@ -71,13 +71,22 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
             //multidimensional array form multiple nodes
             peerData = _.flatten(peerData);
 
-            //TODO save nodeUuid for multiple
-
             peerData.forEach(function (data) {
+
                 //make sure it's not self
-                if (data.uuid !== settings.uuid) {
-                    module.add(new Peer(data));
+                if (data.uuid === settings.uuid) return;
+
+                //already got this one?
+                var peer = module.getPeerByUuid(data.uuid);
+
+                //already got this peer?
+                if (peer) {
+                    //only add the node uuid
+                    peer.addNodes(data.nodes);
+                    return;
                 }
+                //save as new peer
+                module.add(new Peer(data));
 
             });
 
