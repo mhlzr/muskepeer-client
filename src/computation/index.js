@@ -3,46 +3,9 @@
  * @module Computation
  */
 
-define(['muskepeer-module', '../storage/index', '../project', './jobs'], function (MuskepeerModule, storage, project, jobs) {
+define(['muskepeer-module', '../storage/index', '../project', './collection/workers', './collection/jobs'], function (MuskepeerModule, storage, project, workers, jobs) {
 
-    var MAX_WORKERS = 2;
-
-    var module = new MuskepeerModule(),
-        workers = [];
-
-
-    function createWorkers(uri) {
-        var worker;
-        for (var i = 0; i < MAX_WORKERS; i++) {
-            worker = new Worker(uri);
-            worker.addEventListener('message', workerMessageHandler);
-            worker.addEventListener('error', workerErrorHandler);
-            workers.push(worker);
-        }
-    }
-
-    function workerMessageHandler(e) {
-        //console.log(e.data);
-    }
-
-    function workerErrorHandler(e) {
-    }
-
-    function taskStartHandler(e) {
-    }
-
-    function taskCompleteHandler(e) {
-    }
-
-    function taskErrorHandler(e) {
-    }
-
-    function postToAllWorkers(data) {
-        workers.forEach(function (worker) {
-            worker.postMessage(data);
-        });
-    }
-
+    var module = new MuskepeerModule();
 
     return module.extend({
 
@@ -50,39 +13,44 @@ define(['muskepeer-module', '../storage/index', '../project', './jobs'], functio
         isPaused: false,
 
         start: function () {
-
             //are there any jobs left, that are related to this project?
-            storage.find('jobs')
-                .progress(function (job) {
-                    jobs.add(job);
-                })
-                .done(function (results) {
-                    console.log('all jobs read:', results);
-                });
+            /* storage.find('jobs')
+             .progress(function (job) {
+             jobs.add(job);
+             })
+             .done(function (results) {
+             console.log('all local jobs read:', results);
+             });
+             */
 
-
-            if (workers.length === 0) {
-                createWorkers('./worker.js');
+            if (workers.size === 0) {
+                workers.create('./worker.js');
+                //workers.create(URL.createObjectURL(project.computation.worker.algorithm()));
+                this.isRunning = true;
+                this.isPaused = false;
             }
 
-            postToAllWorkers({cmd: 'start'});
+            logger.log('Computation', 'workers starting');
 
-            this.isRunning = true;
+            workers.start();
+
+            /*
+             workers.on('need:job');
+             workers.on('need:result');
+             workers.on('need:result');
+             */
 
         },
         pause: function () {
-            postToAllWorkers({cmd: 'pause'});
+            workers.pause();
             this.isPaused = true;
         },
         resume: function () {
-            postToAllWorkers({cmd: 'resume'});
+            workers.resume();
             this.isPaused = false;
         },
         stop: function () {
-            postToAllWorkers({cmd: 'stop'});
-            workers.forEach(function (worker) {
-                worker.terminate();
-            });
+            workers.stop();
             this.isRunning = false;
         }
     });

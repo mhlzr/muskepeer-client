@@ -12,7 +12,9 @@ require.config({
 
     },
     shim: {
-        'sjcl': {exports: 'sjcl'}
+        'sjcl': {
+            exports: 'sjcl'
+        }
     }
 });
 
@@ -27,19 +29,39 @@ require(['muskepeer-client', 'util/logger', 'domready'], function (Muskepeer, Lo
 
             uuid: '2345678902765456789',
             title: 'TestProject',
+            description: 'Here be dragons!',
             active: true,
 
             owner: {
                 email: 'matthieholzer@gmx.de',
                 name: 'Matthieu Holzer',
+                url: 'http://www.matthieuholzer.de',
                 publicKey: ''
             },
 
             computation: {
+                offlineAllowed: true,
                 hasDependingTasks: false,
                 hasFiniteTasks: true,
                 hasDataFiles: false,
-                validationIterations: -1 //-1 : Inifinite, 0 : None; >0 : Amount,
+                validationIterations: -1, //-1 : Inifinite, 0 : None; >0 : Amount,
+                worker: {
+                    url: null,
+                    algorithm: ''
+                },
+                jobs: {},
+                results: {
+                    bundleSize: 100,
+                    storages: [
+                        {
+                            enabled: true,
+                            type: 'rest',
+                            url: 'http://www.parse.com',
+                            method: 'post',
+                            params: {}
+                        }
+                    ]
+                }
             },
 
             network: {

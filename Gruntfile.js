@@ -28,7 +28,7 @@ module.exports = function (grunt) {
 
             jshint: {
 
-                files: ['Gruntfile.js', 'src/js/**/*.js', '!src/js/lib/**', '!src/js/require*.js'],
+                files: ['Gruntfile.js', 'src/**.js', '!src/js/lib/**', '!src/js/require*.js'],
                 options: {
                     curly: true,
                     eqeqeq: true,
@@ -51,10 +51,9 @@ module.exports = function (grunt) {
 
                         // Environments
                         console: true,
-
-                        // General Purpose Libraries
-                        $: true,
-                        jQuery: true,
+                        logger: true,
+                        process: true,
+                        self: true,
 
                         // Testing
                         sinon: true,
@@ -80,6 +79,26 @@ module.exports = function (grunt) {
                     configFile: 'test/karma.remote.unit.js'
                 }
 
+            },
+
+            requirejs: {
+                compile: {
+                    options: {
+                        appDir: "src",
+                        baseUrl: "/",
+                        dir: "dist",
+                        name: 'main',
+                        mainConfigFile: 'src/js/main.js',
+                        optimize: "uglify2",
+                        optimizeCss: 'none',
+                        generateSourceMaps: true,
+                        preserveLicenseComments: false,
+                        skipDirOptimize: true,
+                        fileExclusionRegExp: /^\.|sass/,
+                        removeCombined: true,
+                        useStrict: false
+                    }
+                }
             },
 
 
@@ -112,9 +131,11 @@ module.exports = function (grunt) {
 // Load NPM Tasks
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-yuidoc');
-    grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks('grunt-contrib-requirejs');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-yuidoc');
+
 
 // Default Task
     grunt.registerTask('default', ['watch']);
@@ -128,7 +149,7 @@ module.exports = function (grunt) {
     grunt.registerTask('doc', ['yuidoc']);
 
 // Release Task
-    grunt.registerTask('deploy', ['jshint', 'yuidoc']);
+    grunt.registerTask('deploy', []);
 
 
 };

@@ -15,5 +15,6 @@ define(function (require) {
         LOADING: '',
         COMPUTING: ''
 
-    }
+    };
+
 });

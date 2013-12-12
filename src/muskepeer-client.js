@@ -69,13 +69,16 @@ define([
             //combine project settings with defaults
             project = _.defaults(project, muskepeer.config.project);
 
+            computation.start();
+
+            /*
             //store node configuration
             storage.saveMultiple('nodes', muskepeer.config.nodes, {allowDuplicates: false})
                 .then(function () {
-                    network.start();
+                    //network.start();
                     computation.start();
                 });
-
+*/
 
             return muskepeer;
         },
