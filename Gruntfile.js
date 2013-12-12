@@ -84,11 +84,11 @@ module.exports = function (grunt) {
             requirejs: {
                 compile: {
                     options: {
-                        appDir: "src",
-                        baseUrl: "/",
+                        appDir: "",
+                        baseUrl: "src",
                         dir: "dist",
                         name: 'main',
-                        mainConfigFile: 'src/js/main.js',
+                        mainConfigFile: 'src/main.js',
                         optimize: "uglify2",
                         optimizeCss: 'none',
                         generateSourceMaps: true,
@@ -118,7 +118,7 @@ module.exports = function (grunt) {
                     version: '<%= pkg.version %>',
                     options: {
                         ignorePaths: './src/lib',
-                        paths: './src/',
+                        paths: './src',
                         outdir: './doc'
                     }
                 }

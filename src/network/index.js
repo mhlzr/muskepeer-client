@@ -1,6 +1,7 @@
 /**
  *
  * @module Network
+ * @class Network
  *
  */
 
@@ -15,6 +16,11 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
         window.addEventListener('offline', networkConnectivityStateChangeHandler);
         window.addEventListener('online', networkConnectivityStateChangeHandler);
 
+        /**
+         * @private
+         * @method networkConnectivityStateChangeHandler
+         * @param {Object} e Event-Object
+         */
         function networkConnectivityStateChangeHandler(e) {
             if (e.type === 'online') {
                 logger.warn('Device is online!');
@@ -24,6 +30,11 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
             }
         }
 
+        /**
+         * @private
+         * @method peerOfferHandler
+         * @param data
+         */
         function peerOfferHandler(data) {
             var peer = peers.getPeerByUuid(data.targetPeerUuid);
 
@@ -35,11 +46,21 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
             peer.answerOffer(data);
         }
 
+        /**
+         * @private
+         * @method peerAnswerHandler
+         * @param {Object} data
+         */
         function peerAnswerHandler(data) {
             var peer = peers.getPeerByUuid(data.targetPeerUuid);
             peer.acceptConnection(data);
         }
 
+        /**
+         * @private
+         * @method peerCandidateHandler
+         * @param {Object} data
+         */
         function peerCandidateHandler(data) {
             var peer = peers.getPeerByUuid(data.targetPeerUuid);
             peer.addCandidate(data);
@@ -48,11 +69,17 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
 
         return _module.extend({
 
+            /**
+             * @property isOnline {Boolean}
+             */
             isOnline: window.navigator.onLine,
 
             nodes: nodes,
             peers: peers,
 
+            /**
+             * @method start
+             */
             start: function () {
 
                 //no need to do anything more if we are not online
@@ -85,15 +112,19 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                     });
 
             },
-
+            /**
+             * @method stop
+             */
             stop: function () {
 
             },
 
             /**
              * Send data to all nodes and peers
-             * @param cmd defines type of data
-             * @param data
+             *
+             * @method broadcast
+             * @param cmd {String} defines type of data
+             * @param data {Object}
              */
             broadcast: function (cmd, data) {
 

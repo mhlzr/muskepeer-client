@@ -1,10 +1,19 @@
 /**
  * @author Matthieu Holzer
  * @date 12.11.13
+ * @module Logger
+ * @class Logger
  */
 
 define([], function () {
 
+    /**
+     * Create a timestamp ( format : HH::MM:SS )
+     *
+     * @private
+     * @method getPrettyTimeStamp
+     * @return {String}
+     */
     function getPrettyTimeStamp() {
         var current = new Date(),
             date = [],
@@ -20,6 +29,15 @@ define([], function () {
     }
 
     return {
+
+        /**
+         * Log some information
+         *
+         * @method log
+         * @param {*} msg
+         * @param {*} [desc]
+         * @param {*} [data]
+         */
         log: function (msg, desc, data) {
             if (desc && !data) {
                 console.log(getPrettyTimeStamp(), msg + ':', desc);
@@ -31,6 +49,13 @@ define([], function () {
                 console.log(getPrettyTimeStamp(), msg);
             }
         },
+
+        /**
+         * Log a warning
+         * @method warn
+         * @param {String} msg
+         * @param {*} data
+         */
         warn: function (msg, data) {
             console.warn(getPrettyTimeStamp(), msg + ':', data);
         }

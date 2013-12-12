@@ -1,6 +1,7 @@
 /**
  *
  * @module Computation
+ * @class Computation
  */
 
 define(['muskepeer-module', '../storage/index', '../project', './collection/workers', './collection/jobs'], function (MuskepeerModule, storage, project, workers, jobs) {
@@ -9,9 +10,20 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
 
     return module.extend({
 
+        /**
+         * @property {Boolean} isRunning
+         * @default false
+         */
         isRunning: false,
+        /**
+         * @property {Boolean} isPaused
+         * @default false
+         */
         isPaused: false,
 
+        /**
+         * @method start
+         */
         start: function () {
             //are there any jobs left, that are related to this project?
             /* storage.find('jobs')
@@ -41,14 +53,23 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
              */
 
         },
+        /**
+         * @method pause
+         */
         pause: function () {
             workers.pause();
             this.isPaused = true;
         },
+        /**
+         * @method resume
+         */
         resume: function () {
             workers.resume();
             this.isPaused = false;
         },
+        /**
+         * @method stop
+         */
         stop: function () {
             workers.stop();
             this.isRunning = false;

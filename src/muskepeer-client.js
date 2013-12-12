@@ -2,6 +2,8 @@
  *
  * @author Matthieu Holzer
  * @version 0.1
+ * @module Muskepeer-Client
+ * @class Muskepeer-Client
  */
 
 define([
@@ -17,6 +19,11 @@ define([
 
     "use strict";
 
+    /**
+     * @private
+     * @method browserFitsRequirements
+     * @returns {boolean}
+     */
     function browserFitsRequirements() {
         //Object.observe is handled via observe-js, as too many browser yet don't support it
         return !!JSON && !!localStorage && !!indexedDB && !!navigator.geolocation;
@@ -34,8 +41,8 @@ define([
 
         /**
          * Initiate muskepeer
-         * Tests if browser-requirements are fulfilled.
-         * @returns {muskepeer}
+         * @method init
+         * @return {Object}
          */
         init: function () {
 
@@ -47,8 +54,9 @@ define([
         },
         /**
          * Start muskepeer
+         * @method start
          * @param config Configuration-Object
-         * @returns {muskepeer}
+         * @returns {Object}
          */
         start: function (config) {
 
@@ -72,19 +80,20 @@ define([
             computation.start();
 
             /*
-            //store node configuration
-            storage.saveMultiple('nodes', muskepeer.config.nodes, {allowDuplicates: false})
-                .then(function () {
-                    //network.start();
-                    computation.start();
-                });
-*/
+             //store node configuration
+             storage.saveMultiple('nodes', muskepeer.config.nodes, {allowDuplicates: false})
+             .then(function () {
+             //network.start();
+             computation.start();
+             });
+             */
 
             return muskepeer;
         },
 
         /**
          * Stop muskepeer
+         * @method stop
          */
         stop: function () {
             muskepeer.computation.stop();

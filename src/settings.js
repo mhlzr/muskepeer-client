@@ -3,19 +3,48 @@
  * localStorage
  *
  * @module Settings
- * @constructor
- * @param storeName String Keyname for the settings object in localStorage
+ * @class Settings
  */
 
 define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
 
+    /**
+     *
+     * @type {String}
+     * @private
+     * @default 'settings'
+     */
     var _storeName = 'settings',
-        _settings = readSettingsFromLocalStorage();
+        /**
+         *
+         * @type {*}
+         * @private
+         */
+            _settings = readSettingsFromLocalStorage();
+
+
+    /**
+     * @private
+     * @method readSettingsFromLocalStorage
+     * @return {Object} Settings
+     */
+    function readSettingsFromLocalStorage() {
+        return JSON.parse(localStorage.getItem(_storeName)) || {};
+    }
+
+    /**
+     * @private
+     * @method storeSettingsToLocalStorage
+     */
+    function storeSettingsToLocalStorage() {
+        localStorage.setItem(_storeName, JSON.stringify(_settings));
+    }
+
 
     //Chrome is currently the only one supporting
     //Object.observe(_settings, storeSettingsToLocalStorage);
 
-    var observer = new PathObserver(_settings, storeSettingsToLocalStorage);
+    new PathObserver(_settings, storeSettingsToLocalStorage);
 
     //Defaults
     _.defaults(_settings, {
@@ -25,13 +54,6 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
         maxWorkers: 2
     });
 
-    function readSettingsFromLocalStorage() {
-        return JSON.parse(localStorage.getItem(_storeName)) || {};
-    }
-
-    function storeSettingsToLocalStorage() {
-        localStorage.setItem(_storeName, JSON.stringify(_settings));
-    }
 
     return _settings;
 

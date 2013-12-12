@@ -1,16 +1,42 @@
 /**
+ *
  * @author Matthieu Holzer
- * @date 22.10.13
+ *
+ * @module GeoLocation
  * @class GeoLocation
+ * @requires q, project
+ *
  */
 
 define(['q', 'project'], function (Q, project) {
 
-    var EARTH_RADIUS = 6371; // Radius of the earth in km
+    /**
+     * Earth-radius in kilometers
+     * @private
+     * @property EARH_RADIUS
+     * @type {Number}
+     * @readOnly
+     * @static
+     * @final
+     */
+    var EARTH_RADIUS = 6371;
 
-    var _location;
+    /**
+     * Internal caching for the location object
+     * @private
+     * @property location
+     * @type Object
+     * @default null
+     */
+    var _location = null;
 
-
+    /**
+     * Convert angular-value to radian
+     * @method deg2grad
+     * @private
+     * @param deg {Number} Degrees
+     * @return {Number}
+     */
     function deg2rad(deg) {
         return deg * (Math.PI / 180);
     }
@@ -19,7 +45,8 @@ define(['q', 'project'], function (Q, project) {
 
         /**
          * Asynchronously get the latitude/longitude of the device using the W3C-API
-         * @returns {promise|*}
+         * @method getGeoLocation
+         * @return {Promise}
          */
         getGeoLocation: function () {
 
@@ -57,11 +84,19 @@ define(['q', 'project'], function (Q, project) {
         },
 
         /**
-         * Uses the Haversine formula to calculate the distance between two locations
-         * @param position1
-         * @param position2 (optional)
+         * Uses the Haversine formula to calculate the distance between two geoLocations
          *
-         * @returns distance Float distance in kilometers
+         * @method getDistanceBetweenTwoLocations
+         * @see http://en.wikipedia.org/wiki/Haversine_formula
+         *
+         * @param {Object} position1
+         * @param {Number} position1.lat
+         * @param {Number} position1.long
+         * @param {Object} [position2]
+         * @param {Number} position2.lat
+         * @param {Number} position2.long
+         *
+         * @return [Number] distance in kilometers
          */
         getDistanceBetweenTwoLocations: function (position1, position2) {
 
