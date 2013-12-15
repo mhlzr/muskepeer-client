@@ -8,7 +8,7 @@ define(['sjcl'], function (sjcl) {
 
     return {
         hash: function (data) {
-            var bitArray = sjcl.hash.sha256.hash(data);
+            var bitArray = sjcl.hash.sha256.hash(JSON.stringify(data));
             return sjcl.codec.hex.fromBits(bitArray);
         }
 
