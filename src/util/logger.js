@@ -28,39 +28,61 @@ define([], function () {
         return date.join(':');
     }
 
+    function print(type, args) {
+
+        if (args.length === 1) {
+            console[type](getPrettyTimeStamp(), args[0]);
+        }
+        else if (args.length === 2) {
+            console[type](getPrettyTimeStamp(), args[0] + ':', args[1]);
+        }
+        else if (args.length === 3) {
+            console[type](getPrettyTimeStamp(), args[0], args[1], ':', args[2]);
+        }
+        else {
+            console[type](getPrettyTimeStamp(), args);
+        }
+    }
+
     return {
 
         /**
          * Log some information
          *
          * @method log
+         *
          * @param {*} msg
          * @param {*} [desc]
          * @param {*} [data]
          */
         log: function (msg, desc, data) {
-            if (arguments.length === 1) {
-                console.log(getPrettyTimeStamp(), msg);
-            }
-            else if (arguments.length === 2) {
-                console.log(getPrettyTimeStamp(), msg + ':', desc);
-            }
-            else if (arguments.length === 3) {
-                console.log(getPrettyTimeStamp(), msg, desc, ':', data);
-            }
-            else {
-                console.log(getPrettyTimeStamp(), arguments);
-            }
+            print('log', arguments);
         },
 
         /**
          * Log a warning
+         *
          * @method warn
-         * @param {String} msg
-         * @param {*} data
+         *
+         * @param {*} msg
+         * @param {*} [desc]
+         * @param {*} [data]
          */
-        warn: function (msg, data) {
-            console.warn(getPrettyTimeStamp(), msg + ':', data);
+        warn: function (msg, desc, data) {
+            print('warn', arguments);
+        },
+
+        /**
+         * Log an error
+         *
+         * @method error
+         *
+         * @param {*} msg
+         * @param {*} [desc]
+         * @param {*} [data]
+         */
+        error: function (msg, desc, data) {
+            print('error', arguments);
         }
     };
 });
