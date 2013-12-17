@@ -13,98 +13,97 @@ define([
     './network/index',
     './project',
     './settings',
-    './states',
     './storage/index'
-], function (_, computation, crypto, network, project, settings, states, storage) {
+], function (_, computation, crypto, network, project, settings, storage) {
 
     "use strict";
 
     /**
      * @private
-     * @method browserFitsRequirements
+     * @method deviceHasRequiredFeatures
      * @returns {boolean}
      */
-    function browserFitsRequirements() {
+    function deviceHasRequiredFeatures() {
         //Object.observe is handled via observe-js, as too many browser yet don't support it
-        return !!JSON && !!localStorage && !!indexedDB && !!navigator.geolocation;
+        return !!JSON && !!localStorage && !!indexedDB && !!navigator.geolocation && !!(window.mozRTCPeerConnection || window.webkitRTCPeerConnection || RTCPeerConnection);
     }
 
-    var muskepeer = {
+    var module = {
 
         computation: computation,
         crypto: crypto,
         network: network,
         project: project,
         settings: settings,
-        states: states,
         storage: storage,
 
         /**
          * Initiate muskepeer
          * @method init
+         * @chainable
          * @return {Object}
          */
         init: function () {
 
-            if (!browserFitsRequirements()) {
-                throw new Error('Your browser does not fit the requirements');
+            if (!deviceHasRequiredFeatures()) {
+                throw new Error('Your browser is not supported.');
             }
 
-            return muskepeer;
+            return module;
         },
         /**
          * Start muskepeer
          * @method start
+         * @chainable
          * @param config Configuration-Object
          * @returns {Object}
          */
         start: function (config) {
 
             if (config) {
-                muskepeer.config = config;
+                module.config = config;
             }
 
             //storage is initialized async,
             //if not yet read, we wait for the event
             if (!storage.isReady) {
-                storage.on('ready', muskepeer.start);
+                storage.on('ready', module.start);
                 return this;
             }
             else {
-                storage.off('ready', muskepeer.start);
+                storage.off('ready', module.start);
             }
 
             //combine project settings with defaults
-            project = _.defaults(project, muskepeer.config.project);
+            project = _.defaults(project, module.config.project);
 
-            computation.start();
 
-            /*
-             //store node configuration
-             storage.saveMultiple('nodes', muskepeer.config.nodes, {allowDuplicates: false})
-             .then(function () {
-             //network.start();
-             computation.start();
-             });
-             */
+            //store node configuration
+            storage.saveMultiple('nodes', module.config.nodes, {allowDuplicates: false})
+                .then(function () {
+                    network.start();
+                    //computation.start();
+                });
 
-            return muskepeer;
+
+            return module;
         },
 
         /**
          * Stop muskepeer
          * @method stop
+         * @chainable
          */
         stop: function () {
-            muskepeer.computation.stop();
-            muskepeer.network.stop();
-            return muskepeer;
+            module.computation.stop();
+            module.network.stop();
+            return module;
 
         }
 
 
     };
 
-    return muskepeer;
+    return module;
 
 });

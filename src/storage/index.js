@@ -1,11 +1,13 @@
 /**
  * Storage
+ *
  * @class Storage
+ * @module Storage
  *
  * @see https://github.com/jensarps/IDBWrapper
  */
 
-define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], function (_, Q, uuid, project, MuskepeerModule, IDBStore) {
+define(['lodash', 'q', 'uuid', 'project', './collection/files', 'muskepeer-module', 'idbwrapper'], function (_, Q, uuid, project, files, MuskepeerModule, IDBStore) {
 
         var STORE_PREFIX = 'Muskepeer-',
             EVENT_READY = 'ready',
@@ -26,7 +28,14 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
             module.emit(EVENT_READY);
         });
 
+        module.files = files.init(module);
 
+        /**
+         * Create needed indexedDB-Stores
+         * @private
+         * @method createStores
+         * @return {Promise}
+         */
         function createStores() {
             var storeNames = ['results', 'jobs', 'files', 'nodes'],
                 promises = [];
@@ -36,18 +45,24 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
                     deferred = Q.defer();
 
                     //create store
-                    stores.push(new IDBStore({
-                        autoIncrement: false,
-                        keyPath: 'uuid',
-                        storeName: storeName,
-                        storePrefix: STORE_PREFIX,
-                        indexes: [
-                            { name: 'project', keyPath: 'projectUuid', unique: false, multiEntry: true }
-                        ],
-                        onStoreReady: deferred.resolve,
-                        onError: deferred.reject
+                    stores.push(
+                        new IDBStore({
+                            autoIncrement: false,
+                            keyPath: 'uuid',
+                            storeName: storeName,
+                            storePrefix: STORE_PREFIX,
+                            indexes: [
+                                {
+                                    name: 'project',
+                                    keyPath: 'projectUuid',
+                                    unique: false,
+                                    multiEntry: true
+                                }
+                            ],
+                            onStoreReady: deferred.resolve,
+                            onError: deferred.reject
 
-                    })
+                        })
                     );
 
                     //add promise
@@ -61,7 +76,12 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
 
         }
 
-
+        /**
+         * @private
+         * @method getStoreByBame
+         * @param {String} name
+         * @return {Object}
+         */
         function getStoreByName(name) {
             return _.find(stores, function (store) {
                 return store.storeName === name;
@@ -70,10 +90,17 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
 
         return module.extend({
 
+            /**
+             * @property isReady
+             * @type Boolean
+             * @default false
+             */
             isReady: false,
 
             /**
              * Clear all data from stores
+             * @method clear
+             * @return {Promise}
              */
             clear: function () {
                 var promises = [];
@@ -95,9 +122,9 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
             /**
              * Read data by key from indexedDB
              * @method read
-             * @param storeName
-             * @param key
-             * @returns {Promise}
+             * @param {String} storeName
+             * @param {String} key
+             * @return {Promise}
              */
             read: function (storeName, key) {
                 var deferred = Q.defer(),
@@ -119,12 +146,15 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
             },
 
             /**
-             * LIst all items from a store
-             * @param storeName
-             * @param options
-             * @param keyRangeOptions
-             * @param filterObject
-             * @returns {Promise}
+             * List all items from a store
+             * @method list
+             *
+             * @param {String} storeName
+             * @param {Object} [options]
+             * @param {Object] [keyRangeOptions]
+             * @param {Object] [filterObject]
+             *
+             * @return {Promise}
              */
             list: function (storeName, options, keyRangeOptions, filterObject) {
                 var deferred = Q.defer(),
@@ -187,9 +217,12 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
 
             /**
              * Uses list() and reduces matches by indexedDB.keyranges
-             * @param storeName
-             * @param options
-             * @param keyRangeOptions
+             *
+             * @method findAndReduceByKeyRange
+             *
+             * @param {String} storeName
+             * @param {Object} options
+             * @param {Object} keyRangeOptions
              * @returns {Promise}
              */
             findAndReduceByKeyRange: function (storeName, options, keyRangeOptions) {
@@ -198,9 +231,12 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
 
             /**
              * Uses list() and reduces matches by a filterObject
-             * @param storeName
-             * @param options
-             * @param filterObject
+             *
+             * @method findAndReduceByObject
+             *
+             * @param {String} storeName
+             * @param {Object} options
+             * @param {Object} filterObject
              * @returns {Promise}
              */
             findAndReduceByObject: function (storeName, options, filterObject) {
@@ -209,9 +245,12 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
 
             /**
              * Save data to indexedDb, if not uuid is set it will be added automatically
-             * @param storeName
-             * @param data
-             * @param options
+             *
+             * @method save
+             *
+             * @param {String} storeName
+             * @param {Object} data
+             * @param {Object} options
              * @returns {Promise}
              */
             save: function (storeName, data, options) {
@@ -231,7 +270,7 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
                 }
 
                 //data has uuid?
-                if (!data.uuid || !uuid.isValid(data.uuid)) {
+                if (!options.uuidIsHash && (!data.uuid || !uuid.isValid(data.uuid))) {
                     data.uuid = uuid.generate();
                 }
 
@@ -282,10 +321,13 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
 
             /**
              * Save Mutiple objects to a shared store
-             * @param storeName
-             * @param datasets Array
-             * @param options
-             * @returns {Promise}
+             *
+             * @method saveMultiple
+             *
+             * @param {String} storeName
+             * @param {Array} datasets
+             * @param {Object} options
+             * @return {Promise}
              */
             saveMultiple: function (storeName, datasets, options) {
                 var promises = [];
@@ -299,9 +341,12 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
 
             /**
              * Remove an existing dataset
-             * @param storeName
-             * @param key
-             * @returns {Promise}
+             *
+             * @method remove
+             *
+             * @param {String} storeName
+             * @param {String} key
+             * @return {Promise}
              */
             remove: function (storeName, key) {
                 var deferred = Q.defer(),
@@ -319,6 +364,9 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
 
             /**
              * Update an existing dataset
+             *
+             * @method update
+             *
              * @param storeName
              * @param data
              * @returns {Promise}
@@ -364,8 +412,6 @@ define(['lodash', 'q', 'uuid', 'project', 'muskepeer-module', 'idbwrapper'], fun
                 return deferred.promise;
             }
 
-        })
-            ;
+        });
     }
-)
-;
+);

@@ -32,10 +32,14 @@ define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, Musk
                 var node;
                 nodeData.forEach(function (data) {
                     node = new Node(data);
+
+                    node.id = _nodes.length + 1;
+
                     //pass-through events
                     node.onAny(function (e) {
                         module.emit(this.event, e)
                     });
+
                     _nodes.push(node);
                 });
             },

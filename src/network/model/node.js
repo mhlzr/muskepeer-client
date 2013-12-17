@@ -13,6 +13,11 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
     });
 
 
+    /**
+     * @class Node
+     * @param config
+     * @constructor
+     */
     var Node = function (config) {
 
         var self = this;
@@ -27,6 +32,7 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
         this.port = config.port || 8080;
         this.isSecure = config.isSecure || false;
         this.url = null; //set via WS
+        this.id = 0; //for local use only
         this.uuid = config.uuid;
         this.socket = null;
 
@@ -41,19 +47,25 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
                 //add listeners
                 this.socket.addEventListener('message', this.messageHandler);
                 this.socket.addEventListener('open', function () {
-                    logger.log('Node ' + self.url, 'connected');
+                    logger.log('Node' + self.id + ' ' + self.url, 'connected');
                     self.isConnected = true;
                     callback();
                 });
 
                 this.socket.addEventListener('error', function (e) {
                     self.disconnect();
-                    logger.log('Node ' + self.url, 'error');
+                    logger.log('Node' + self.id + ' ' + self.url, 'error');
                 });
 
                 this.socket.addEventListener('close', function (e) {
                     self.disconnect();
-                    logger.log('Node ' + self.url, 'disconnected', e.reason);
+                    logger.log('Node' + self.id + ' ' + self.url, 'disconnected', e.code + ' : ' + e.reason);
+
+                    switch (e.code) {
+                        case 1011 :
+                            logger.log('Node' + self.id + ' ' + self.url, 'is idle! Please restart it.');
+                            break;
+                    }
                 });
             }
             catch (e) {
@@ -63,6 +75,11 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
             return this;
         };
 
+        /**
+         * @method
+         * @chainable
+         * @returns {Node}
+         */
         this.disconnect = function () {
             this.socket = null;
             this.isConnected = false;
@@ -120,7 +137,11 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
         };
 
         this.sendPeerOffer = function (targetPeerUuid, offer) {
-            return this.send('peer:offer', {uuid: settings.uuid, targetPeerUuid: targetPeerUuid, offer: offer}, false);
+
+            return geolocation.getGeoLocation()
+                .then(function (location) {
+                    self.send('peer:offer', {uuid: settings.uuid, targetPeerUuid: targetPeerUuid, offer: offer, location: location}, false);
+                });
         };
 
         this.sendPeerAnswer = function (targetPeerUuid, answer) {
@@ -140,11 +161,11 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
             var data = JSON.parse(e.data),
                 cmd = data.cmd;
 
-            logger.log('Node', 'received', data);
+            logger.log('Node' + self.id, 'received', data);
 
             switch (cmd.toLowerCase()) {
                 case 'peer:offer' :
-                    self.emit('peer:offer', {nodeUuid: self.uuid, targetPeerUuid: data.data.targetPeerUuid, offer: data.data.offer});
+                    self.emit('peer:offer', {nodeUuid: self.uuid, targetPeerUuid: data.data.targetPeerUuid, offer: data.data.offer, location: data.data.location});
                     break;
                 case 'peer:answer' :
                     self.emit('peer:answer', {nodeUuid: self.uuid, targetPeerUuid: data.data.targetPeerUuid, answer: data.data.answer});

@@ -4,9 +4,23 @@
  * @class Computation
  */
 
-define(['muskepeer-module', '../storage/index', '../project', './collection/workers', './collection/jobs'], function (MuskepeerModule, storage, project, workers, jobs) {
+define(['muskepeer-module', '../storage/index', '../project', './collection/workers', './collection/jobs', './model/job'], function (MuskepeerModule, storage, project, workers, jobs, Job) {
 
     var module = new MuskepeerModule();
+
+    /**
+     * @private
+     * @method addWorkerListeners
+     */
+    function addWorkerListeners() {
+        workers.on('job:required');
+        workers.on('job:complete');
+        workers.on('job:started');
+        workers.on('result:required');
+        workers.on('result:found');
+        workers.on('data:required');
+    }
+
 
     return module.extend({
 
@@ -21,36 +35,46 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
          */
         isPaused: false,
 
+
+        /**
+         * @property {Object} jobs
+         */
+        jobs: jobs,
+
         /**
          * @method start
          */
         start: function () {
+
             //are there any jobs left, that are related to this project?
-            /* storage.find('jobs')
-             .progress(function (job) {
-             jobs.add(job);
-             })
-             .done(function (results) {
-             console.log('all local jobs read:', results);
-             });
-             */
+            storage.findAndReduceByObject('jobs', {filterDuplicates: false}, {projectUuid: project.uuid})
+                .progress(function (job) {
+                    jobs.add(job);
+                })
+                .then(function (results) {
 
-            if (workers.size === 0) {
-                workers.create('./worker.js');
-                //workers.create(URL.createObjectURL(project.computation.worker.algorithm()));
-                this.isRunning = true;
-                this.isPaused = false;
-            }
+                    logger.log('Computation', 'read all local jobs', results.length);
 
-            logger.log('Computation', 'workers starting');
+                    if (workers.size === 0) {
+                        workers.create('./worker.js');
+                        //workers.create(URL.createObjectURL(project.computation.worker.algorithm()));
+                        this.isRunning = true;
+                        this.isPaused = false;
+                    }
 
-            workers.start();
 
-            /*
-             workers.on('need:job');
-             workers.on('need:result');
-             workers.on('need:result');
-             */
+                    // Create jobs if enabled
+                    if (jobs.size === 0 && project.computation.jobs.autoGeneration) {
+                        module.createAndStoreJobs(project.computation.jobs.groupSize);
+                    }
+
+                    addWorkerListeners();
+
+                    logger.log('Computation', 'workers starting');
+                    workers.start();
+
+                });
+
 
         },
         /**
@@ -73,8 +97,28 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
         stop: function () {
             workers.stop();
             this.isRunning = false;
+        },
+
+        /**
+         * @method createAndStoreJobs
+         */
+        createAndStoreJobs: function (amount) {
+
+
+            var job;
+            for (var i = 0; i < amount; i++) {
+                job = new Job(project.computation.jobs.createJobParameters(i));
+                jobs.add(job);
+            }
+
+            this.jobs = jobs;
+
+            //store node configuration
+            storage.saveMultiple('jobs', jobs.list, {allowDuplicates: false, uuidIsHash: true})
+                .then(function () {
+                    console.log('Jobs saved');
+                });
+
         }
     });
-
-
 });

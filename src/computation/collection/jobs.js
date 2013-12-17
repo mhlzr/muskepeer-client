@@ -1,37 +1,44 @@
 /**
- *
+ * @class Jobs
+ * @module Jobs
  */
 
 
 define(function () {
 
-    var jobs = [];
+    var _jobs = [];
 
     return{
 
-        size: jobs.length,
+        list: _jobs,
+        size: _jobs.length,
 
-        add: function (task) {
-            jobs.push(task);
-            this.size = jobs.length;
+        add: function (job) {
+
+            if (!job.uuid || this.getJobByUuid(job.uuid) != null) return;
+
+            _jobs.push(job);
+            this.size = _jobs.length;
         },
 
         clear: function () {
-            jobs = [];
+            _jobs = [];
             this.size = 0;
         },
 
         getNext: function () {
-            return jobs.shift();
+            return _jobs.shift();
         },
 
-        getByUuid: function (uuid) {
-            //TODO Job Model
+        getJobByUuid: function (uuid) {
+            return _.find(_jobs, function (job) {
+                return job.uuid === uuid;
+            });
         },
 
 
         remove: function () {
-            this.size = jobs.length;
+            this.size = _jobs.length;
         }
 
     }

@@ -39,14 +39,17 @@ define([], function () {
          * @param {*} [data]
          */
         log: function (msg, desc, data) {
-            if (desc && !data) {
+            if (arguments.length === 1) {
+                console.log(getPrettyTimeStamp(), msg);
+            }
+            else if (arguments.length === 2) {
                 console.log(getPrettyTimeStamp(), msg + ':', desc);
             }
-            else if (desc && data) {
+            else if (arguments.length === 3) {
                 console.log(getPrettyTimeStamp(), msg, desc, ':', data);
             }
             else {
-                console.log(getPrettyTimeStamp(), msg);
+                console.log(getPrettyTimeStamp(), arguments);
             }
         },
 

@@ -31,6 +31,8 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
         }
 
         /**
+         * Event-Handler, gets called when another Peer sends an offer
+         *
          * @private
          * @method peerOfferHandler
          * @param data
@@ -39,14 +41,26 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
             var peer = peers.getPeerByUuid(data.targetPeerUuid);
 
             if (!peer) {
-                peer = new Peer({uuid: data.targetPeerUuid, nodes: [data.nodeUuid], isSource: true});
-                peers.add(peer);
+
+                peers.update([
+                    {
+                        uuid: data.targetPeerUuid,
+                        nodes: [data.nodeUuid],
+                        location: data.location,
+                        isSource: true,
+                        isTarget: false
+                    }
+                ]);
+
+                peer = peers.getPeerByUuid(data.targetPeerUuid);
             }
 
             peer.answerOffer(data);
         }
 
         /**
+         * Event-Handler, gets called when another Peer sends an answer to an offer
+         *
          * @private
          * @method peerAnswerHandler
          * @param {Object} data
@@ -106,7 +120,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                         //creates objects of type model/peer
                         peers.update(peerData);
                     })
-                    .then(peers.connect)
+                    .then(peers.connectToNeighbourPeers)
                     .done(function () {
                         logger.log('Network', 'Start complete');
                     });
@@ -123,18 +137,17 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
              * Send data to all nodes and peers
              *
              * @method broadcast
-             * @param cmd {String} defines type of data
+             * @param type {String} defines type of data
              * @param data {Object}
              */
-            broadcast: function (cmd, data) {
+            broadcast: function (type, data) {
+
 
                 nodes.list.forEach(function (node) {
-                    node.send(cmd, data);
+                    node.send(type, data);
                 });
 
-                peers.list.forEach(function (peer) {
-                    peer.send(cmd, data);
-                });
+                peers.broadcast(type, data);
             }
 
 

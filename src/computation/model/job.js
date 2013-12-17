@@ -3,16 +3,12 @@
  */
 define(['crypto/index'], function (crypto) {
 
-    return function Job(data) {
+    return function Job(parameters) {
 
-        this.uuid = this.getParamsAsHash();
+        this.parameters = parameters;
+        this.uuid = crypto.hash(this.parameters);
 
-        this.getParams = function () {
-            return data.params;
-        };
-
-        this.getParamsAsHash = function () {
-            return crypto.hash(this.getParams())
-        };
+        console.log(this.parameters, this.uuid);
+        return this;
     };
 });

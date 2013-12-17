@@ -117,7 +117,7 @@ module.exports = function (grunt) {
                     description: '<%= pkg.description %>',
                     version: '<%= pkg.version %>',
                     options: {
-                        ignorePaths: './src/lib',
+                        exclude: 'lib',
                         paths: './src',
                         outdir: './doc'
                     }
@@ -149,7 +149,7 @@ module.exports = function (grunt) {
     grunt.registerTask('doc', ['yuidoc']);
 
 // Release Task
-    grunt.registerTask('deploy', []);
+    grunt.registerTask('deploy', ['doc', 'requirejs']);
 
 
 };
