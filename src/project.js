@@ -5,6 +5,11 @@
 define([], function () {
     return {
 
+        files: [
+            'http://localhost/main.js',
+            'http://localhost/index.html',
+            'https://dl.dropboxusercontent.com/u/959008/paris.jpg'
+        ],
         computation: {
 
             jobs: {

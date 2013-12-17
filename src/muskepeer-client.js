@@ -60,47 +60,33 @@ define([
          */
         start: function (config) {
 
-            if (config) {
-                module.config = config;
-            }
+            // Store configuration
+            module.config = config;
 
-            //storage is initialized async,
-            //if not yet read, we wait for the event
-            if (!storage.isReady) {
-                storage.on('ready', module.start);
-                return this;
-            }
-            else {
-                storage.off('ready', module.start);
-            }
-
-            //combine project settings with defaults
+            // Combine project settings with defaults
             project = _.defaults(project, module.config.project);
 
-
-            //store node configuration
-            storage.saveMultiple('nodes', module.config.nodes, {allowDuplicates: false})
+            // Initialize storage module
+            storage.init()
                 .then(function () {
-                    network.start();
+                    // Store node configuration
+                    return storage.db.saveMultiple('nodes', module.config.nodes, {allowDuplicates: false})
+                })
+                .then(function () {
+                    //network.start();
                     //computation.start();
-                });
 
 
-            //TESTING
-            storage.files.downloadAndStoreFiles(
-                    [
-                        'http://localhost/main.js',
-
-                        'http://localhost/index.html'
-                    ])
-                .then(function () {
-                    console.log('saved');
-                    storage.files.getFileByUuid('4e8a26824a5fdb3cb836ee8ad737e520b2b997b6e023e6238402bb526e9ca4d2')
-                        .then(function (d) {
-                            console.log(d);
+                    //TESTING
+                    storage.files.add(project.files)
+                        .then(function () {
+                            return storage.files.download();
+                        })
+                        .then(function () {
+                            logger.log('DONE!');
                         });
-                });
 
+                });
 
             return module;
         },
