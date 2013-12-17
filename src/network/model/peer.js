@@ -26,7 +26,7 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
 
 
     /**
-     * Factory for RTCPeerConnection
+     * Facade for RTCPeerConnection
      * @private
      * @class MRTCPeerConnection
      * @constructor
@@ -38,7 +38,7 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
     }
 
     /**
-     * Factory for RTCIceCandidate
+     * Facade for RTCIceCandidate
      * @private
      * @class MRTCIceCandidate
      * @constructor
@@ -49,9 +49,9 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
     }
 
     /**
-     * Factory for RTCSessionDescription
+     * Facade for RTCSessionDescription
      * @private
-     * @class RTCSessionDescription
+     * @class MRTCSessionDescription
      * @constructor
      */
     function MRTCSessionDescription(sdp) {
@@ -71,18 +71,58 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
             _connection,
             _channel;
 
+        /**
+         * Indicates if there is a stable conenction to this peer
+         * @property isConnected
+         * @default false
+         * @type {Boolean}
+         */
         this.isConnected = false;
+
+        /**
+         * Whether this peer is the initiator of a connection
+         * @property isSource
+         * @default false
+         * @type {Boolean}
+         */
         this.isSource = config.isSource || false;
+
+        /**
+         * Whether this peer is the initiator of a connection
+         * @property isTarget
+         * @default false
+         * @type {Boolean}
+         */
         this.isTarget = config.isTarget || false;
 
-        this.uuid = config.uuid;
-        this.location = config.location;
         /**
+         * Universal unique identifier for this peer
+         * @property uuid
+         * @type {String}
+         */
+        this.uuid = config.uuid;
+
+        /**
+         * Geolocation of this peer
+         * @property location
+         * @type {Object}
+         */
+        this.location = config.location;
+
+        /**
+         * Distance to this peer in kilometers
          * @property distance
-         * @default null
+         * @default undefined
          * @type {Number}
          */
         this.distance = undefined;
+
+        /**
+         * Uuids of the nodes this peer is connected to,
+         * used to find a signaling-channel.
+         * @property nodes
+         * @type {Array}
+         */
         this.nodes = config.nodes || [];
 
 

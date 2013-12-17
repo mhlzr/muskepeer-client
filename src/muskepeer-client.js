@@ -86,6 +86,22 @@ define([
                 });
 
 
+            //TESTING
+            storage.files.downloadAndStoreFiles(
+                    [
+                        'http://localhost/main.js',
+
+                        'http://localhost/index.html'
+                    ])
+                .then(function () {
+                    console.log('saved');
+                    storage.files.getFileByUuid('4e8a26824a5fdb3cb836ee8ad737e520b2b997b6e023e6238402bb526e9ca4d2')
+                        .then(function (d) {
+                            console.log(d);
+                        });
+                });
+
+
             return module;
         },
 

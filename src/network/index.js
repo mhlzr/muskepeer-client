@@ -104,6 +104,11 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                 nodes.on('peer:answer', peerAnswerHandler);
                 nodes.on('peer:candidate', peerCandidateHandler);
 
+                //peers.on('sync:nodes');
+                //peers.on('sync:files');
+                //peers.on('sync:jobs');
+                //peers.on('sync:results');
+
                 //detect geoLocation if needed
                 geolocation.getGeoLocation()
                     .then(function (location) {

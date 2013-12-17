@@ -124,18 +124,20 @@ define(['lodash', 'q', 'uuid', 'project', './collection/files', 'muskepeer-modul
              * @method read
              * @param {String} storeName
              * @param {String} key
+             * @param {Boolean} [keyIsHash]
              * @return {Promise}
              */
-            read: function (storeName, key) {
+            read: function (storeName, key, keyIsHash) {
                 var deferred = Q.defer(),
                     store = getStoreByName(storeName);
 
+                keyIsHash = keyIsHash || false;
 
                 if (!store) {
                     deferred.reject(ERRORS.STORE_NOT_FOUND);
                     return deferred.promise;
                 }
-                else if (!uuid.isValid(key)) {
+                else if (!uuid.isValid(key) && !keyIsHash) {
                     deferred.reject(ERRORS.UUID_INVALID);
                     return deferred.promise;
                 }
@@ -151,8 +153,8 @@ define(['lodash', 'q', 'uuid', 'project', './collection/files', 'muskepeer-modul
              *
              * @param {String} storeName
              * @param {Object} [options]
-             * @param {Object] [keyRangeOptions]
-             * @param {Object] [filterObject]
+             * @param {Object} [keyRangeOptions]
+             * @param {Object} [filterObject]
              *
              * @return {Promise}
              */
@@ -223,7 +225,7 @@ define(['lodash', 'q', 'uuid', 'project', './collection/files', 'muskepeer-modul
              * @param {String} storeName
              * @param {Object} options
              * @param {Object} keyRangeOptions
-             * @returns {Promise}
+             * @return {Promise}
              */
             findAndReduceByKeyRange: function (storeName, options, keyRangeOptions) {
                 return this.list(storeName, options, keyRangeOptions);
@@ -237,7 +239,7 @@ define(['lodash', 'q', 'uuid', 'project', './collection/files', 'muskepeer-modul
              * @param {String} storeName
              * @param {Object} options
              * @param {Object} filterObject
-             * @returns {Promise}
+             * @return {Promise}
              */
             findAndReduceByObject: function (storeName, options, filterObject) {
                 return this.list(storeName, options, null, filterObject);
@@ -251,7 +253,7 @@ define(['lodash', 'q', 'uuid', 'project', './collection/files', 'muskepeer-modul
              * @param {String} storeName
              * @param {Object} data
              * @param {Object} options
-             * @returns {Promise}
+             * @return {Promise}
              */
             save: function (storeName, data, options) {
                 var deferred = Q.defer(),
@@ -299,8 +301,11 @@ define(['lodash', 'q', 'uuid', 'project', './collection/files', 'muskepeer-modul
                     module.findAndReduceByObject(storeName, null, clone).then(function (results) {
                         //not found in db
                         if (_.isEmpty(results)) {
+
                             //save
-                            store.put(data, deferred.resolve, deferred.reject)
+                            store.put(data, deferred.resolve, function onError(e) {
+                                deferred.reject(e);
+                            })
                         }
                         //already got such an entry
                         else {
