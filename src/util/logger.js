@@ -39,6 +39,9 @@ define([], function () {
         else if (args.length === 3) {
             console[type](getPrettyTimeStamp(), args[0], args[1], ':', args[2]);
         }
+        else if (args.length === 4) {
+            console[type](getPrettyTimeStamp(), args[0], args[1], ':', args[2], args[3]);
+        }
         else {
             console[type](getPrettyTimeStamp(), args);
         }

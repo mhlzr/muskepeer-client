@@ -2,40 +2,47 @@
  *
  * @module Network
  * @class Network
+ * @extends MuskepeerModule
+ * @uses window
+ *
+ * @see http://www.html5rocks.com/en/mobile/workingoffthegrid/
  *
  */
 
-define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', './model/peer'],
+define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'muskepeer-module', './collections/nodes', './collections/peers'],
 
-    function (Q, _, storage, project, settings, geolocation, MuskepeerModule, nodes, peers, Peer) {
+    function (Q, _, storage, project, settings, geolocation, MuskepeerModule, nodes, peers) {
 
-        var _module = new MuskepeerModule();
+        var module = new MuskepeerModule();
 
         // Detect network change
-        // http://www.html5rocks.com/en/mobile/workingoffthegrid/
         window.addEventListener('offline', networkConnectivityStateChangeHandler);
         window.addEventListener('online', networkConnectivityStateChangeHandler);
 
         /**
+         * Event-Handler, called when Network state changes
+         *
          * @private
          * @method networkConnectivityStateChangeHandler
-         * @param {Object} e Event-Object
+         * @param {Object} e
          */
         function networkConnectivityStateChangeHandler(e) {
             if (e.type === 'online') {
-                logger.warn('Device is online!');
+                logger.log('Network', 'online!');
             }
             else {
-                logger.warn('Device is offline!');
+                logger.warn('Network', 'offline!');
             }
         }
 
         /**
          * Event-Handler, gets called when another Peer sends an offer
+         * If the Peer is not yet in the Peers-Collection, it will be created and added.
+         * Then the answering process gets initialized.
          *
          * @private
          * @method peerOfferHandler
-         * @param data
+         * @param {Object} data
          */
         function peerOfferHandler(data) {
             var peer = peers.getPeerByUuid(data.targetPeerUuid);
@@ -71,6 +78,8 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
         }
 
         /**
+         * Event-Handler, gets called when another Peer sends candidate-data.
+         * Adds the candidate-data to the Peer it came from
          * @private
          * @method peerCandidateHandler
          * @param {Object} data
@@ -81,9 +90,10 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
         }
 
 
-        return _module.extend({
+        return module.extend({
 
             /**
+             * Determine if the client is on-/offline
              * @property isOnline {Boolean}
              */
             isOnline: window.navigator.onLine,
@@ -92,37 +102,67 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
             peers: peers,
 
             /**
+             * Start the network-module
+             *
              * @method start
              */
             start: function () {
 
-                //no need to do anything more if we are not online
-                if (!_module.isOnline) return;
+                // No need to do anything more if we are not online
+                if (!module.isOnline) {
+                    logger.warn('Network', 'not starting, no Internet connection.');
+                    return;
+                }
 
-                //peer listeners
+                // Adding listeners to nodes module
                 nodes.on('peer:offer', peerOfferHandler);
                 nodes.on('peer:answer', peerAnswerHandler);
                 nodes.on('peer:candidate', peerCandidateHandler);
 
-                //peers.on('sync:nodes');
-                //peers.on('sync:files');
-                //peers.on('sync:jobs');
-                //peers.on('sync:results');
+                // Adding listeners to peers module
+                peers.on('peer:connect', function (peer) {
 
-                //detect geoLocation if needed
+                    // Am I the Source?
+                    if (peer.isTarget) {
+                        peer.synchronize();
+
+                        //TESTING
+                        storage.fs.readFileAsDataUrl('paris.jpg')
+                            .then(function (base64) {
+                                peer.sendFile('some uuid', base64, 0);
+                            });
+                    }
+
+                });
+
+                peers.on('peer:message', function (e) {
+                    var peer = e.target;
+
+                    switch(e.type.toLowerCase()){
+                        case 'node:list:pull' : peer.sendNodeList(['foo', 'bar']); break;
+                    }
+                });
+
+                peers.on('peer:disconnect', function (peer) {
+                });
+
+
+                // Detect geoLocation if needed
                 geolocation.getGeoLocation()
                     .then(function (location) {
-                        return storage.findAndReduceByObject('nodes', {filterDuplicates: false}, {projectUuid: project.uuid})
+                        logger.log('Geolocation', 'available');
+                        // Get nodes from database
+                        return storage.db.findAndReduceByObject('nodes', {filterDuplicates: false}, {projectUuid: project.uuid})
                     })
                     .then(function (nodeData) {
-                        //creates objects of type model/node
+                        // Create instances of type model/node
                         nodes.update(nodeData);
                     })
                     .then(nodes.connect)
                     .then(nodes.authenticate)
                     .then(nodes.getRelatedPeers)
                     .then(function (peerData) {
-                        //creates objects of type model/peer
+                        // Create instances of type model/peer
                         peers.update(peerData);
                     })
                     .then(peers.connectToNeighbourPeers)
@@ -132,6 +172,8 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
 
             },
             /**
+             * Stop the network module
+             *
              * @method stop
              */
             stop: function () {
@@ -142,7 +184,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
              * Send data to all nodes and peers
              *
              * @method broadcast
-             * @param type {String} defines type of data
+             * @param type {String} Type of data
              * @param data {Object}
              */
             broadcast: function (type, data) {

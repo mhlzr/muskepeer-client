@@ -1,9 +1,9 @@
 /**
  * Storage
  *
- * @class Storage
  * @module Storage
- *
+ * @class Storage
+ * @extends MuskepeerModule
  */
 
 define(['./database', './filesystem', 'muskepeer-module'], function (database, fileSystem, MuskepeerModule) {
@@ -14,20 +14,33 @@ define(['./database', './filesystem', 'muskepeer-module'], function (database, f
 
         return module.extend({
 
+            /**
+             * Initialize Storage Module
+             *
+             * @method init
+             * @return {Promise}
+             */
             init: function () {
                 return database.init()
                     .then(function () {
-                        fileSystem.init(database);
+                        logger.log('Database', 'ready');
+                        return fileSystem.init(database);
                     })
                     .then(function () {
+                        logger.log('FileSystem', 'ready');
                         module.db = database;
-                        module.files = fileSystem;
+                        module.fs = fileSystem;
                         module.isReady = true;
                     });
             },
+
+            /**
+             * @property isReady
+             * @type {Boolean}
+             */
             isReady: false,
             db: null,
-            files: null
+            fs: null
         });
 
     }

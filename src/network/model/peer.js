@@ -1,11 +1,10 @@
 /**
- * @author Matthieu Holzer
- * @date 12.11.13
+ * @module Network
  *
  * @see http://www.html5rocks.com/en/tutorials/webrtc/infrastructure/
  */
 
-define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
+define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q, EventEmitter2, nodes) {
 
     var ICE_SERVER_SETTINGS = {
             iceServers: [
@@ -24,11 +23,18 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
             }
         };
 
+    var ee = new EventEmitter2({
+        wildcard: true,
+        delimiter: ':',
+        newListener: false,
+        maxListeners: 10
+    });
 
     /**
      * Facade for RTCPeerConnection
      * @private
      * @class MRTCPeerConnection
+     * @for Peer
      * @constructor
      */
     function MRTCPeerConnection(ice, optional) {
@@ -41,6 +47,7 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
      * Facade for RTCIceCandidate
      * @private
      * @class MRTCIceCandidate
+     * @for Peer
      * @constructor
      */
     function MRTCIceCandidate(candidate) {
@@ -52,6 +59,7 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
      * Facade for RTCSessionDescription
      * @private
      * @class MRTCSessionDescription
+     * @for Peer
      * @constructor
      */
     function MRTCSessionDescription(sdp) {
@@ -70,6 +78,12 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
         var _self = this,
             _connection,
             _channel;
+
+        // Event-methods
+        this.emit = ee.emit;
+        this.on = ee.on;
+        this.off = ee.off;
+        this.onAny = ee.onAny;
 
         /**
          * Indicates if there is a stable conenction to this peer
@@ -162,7 +176,7 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
         }
 
         function dataChannelHandler(e) {
-            logger.log('Peer', 'got remote datachannel');
+            logger.log('Peer', _self.uuid, ' got remote datachannel');
 
             _channel = e.channel;
 
@@ -178,46 +192,51 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
             if (_connection.iceConnectionState === 'connected' &&
                 _connection.iceGatheringState === 'complete') {
 
-                logger.log('Peer', 'stable connection');
-
-                _self.isConnected = true;
+                logger.log('Peer', 'connection established');
             }
             else {
-                //TODO dispatch event saying that this peer is offline
-                _self.isConnected = false;
+                logger.log('Peer', 'connection closed');
             }
 
         }
 
         function channelErrorHandler(e) {
-            logger.log('Peer', 'Channel to ' + _self.uuid + ' has an error', e);
+            logger.log('Peer', _self.uuid + ' Channel has an error', e);
         }
 
-        function channelCloseHandler(e) {
-            logger.log('Peer', 'Channel to ' + _self.uuid + ' is closed');
-            _self.isConnected = false;
-        }
 
         function channelMessageHandler(e) {
-            logger.log('Peer', 'received', e.data);
+            var msg;
+
+            if (e.data instanceof Blob) {
+                msg = e.data;
+            }
+            else {
+                msg = JSON.parse(e.data);
+            }
+
+            logger.log('Peer', _self.uuid, 'received', msg);
+
+            _self.emit('peer:message', _.extend(msg, {target: _self}));
+
         }
 
         function channelOpenHandler(e) {
-            logger.log('Peer', 'Channel to ' + _self.uuid + ' is open');
+            logger.log('Peer', _self.uuid + ' Channel is open');
 
             _self.isConnected = true;
-
-            if (_self.isSource) {
-                _channel.send('message send to target');
-            }
-
-            if (_self.isTarget) {
-                _channel.send('message send to source');
-            }
+            _self.emit('peer:connect', _self);
 
         }
 
+        function channelCloseHandler(e) {
+            logger.log('Peer', _self.uuid, ' Channel is closed');
+            _self.isConnected = false;
+            _self.emit('peer:disconnect', _self);
+        }
+
         /* Event Handler END */
+
 
         //1.Alice creates an RTCPeerConnection object.
         _connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, OPTIONAL_SETTINGS);
@@ -245,7 +264,7 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
 
             //create  data-channel with a pseudo-random name
             _channel = _connection.createDataChannel('RTCDataChannel' + (Math.random() * 1000 | 0), {
-                reliable: false
+                reliable: true
             });
 
             //add listeners to channel
@@ -339,19 +358,6 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
 
 
         /**
-         * Send data via a WebRTC-Channel to a peer
-         *
-         * @method send
-         * @param data
-         */
-        this.send = function (data) {
-            if (!this.isConnected) return;
-
-            _channel.send(data);
-
-        };
-
-        /**
          * Save a reference to a node
          *
          * @method addNodes
@@ -366,7 +372,158 @@ define(['lodash', 'q', '../collections/nodes'], function (_, Q, nodes) {
                 }
             });
 
-        }
+        };
+
+        /**
+         * Send data via a WebRTC-Channel to a peer
+         *
+         * @method send
+         * @param data
+         */
+        this.send = function (data) {
+
+            if (!this.isConnected || _channel.readyState !== 'open') {
+                logger.err('Peer', 'attempt to send, but channel is not open!');
+                return;
+            }
+            //actually it should be possible to send a blob
+            if (data instanceof Blob) {
+                _channel.send(data);
+            }
+            else {
+                _channel.send(JSON.stringify(data));
+            }
+
+
+        };
+
+        /**
+         * @method synchronize
+         */
+        this.synchronize = function () {
+
+            logger.log('Peer', this.uuid, ' synchronizing');
+
+            this.getNodeList();
+            this.getPeerList();
+            this.getFileList();
+            this.getJobList();
+            this.getResultList();
+        };
+
+
+        /* File Exchange */
+        this.getFileList = function () {
+            this.send({ type: 'file:list:pull'});
+        };
+
+        this.sendFileList = function (list) {
+            this.send({ type: 'file:list:push', list: list});
+        };
+
+        this.getFileByUuid = function (uuid) {
+            this.send({ type: 'file:pull', uuid: uuid});
+        };
+
+        this.sendFile = function (uuid, chunk, pos) {
+            pos = pos || 0;
+            this.send({ type: 'file:push', uuid: uuid, chunk: 'foo/:\/\////:::()', pos: pos});
+        };
+
+        this.fileReceiveHandler = function () {
+        };
+
+        /* Node Exchange */
+        this.getNodeList = function () {
+            this.send({ type: 'node:list:pull'});
+        };
+
+        this.sendNodeList = function (list) {
+            this.send({ type: 'node:list:push', list: list});
+        };
+
+        this.getNodeByUuid = function (uuid) {
+            this.send({ type: 'node:pull', uuid: uuid});
+        };
+
+        this.sendNode = function (nodes) {
+
+            if (!_.isArray(nodes)) {
+                nodes = [nodes];
+            }
+
+            nodes.forEach(function (node) {
+                _self.send({type: 'node:push', node: node});
+            });
+        };
+
+
+        /* Peer Exchange */
+        this.getPeerList = function () {
+            this.send({ type: 'peer:list:pull'});
+        };
+
+        this.sendPeerList = function (list) {
+            this.send({ type: 'peer:list:push', list: list});
+        };
+
+        this.getPeerByUuid = function () {
+            this.send({ type: 'peer:pull', uuid: uuid});
+        };
+        this.sendPeer = function (peers) {
+            if (!_.isArray(peers)) {
+                peers = [peers];
+            }
+
+            peers.forEach(function (peer) {
+                _self.send({type: 'peer:push', peer: peer});
+            });
+        };
+
+        /* Job Exchange */
+        this.getJobList = function () {
+            this.send({ type: 'job:list:pull'});
+        };
+
+        this.sendPeerList = function (list) {
+            this.send({type: 'job:list:push', list: list});
+        };
+
+        this.getJobByUuid = function (uuid) {
+            this.send({ type: 'job:pull', uuid: uuid});
+        };
+
+        this.sendJob = function (jobs) {
+            if (!_.isArray(jobs)) {
+                jobs = [jobs];
+            }
+
+            jobs.forEach(function (job) {
+                _self.send({type: 'job:push', job: job});
+            });
+        };
+
+        /* Result Exchange */
+        this.getResultList = function () {
+            this.send({ type: 'result:list:pull'});
+        };
+
+        this.sendResultList = function (list) {
+            this.send({type: 'result:list:push', list: list});
+        };
+        this.getResultByUuid = function (uuid) {
+            this.send({type: 'result:pull', uuid: uuid});
+        };
+        this.sendResult = function (results) {
+            if (!_.isArray(results)) {
+                results = [results];
+            }
+
+            results.forEach(function (result) {
+                _self.send({type: 'result:push', result: result});
+            });
+        };
+
 
     };
 

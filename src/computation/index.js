@@ -2,6 +2,7 @@
  *
  * @module Computation
  * @class Computation
+ * @extends MuskepeerModule
  */
 
 define(['muskepeer-module', '../storage/index', '../project', './collection/workers', './collection/jobs', './model/job'], function (MuskepeerModule, storage, project, workers, jobs, Job) {
@@ -34,7 +35,6 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
          * @default false
          */
         isPaused: false,
-
 
         /**
          * @property {Object} jobs

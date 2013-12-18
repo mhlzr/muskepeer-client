@@ -24,7 +24,6 @@
     "idbwrapper": "~1.4.0",
     "node-uuid": "~1.4.1",
     "requirejs-domready": "~2.0.1",
-    "sockjs": "~0.3.4",
-    "observe-js": "~0.1.0"
+    "sockjs": "~0.3.4"
   }
 }

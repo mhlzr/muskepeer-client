@@ -35,7 +35,7 @@ define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, Musk
 
                     node.id = _nodes.length + 1;
 
-                    //pass-through events
+                    // Pass-through events
                     node.onAny(function (e) {
                         module.emit(this.event, e)
                     });

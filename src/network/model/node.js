@@ -1,6 +1,5 @@
 /**
- * @author Matthieu Holzer
- * @date 17.10.13
+ * @module Network
  */
 
 define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], function (_, Q, EventEmitter2, settings, project, geolocation) {
@@ -22,7 +21,7 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
 
         var self = this;
 
-        //events
+        // Event-methods
         this.emit = ee.emit;
         this.on = ee.on;
         this.off = ee.off;

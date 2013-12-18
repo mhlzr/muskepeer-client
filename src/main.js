@@ -5,7 +5,6 @@ require.config({
         'eventemitter2': 'lib/eventemitter2/lib/eventemitter2',
         'idbwrapper': 'lib/idbwrapper/idbstore',
         'node-uuid': 'lib/node-uuid/uuid',
-        'observe-js': 'lib/observe-js/src/observe',
         'q': 'lib/q/q',
         'sjcl': 'lib/sjcl/sjcl',
         'sockjs': 'lib/sockjs/sockjs'

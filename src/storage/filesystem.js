@@ -1,9 +1,9 @@
 /**
- * Files
+ * FileSystem
  *
  * @module Storage
- * @submodule Files
- * @class Files
+ * @submodule FileSystem
+ *
  * @see http://www.html5rocks.com/de/tutorials/file/filesystem/
  * @see https://gist.github.com/robnyman/1894032
  * @see https://developer.mozilla.org/en-US/docs/Web/API/URL.createObjectURL
@@ -11,6 +11,8 @@
  */
 
 define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, crypto, Q, project, settings) {
+
+    var CHUNK_SIZE = 1000;
 
     var _self,
         _db,
@@ -91,11 +93,6 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
     return {
 
-        /**
-         * @property isReady
-         * @default false
-         */
-        isReady: false,
 
         /**
          * Initialize fileStorage
@@ -111,18 +108,12 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
             _self = this;
             _db = db;
 
-            requestQuota()
+            return requestQuota()
                 .then(requestFileSystem)
                 .then(function (fileSystem) {
                     _fs = fileSystem;
                     return createSubDirectory(project.uuid);
-                })
-                .then(function () {
-                    _self.isReady = true;
-                    logger.log('FileStorage', 'ready');
                 });
-
-            return this;
         },
 
         /**
@@ -161,27 +152,63 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
          * @method read
          * @param path
          */
-        read: function (path) {
+        readFileAsLocalUrl: function (path) {
+            var deferred = Q.defer();
+
+            _fs.root.getFile(project.uuid + '/' + path, {}, function (fileEntry) {
+                deferred.resolve(fileEntry.toURL());
+            }, deferred.reject);
+
+            return deferred.promise;
+        },
+
+        readFileAsDataUrl: function (path, offset) {
             var deferred = Q.defer();
 
             _fs.root.getFile(project.uuid + '/' + path, {}, function (fileEntry) {
 
-                deferred.resolve(fileEntry.toURL());
-
                 // Get a File object representing the file,
                 // then use FileReader to read its contents.
-                /* fileEntry.file(function (file) {
+                fileEntry.file(function (file) {
 
-                 var reader = new FileReader();
+                    var reader = new FileReader(),
+                        start = offset || 0,
+                        end = start + CHUNK_SIZE,
+                        blob, chunk;
 
-                 reader.onloadend = function (e) {
-                 deferred.resolve(URL.createObjectURL(reader.result));
-                 };
+                    //
+                    if (start + CHUNK_SIZE > file.size) {
+                        end = file.size;
+                    }
 
-                 reader.readAsDataURL(file);
+                    blob = file.slice(start, end);
 
-                 }, deferred.reject);
-                 */
+                    reader.onloadend = function (e) {
+
+                        if (e.target.readyState === FileReader.DONE) {
+
+                            // Remove data attribute prefix
+                           // chunk = reader.result.match(/,(.*)$/);
+
+                            deferred.resolve(reader.result);
+
+                           // if (chunk) {
+                           //     deferred.resolve(chunk[1]);
+                           //     reader = null;
+                           // } else {
+                            //    deferred.reject();
+                           // }
+
+                        } else {
+                            deferred.rejct();
+                        }
+
+                    };
+
+                    reader.readAsDataURL(blob);
+
+                }, deferred.reject);
+
 
             }, deferred.reject);
 
@@ -241,11 +268,18 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
             return Q.all(promises);
         },
 
+        /**
+         *
+         * @return {Promise}
+         */
+        getListOfIncompleteFiles: function () {
+            return _db.findAndReduceByObject('files', {filterDuplicates: false}, {projectUuid: project.uuid, isComplete: false});
+        },
+
         download: function () {
 
             // Get incomplete files from database
-            return _db.findAndReduceByObject('files', {filterDuplicates: false}, {projectUuid: project.uuid, isComplete: false})
-
+            return this.getListOfIncompleteFiles()
                 .then(function (files) {
 
                     var promises = [];

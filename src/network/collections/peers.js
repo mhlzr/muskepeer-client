@@ -126,12 +126,18 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
                         peer.addNodes(data.nodes);
                         return;
                     }
-                    //save as new peer
+
+                    // Save as new peer
                     peer = new Peer(data);
                     module.add(peer);
 
+                    // Pass-through events
+                    peer.onAny(function (e) {
+                        module.emit(this.event, e);
+                    });
+
                     // Calculate geolocation distance
-                    peer.distance = geolocation.getDistanceBetweenTwoLocations(peer.location)
+                    peer.distance = geolocation.getDistanceBetweenTwoLocations(peer.location);
 
                 });
 

@@ -6,7 +6,7 @@
  * @class Settings
  */
 
-define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
+define(['lodash', './uuid'], function (_, uuid) {
 
     /**
      *
@@ -41,10 +41,8 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
     }
 
 
-    //Chrome is currently the only one supporting
-    //Object.observe(_settings, storeSettingsToLocalStorage);
-
-    new PathObserver(_settings, storeSettingsToLocalStorage);
+    //Chrome is currently the only one supporting this
+    Object.observe(_settings, storeSettingsToLocalStorage);
 
     //Defaults
     _.defaults(_settings, {
@@ -55,6 +53,8 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
         fileStorageSize: 500 * 1024 * 1024 //500MB
     });
 
+    //TESTING
+    _settings.uuid = uuid.generate();
 
     return _settings;
 

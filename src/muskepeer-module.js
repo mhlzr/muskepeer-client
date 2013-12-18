@@ -1,7 +1,7 @@
 /**
  * Created by Matthieu Holzer on 15.10.13.
- * @module Muskepeer-Module
- * @class Muskepeer-Module
+ * @module MuskepeerModule
+ * @class MuskepeerModule
  * @constructor
  */
 define(['lodash', 'eventemitter2'], function (_, EventEmitter2) {

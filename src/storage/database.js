@@ -2,6 +2,7 @@
  * Database
  *
  * @module Storage
+ * @class Database
  * @submodule Database
  *
  * @see https://github.com/jensarps/IDBWrapper
@@ -10,6 +11,7 @@
 define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, project, IDBStore) {
 
         var STORE_PREFIX = 'Muskepeer-',
+
             ERRORS = {
                 DATA_MISSING: 'Data is missing!',
                 DATA_EMPTY: 'Data is empty!',
