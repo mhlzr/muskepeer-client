@@ -119,15 +119,14 @@ define([
                     return storage.db.saveMultiple('nodes', config.nodes, {allowDuplicates: false})
                 })
                 .then(function () {
-
                     //Finallly initialize the network and computation module
-                    network.start();
+                    //network.start();
                     //computation.start();
 
                     //TESTING
-                    storage.files.add(project.files)
+                    storage.fs.add(project.files)
                         .then(function () {
-                            return storage.files.download();
+                            return storage.fs.downloadIncompleteFiles();
                         })
                         .then(function () {
                             logger.log('DONE!');

@@ -8,16 +8,30 @@
  * @see https://gist.github.com/robnyman/1894032
  * @see https://developer.mozilla.org/en-US/docs/Web/API/URL.createObjectURL
  * @see http://www.html5rocks.com/en/tutorials/file/filesystem/#toc-filesystemurls
+ *
  */
 
 define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, crypto, Q, project, settings) {
 
-    var CHUNK_SIZE = 1000;
+    /**
+     * @final
+     * @property CHUNK_SIZE
+     * @type {Number}
+     */
+    var CHUNK_SIZE = 1024;
 
     var _self,
         _db,
         _fs;
 
+    /**
+     * Request access to the local fileSystem,
+     * will cause a user prompt at first attempt
+     *
+     * @private
+     * @method requestFileSystem
+     * @return {Promise}
+     */
     function requestFileSystem() {
         var deferred = Q.defer();
 
@@ -30,19 +44,44 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
         return deferred.promise;
     }
 
+    /**
+     * Request a specific stoage-quota
+     * will cause a user prompt at first attempt
+     *
+     * @private
+     * @method requestQuota
+     * @return {Promise}
+     */
     function requestQuota() {
         var deferred = Q.defer();
-        navigator.webkitPersistentStorage = navigator.webkitPersistentStorage || window.webkitStorageInfo;
 
-        navigator.webkitPersistentStorage.requestQuota(settings.fileStorageSize, deferred.resolve, deferred.reject);
+        navigator.webkitPersistentStorage = navigator.webkitPersistentStorage || window.webkitStorageInfo;
+        navigator.webkitPersistentStorage.requestQuota(settings.fileStorageSize || 50 * 1024 * 1024, deferred.resolve, deferred.reject);
+
         return deferred.promise;
     }
 
+    /**
+     * Parse a fileName from an uri
+     *
+     * @private
+     * @method getFileNameFromUri
+     * @param {String} uri
+     * @return {String}
+     */
     function getFileNameFromUri(uri) {
         var regex = new RegExp(/[^\\/]+$/);
         return uri.match(regex)[0];
     }
 
+    /**
+     * Create a directory in filesystem
+     *
+     * @private
+     * @method createSubDirectory
+     * @param {String} dir
+     * @return {Promise}
+     */
     function createSubDirectory(dir) {
         var deferred = Q.defer();
 
@@ -52,12 +91,13 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
     }
 
     /**
-     * Gets a file via XHR and returns a promise containing a Blob
+     * Gets a file via XHR and returns a promise,
+     * resolve will contain a Blob
      *
      * @private
      * @method download
      *
-     * @param file
+     * @param {Object} file
      * @return {Promise}
      *
      */
@@ -91,8 +131,31 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
     }
 
 
+    /**
+     * Updates the list by getting the newest info from db
+     *
+     * @private
+     * @method updateFileList
+     * @return {Promise}
+     */
+    function updateFileList() {
+        return _self.getFileList()
+            .then(function (files) {
+                _self.list = files;
+            });
+    }
+
+
     return {
 
+        /**
+         * List of related files in db,
+         * will always be updated automatically
+         *
+         * @property list
+         * @type {Array}
+         */
+        list: null,
 
         /**
          * Initialize fileStorage
@@ -113,59 +176,102 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                 .then(function (fileSystem) {
                     _fs = fileSystem;
                     return createSubDirectory(project.uuid);
+                })
+                .then(function () {
+                    return updateFileList();
                 });
         },
 
         /**
+         * Write a file/blob ti the olocal filesystem
+         *
          * @method write
-         * @param path
-         * @param blob
-         * @returns {promise|*}
+         *
+         * @param {Object} file
+         * @param {Blob} blob
+         * @param {Number} [pos]
+         * @return {Promise}
          */
-        write: function (path, blob, pos) {
-            var deferred = Q.defer();
+        write: function (file, blob, pos) {
+            var deferred = Q.defer(),
+                writtenBytes = 0,
+                isNewFile = true;
 
-            //TODO if file already exists, we will append, not overwrite
+            // Does the file exist in database?
+            _db.read('files', file.uuid, {uuidIsHash: true})
+                .then(function (fileInfo) {
+                    // Just to make sure, we have data that is up to date
+                    file = fileInfo;
+                    //Is it marked as complete?)
+                    if (!file || file.isComplete) {
+                        deferred.reject('File does not exist, or is already complete');
+                    }
 
-            //Does the file exist in database?
-            //Is it marked as complete?)
+                    writtenBytes = file.position;
+                    isNewFile = writtenBytes === 0;
 
-            _fs.root.getFile(project.uuid + '/' + path, {create: true }, function (fileEntry) {
+                    // We won't overwrite fileDate
+                    if (pos < writtenBytes) {
+                        deferred.reject('Position is lower than already written bytes!');
+                    }
+                })
+                .then(function () {
+                    // Append bytes
+                    _fs.root.getFile(project.uuid + '/' + file.uuid, {create: isNewFile }, function (fileEntry) {
 
-                fileEntry.createWriter(function (writer) {
+                        fileEntry.createWriter(function (writer) {
 
-                    // Start at given position or EOF
-                    pos = pos || writer.length;
-                    writer.seek(pos);
-                    writer.write(blob);
 
-                    deferred.resolve();
+                            // Start at given position or EOF
+                            pos = pos || writer.length;
+                            writer.seek(pos);
+                            writer.write(blob);
 
-                }, deferred.reject);
 
-            }, deferred.reject);
+                        }, deferred.reject);
+
+                    }, deferred.reject);
+                })
+                .then(function () {
+                    // Update fileInfo in database
+                    var currentPosition = file.position + blob.size;
+                    return _db.update('files', {uuid: file.uuid, isComplete: currentPosition >= file.size, position: currentPosition}, {uuidIsHash: true});
+                })
+                .then(updateFileList);
+
 
             return deferred.promise;
         },
 
         /**
-         * @method read
-         * @param path
+         * Get a local url to a file in fileSystem
+         *
+         * @method readFileAsLocalUrl
+         * @param [Object} file
+         * @return {Promise}
          */
-        readFileAsLocalUrl: function (path) {
+        readFileAsLocalUrl: function (file) {
             var deferred = Q.defer();
 
-            _fs.root.getFile(project.uuid + '/' + path, {}, function (fileEntry) {
+            _fs.root.getFile(project.uuid + '/' + file.uuid, {}, function (fileEntry) {
                 deferred.resolve(fileEntry.toURL());
             }, deferred.reject);
 
             return deferred.promise;
         },
 
-        readFileAsDataUrl: function (path, offset) {
+        /**
+         * Read some chunks from the file,
+         * chunk sie is defined globally by CHUNK_SIZE.
+         *
+         * @param {Object} file
+         * @param {Number} offset
+         * @return {Promise}
+         */
+        readFileChunkAsDataUrl: function (file, offset) {
             var deferred = Q.defer();
 
-            _fs.root.getFile(project.uuid + '/' + path, {}, function (fileEntry) {
+            _fs.root.getFile(project.uuid + '/' + file.uuid, {}, function (fileEntry) {
 
                 // Get a File object representing the file,
                 // then use FileReader to read its contents.
@@ -188,16 +294,16 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                         if (e.target.readyState === FileReader.DONE) {
 
                             // Remove data attribute prefix
-                           // chunk = reader.result.match(/,(.*)$/);
+                            // chunk = reader.result.match(/,(.*)$/);
 
                             deferred.resolve(reader.result);
 
-                           // if (chunk) {
-                           //     deferred.resolve(chunk[1]);
-                           //     reader = null;
-                           // } else {
+                            // if (chunk) {
+                            //     deferred.resolve(chunk[1]);
+                            //     reader = null;
+                            // } else {
                             //    deferred.reject();
-                           // }
+                            // }
 
                         } else {
                             deferred.rejct();
@@ -215,22 +321,13 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
             return deferred.promise;
         },
 
-        /**
-         * Retrieve a file from storage by url,
-         *
-         * @method getFileByUri
-         *
-         * @param uri
-         */
-        getFileByUri: function (uri) {
-
-        },
-
 
         /**
-         * Add a file to storage
+         * Add filese-entries to the storage database,
+         * not to the filesystem.
+         *
          * @method add
-         *
+         * @param {Array|String} uris
          * @return {Promise}
          */
         add: function (uris) {
@@ -265,21 +362,42 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
             });
 
-            return Q.all(promises);
+            return Q.all(promises).then(updateFileList);
         },
 
         /**
+         * Get an array of incomplete files from storage-database
          *
+         * @method getListOfIncompleteFiles
          * @return {Promise}
          */
-        getListOfIncompleteFiles: function () {
+        getIncompleteFileList: function () {
             return _db.findAndReduceByObject('files', {filterDuplicates: false}, {projectUuid: project.uuid, isComplete: false});
         },
 
-        download: function () {
+        /**
+         * Get an array of all files from storage-database
+         *
+         * @method getFilesList
+         * @return {Promise}
+         */
+        getFileList: function () {
+            return _db.findAndReduceByObject('files', {filterDuplicates: false}, {projectUuid: project.uuid});
+        },
+
+
+        /**
+         * This will donwload all incomplete files from their urls.
+         * Should be used if you know, that there are no other peers in you pool,
+         * that can deliver the files you need.
+         *
+         * @method downloadIncompleteFiles
+         * @return [Promise}
+         */
+        downloadIncompleteFiles: function () {
 
             // Get incomplete files from database
-            return this.getListOfIncompleteFiles()
+            return this.getIncompleteFileList()
                 .then(function (files) {
 
                     var promises = [];
@@ -289,7 +407,8 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                         var promise = downloadViaXHR(file)
                             .progress(function (e) {
                                 if (e.lengthComputable) {
-                                    _db.update('files', {uuid: file.uuid, position: e.position, size: e.totalSize}, {uuidIsHash: true});
+                                    // Update total fileSize, not position
+                                    _db.update('files', {uuid: file.uuid, size: e.totalSize}, {uuidIsHash: true});
                                 }
                             })
                             .catch(function (e) {
@@ -301,7 +420,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
                                 _db.update('files', {uuid: file.uuid, isComplete: true, position: blob.size, size: blob.size}, {uuidIsHash: true});
 
-                                return _self.write(file.name, blob);
+                                return _self.write(file, blob).then(updateFileList);
                             });
 
                         promises.push(promise);
@@ -319,12 +438,26 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
         /**
          * Retrieve a file from storage by uuid (hash)
          *
-         * @method getFileByUuid
+         * @method getFileInfoByUuid
          *
          * @param uuid
+         * @return {Object}
          */
-        getFileByUuid: function (uuid) {
-            return _storage.read('files', uuid, {uuidIsHash: true});
+        getFileInfoByUuid: function (uuid) {
+            return _db.read('files', uuid, {uuidIsHash: true});
+        },
+
+
+        /**
+         * Retrieve a file from storage by url,
+         *
+         * @method getFileInfoByUri
+         *
+         * @param uri
+         * @return {Array} can be multiple files
+         */
+        getFileInfoByUri: function (uri) {
+            return _db.findAndReduceByObject('files', {}, {uri: uri});
         },
 
         /**
@@ -335,6 +468,45 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
          */
         hasLocalFile: function (uuid) {
 
+        },
+
+
+        /**
+         * Will delete all files/folders inside the project-dir recursively
+         * as well as the references (fileInfo) in database
+         *
+         * @method clear
+         * @return {Promise}
+         */
+        clear: function () {
+            var deferred = Q.defer();
+
+            // Delete form filesystem
+            _fs.root.getDirectory(project.uuid, {}, function (dirEntry) {
+
+                dirEntry.removeRecursively(function () {
+
+                    deferred.resolve();
+                }, deferred.reject);
+
+            }, deferred.reject);
+
+
+            return deferred.promise
+                .then(_self.getFileList)
+                .then(function (files) {
+                    var promises = [];
+
+                    //Delete from database
+                    files.forEach(function (file) {
+                        promises.push(_db.remove('files', file.uuid, {uuidIsHash: true}));
+                    });
+
+                    return Q.all(promises);
+                }).then(function () {
+                    logger.log('FileStorage', 'removed all files/folders from file-system!');
+                    return updateFileList();
+                });
         }
 
 

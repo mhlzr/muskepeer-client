@@ -183,6 +183,7 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
                     options.keyRange = store.makeKeyRange(keyRangeOptions);
                 }
 
+
                 store.iterate(function onItem(item) {
 
                     //test/reduce the found objects
@@ -200,7 +201,6 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
                             }
                         }
                     }
-
                     deferred.notify(item);
                     results.push(item);
 
@@ -293,7 +293,6 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
                     _self.findAndReduceByObject(storeName, null, clone).then(function (results) {
                         //not found in db
                         if (_.isEmpty(results)) {
-
                             //save
                             store.put(data, deferred.resolve, function onError(e) {
                                 deferred.reject(e);
@@ -328,7 +327,6 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
              */
             saveMultiple: function (storeName, datasets, options) {
                 var promises = [];
-
                 datasets.forEach(function (dataset) {
                     promises.push(_self.save(storeName, dataset, options));
                 });

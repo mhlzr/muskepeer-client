@@ -7,7 +7,9 @@ define([], function () {
 
         files: [
             'https://dl.dropboxusercontent.com/u/959008/webstorm.pdf',
-            'https://dl.dropboxusercontent.com/u/959008/paris.jpg'
+            'https://dl.dropboxusercontent.com/u/959008/paris.jpg',
+            'https://dl.dropboxusercontent.com/u/959008/download.pdf',
+            'https://dl.dropboxusercontent.com/u/959008/p2p.pdf'
         ],
         computation: {
 
