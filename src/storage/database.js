@@ -1,9 +1,8 @@
 /**
  * Database
  *
- * @module Storage
+ * @module Database
  * @class Database
- * @submodule Database
  *
  * @see https://github.com/jensarps/IDBWrapper
  */

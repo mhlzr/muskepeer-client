@@ -1,8 +1,8 @@
 /**
  * FileSystem
  *
- * @module Storage
- * @submodule FileSystem
+ * @module FileSystem
+ * @class FileSystem
  *
  * @see http://www.html5rocks.com/de/tutorials/file/filesystem/
  * @see https://gist.github.com/robnyman/1894032
@@ -104,22 +104,39 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
     function downloadViaXHR(file) {
         var deferred = Q.defer(),
             xhr = new XMLHttpRequest(),
-            blob;
+            data;
 
         xhr.open('GET', file.uri, true);
         xhr.responseType = 'blob';
 
         xhr.addEventListener('progress', function (e) {
-            deferred.notify(e);
+
+            // Maybe somehow there will already be some chunks in here
+            if (e.target.response instanceof Blob) {
+                data = {
+                    blob: e.target.response,
+                    position: e.position,
+                    totalSize: e.totalSize
+                };
+            }
+            else {
+                // If not at least we can store these info
+                data = {totalSize: e.totalSize}
+            }
+
+            deferred.notify(data);
         });
 
         xhr.addEventListener('load', function (e) {
 
             if (xhr.status === 200) {
-                blob = xhr.response;
-                deferred.resolve(blob);
-            }
-            else {
+                data = {
+                    blob: e.target.response,
+                    position: e.position,
+                    totalSize: e.target.response.size
+                };
+                deferred.resolve(data);
+            } else {
                 deferred.reject('Error downloading file');
             }
 
@@ -163,7 +180,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
          * @chainable
          * @method init
          *
-         * @param db instance of database
+         * @param db Instance of database submodule
          * @return {Object}
          */
         init: function (db) {
@@ -183,13 +200,14 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
         },
 
         /**
-         * Write a file/blob ti the olocal filesystem
+         * Write a file/blob to the local filesystem
          *
          * @method write
          *
          * @param {Object} file
          * @param {Blob} blob
          * @param {Number} [pos]
+         *
          * @return {Promise}
          */
         write: function (file, blob, pos) {
@@ -221,7 +239,6 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
                         fileEntry.createWriter(function (writer) {
 
-
                             // Start at given position or EOF
                             pos = pos || writer.length;
                             writer.seek(pos);
@@ -247,7 +264,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
          * Get a local url to a file in fileSystem
          *
          * @method readFileAsLocalUrl
-         * @param [Object} file
+         * @param {Object} file
          * @return {Promise}
          */
         readFileAsLocalUrl: function (file) {
@@ -378,7 +395,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
         /**
          * Get an array of all files from storage-database
          *
-         * @method getFilesList
+         * @method getFileList
          * @return {Promise}
          */
         getFileList: function () {
@@ -387,7 +404,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
 
         /**
-         * This will donwload all incomplete files from their urls.
+         * This will download all incomplete files from their urls.
          * Should be used if you know, that there are no other peers in you pool,
          * that can deliver the files you need.
          *
@@ -405,22 +422,32 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                     files.forEach(function (file) {
 
                         var promise = downloadViaXHR(file)
-                            .progress(function (e) {
-                                if (e.lengthComputable) {
-                                    // Update total fileSize, not position
-                                    _db.update('files', {uuid: file.uuid, size: e.totalSize}, {uuidIsHash: true});
+                            .progress(function (data) {
+
+                                // We gort some chunks
+                                if (data.blob && data.position) {
+                                    _db.update('files', {uuid: file.uuid, size: data.totalSize, position: data.position}, {uuidIsHash: true})
+                                        .then(function () {
+                                            _self.write(file, data.blob, data.position);
+                                        });
                                 }
+
+                                // We only got some info
+                                else {
+                                    _db.update('files', {uuid: file.uuid, size: data.totalSize}, {uuidIsHash: true})
+                                }
+
                             })
-                            .catch(function (e) {
+                            .catch(function (err) {
                                 logger.error('FileStorage', file.uri, 'error during download!');
                             })
-                            .done(function (blob) {
+                            .done(function (data) {
 
                                 logger.log('FileStorage', file.uri, 'download complete!');
 
-                                _db.update('files', {uuid: file.uuid, isComplete: true, position: blob.size, size: blob.size}, {uuidIsHash: true});
+                                _db.update('files', {uuid: file.uuid, isComplete: true, position: data.blob.size, size: data.blob.size}, {uuidIsHash: true});
 
-                                return _self.write(file, blob).then(updateFileList);
+                                return _self.write(file, data.blob).then(updateFileList);
                             });
 
                         promises.push(promise);
@@ -436,7 +463,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
         },
 
         /**
-         * Retrieve a file from storage by uuid (hash)
+         * Retrieve a filInfo object from storage (db) by uuid (hash).
          *
          * @method getFileInfoByUuid
          *
@@ -449,7 +476,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
 
         /**
-         * Retrieve a file from storage by url,
+         * Retrieve a fileInfo object from storage by url.
          *
          * @method getFileInfoByUri
          *
@@ -458,16 +485,6 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
          */
         getFileInfoByUri: function (uri) {
             return _db.findAndReduceByObject('files', {}, {uri: uri});
-        },
-
-        /**
-         * @method hasLocalFile
-         *
-         * @param uuid
-         * @return {Boolean}
-         */
-        hasLocalFile: function (uuid) {
-
         },
 
 
