@@ -106,6 +106,17 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
             },
 
 
+            /**
+             * Get all known Peers Uuids as an array
+             *
+             * @return {Array}
+             */
+            getPeerUuidsAsArray: function () {
+                return _.map(_peers, function (peer) {
+                    return peer.uuid;
+                })
+            },
+
             update: function (peerData) {
 
                 logger.log('Peers', 'update');

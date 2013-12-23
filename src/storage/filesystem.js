@@ -18,7 +18,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
      * @property CHUNK_SIZE
      * @type {Number}
      */
-    var CHUNK_SIZE = 1024;
+    var CHUNK_SIZE = 512;
 
     var _self,
         _db,
@@ -163,6 +163,42 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
     }
 
 
+    /**
+     * Converts a base64 String to a Blob
+     *
+     * @private
+     * @method base64toBlob
+     * @see http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
+     *
+     * @param {String} base64
+     * @param {String} [contentType]
+     *
+     * @return {Blob}
+     */
+    function base64toBlob(base64, contentType) {
+        contentType = contentType || '';
+
+        var byteCharacters = atob(base64);
+        var byteArrays = [];
+
+        for (var offset = 0; offset < byteCharacters.length; offset += CHUNK_SIZE) {
+            var slice = byteCharacters.slice(offset, offset + CHUNK_SIZE);
+
+            var byteNumbers = new Array(slice.length);
+            for (var i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            var byteArray = new Uint8Array(byteNumbers);
+
+            byteArrays.push(byteArray);
+        }
+
+        return new Blob(byteArrays, {type: contentType});
+
+    }
+
+
     return {
 
         /**
@@ -277,9 +313,49 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
             return deferred.promise;
         },
 
+
         /**
-         * Read some chunks from the file,
-         * chunk sie is defined globally by CHUNK_SIZE.
+         * Read some chunks from the file, which will resul in a Blob-Instance.
+         * Chunk size is defined globally by CHUNK_SIZE.
+         *
+         * @param file
+         * @param offset
+         *
+         * @return {Promise}
+         */
+        readFileChunkAsBlob: function (file, offset) {
+            var deferred = Q.defer();
+
+            _fs.root.getFile(project.uuid + '/' + file.uuid, {}, function (fileEntry) {
+
+                fileEntry.file(function (file) {
+
+                    var start = offset || 0,
+                        end = start + CHUNK_SIZE,
+                        blob;
+
+                    // Every file has an end
+                    if (start + CHUNK_SIZE > file.size) {
+                        end = file.size;
+                    }
+
+                    // Slice that file
+                    blob = file.slice(start, end);
+
+                    deferred.resolve(blob);
+
+
+                }, deferred.reject);
+
+
+            }, deferred.reject);
+
+            return deferred.promise;
+        },
+
+        /**
+         * Read some chunks from the file, which will be base64 encodded.
+         * Chunk size is defined globally by CHUNK_SIZE.
          *
          * @param {Object} file
          * @param {Number} offset
@@ -299,11 +375,12 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                         end = start + CHUNK_SIZE,
                         blob, chunk;
 
-                    //
+                    // Every file has an end
                     if (start + CHUNK_SIZE > file.size) {
                         end = file.size;
                     }
 
+                    // Slice that file
                     blob = file.slice(start, end);
 
                     reader.onloadend = function (e) {
@@ -311,19 +388,17 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                         if (e.target.readyState === FileReader.DONE) {
 
                             // Remove data attribute prefix
-                            // chunk = reader.result.match(/,(.*)$/);
+                            chunk = reader.result.match(/,(.*)$/);
 
-                            deferred.resolve(reader.result);
-
-                            // if (chunk) {
-                            //     deferred.resolve(chunk[1]);
-                            //     reader = null;
-                            // } else {
-                            //    deferred.reject();
-                            // }
+                            if (chunk) {
+                                deferred.resolve(chunk[1]);
+                                reader = null;
+                            } else {
+                                deferred.reject();
+                            }
 
                         } else {
-                            deferred.rejct();
+                            deferred.reject();
                         }
 
                     };

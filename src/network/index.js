@@ -124,10 +124,16 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
 
                     // Am I the Source?
                     if (peer.isTarget) {
+
                         peer.synchronize();
 
+
+                    }
+
+                    //TESTING
+                    else {
                         //TESTING
-                        storage.fs.readFileAsDataUrl('paris.jpg')
+                        storage.fs.readFileChunkAsDataUrl({uuid: '8e6bcaccef241392cd7d3b127438ce4f41a8d31450f105c34438805dee7f6d1a'})
                             .then(function (base64) {
                                 peer.sendFile('some uuid', base64, 0);
                             });
@@ -138,8 +144,33 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                 peers.on('peer:message', function (e) {
                     var peer = e.target;
 
-                    switch(e.type.toLowerCase()){
-                        case 'node:list:pull' : peer.sendNodeList(['foo', 'bar']); break;
+                    if (!e.type) {
+                        logger.log('Network', 'peer:message without type received');
+                        return;
+                    }
+                    switch (e.type.toLowerCase()) {
+                        case 'node:list:pull' :
+                            peer.sendNodeList(nodes.getNodeUuidsAsArray());
+                            break;
+                        case 'peer:list:pull' :
+                            peer.sendPeerList(peers.getPeerUuidsAsArray());
+                            break;
+                        case 'file:list:pull' :
+                            break;
+                        case 'job:list:pull' :
+                            break;
+                        case 'result:list:pull' :
+                            break;
+                        case 'node:list:push':
+                            break;
+                        case 'peer:list:push':
+                            break;
+                        case 'file:list:push':
+                            break;
+                        case 'job:list:push':
+                            break;
+                        case 'result:list:push':
+                            break;
                     }
                 });
 

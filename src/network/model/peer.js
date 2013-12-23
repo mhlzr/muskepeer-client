@@ -195,13 +195,13 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
                 logger.log('Peer', 'connection established');
             }
             else {
-                logger.log('Peer', 'connection closed');
+                logger.log('Peer', _self.uuid, 'connection closed');
             }
 
         }
 
         function channelErrorHandler(e) {
-            logger.log('Peer', _self.uuid + ' Channel has an error', e);
+            logger.log('Peer', _self.uuid, 'channel has an error', e);
         }
 
 
@@ -215,14 +215,14 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
                 msg = JSON.parse(e.data);
             }
 
-            logger.log('Peer', _self.uuid, 'received', msg);
+            logger.log('Peer', _self.uuid, 'sent', msg);
 
             _self.emit('peer:message', _.extend(msg, {target: _self}));
 
         }
 
         function channelOpenHandler(e) {
-            logger.log('Peer', _self.uuid + ' Channel is open');
+            logger.log('Peer', _self.uuid, 'data-channel is open');
 
             _self.isConnected = true;
             _self.emit('peer:connect', _self);
@@ -230,7 +230,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
         }
 
         function channelCloseHandler(e) {
-            logger.log('Peer', _self.uuid, ' Channel is closed');
+            logger.log('Peer', _self.uuid, ' data-channel is closed');
             _self.isConnected = false;
             _self.emit('peer:disconnect', _self);
         }
@@ -257,7 +257,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
          * @return {Promise}
          */
         this.createConnection = function () {
-            logger.log('Peer', 'creating connection');
+            logger.log('Peer', _self.uuid, 'creating connection');
 
             this.isSource = true;
             this.isTarget = false;
@@ -402,7 +402,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
          */
         this.synchronize = function () {
 
-            logger.log('Peer', this.uuid, ' synchronizing');
+            logger.log('Peer', this.uuid, 'synchronizing');
 
             this.getNodeList();
             this.getPeerList();
@@ -427,7 +427,18 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
 
         this.sendFile = function (uuid, chunk, pos) {
             pos = pos || 0;
-            this.send({ type: 'file:push', uuid: uuid, chunk: 'foo/:\/\////:::()', pos: pos});
+
+            // Send as blob, wrapped with info
+            if (chunk instanceof Blob) {
+                this.send({ type: 'file:push:start', uuid: uuid, pos: pos});
+                this.send(chunk);
+                this.send({ type: 'file:push:end', uuid: uuid});
+            }
+            // Send as base64-String, along with info
+            else {
+                this.send({ type: 'file:push', uuid: uuid, chunk: chunk, pos: pos});
+            }
+
         };
 
         this.fileReceiveHandler = function () {
@@ -485,7 +496,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
             this.send({ type: 'job:list:pull'});
         };
 
-        this.sendPeerList = function (list) {
+        this.sendJobList = function (list) {
             this.send({type: 'job:list:push', list: list});
         };
 
