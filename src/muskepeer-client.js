@@ -121,8 +121,7 @@ define([
                 .then(function () {
                     //Finallly initialize the network and computation module
                     network.start();
-                    computation.start();
-
+                    //computation.start();
                     //TESTING
                     storage.fs.add(project.files)
                         .then(function () {

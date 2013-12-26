@@ -117,6 +117,12 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
                 })
             },
 
+
+            getMissingPeerUuidsAsArray: function (externalList) {
+                var internalList = module.getPeerUuidsAsArray();
+                return _.without(externalList, internalList);
+            },
+
             update: function (peerData) {
 
                 logger.log('Peers', 'update');

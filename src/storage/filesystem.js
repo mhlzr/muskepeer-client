@@ -175,7 +175,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
      *
      * @return {Blob}
      */
-    function base64toBlob(base64, contentType) {
+    function base64oBlob(base64, contentType) {
         contentType = contentType || '';
 
         var byteCharacters = atob(base64);
@@ -241,7 +241,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
          * @method write
          *
          * @param {Object} file
-         * @param {Blob} blob
+         * @param {Blob|String} blob or base64-String
          * @param {Number} [pos]
          *
          * @return {Promise}
@@ -250,6 +250,11 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
             var deferred = Q.defer(),
                 writtenBytes = 0,
                 isNewFile = true;
+
+            // Test if we need to convert from base64
+            if (!blob instanceof Blob) {
+                blob = base64oBlob(blob);
+            }
 
             // Does the file exist in database?
             _db.read('files', file.uuid, {uuidIsHash: true})

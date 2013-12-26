@@ -421,8 +421,14 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
             this.send({ type: 'file:list:push', list: list});
         };
 
-        this.getFileByUuid = function (uuid) {
-            this.send({ type: 'file:pull', uuid: uuid});
+        this.getFileByUuid = function (uuids) {
+            if (!_.isArray(uuids)) {
+                uuids = [uuids];
+            }
+
+            uuids.forEach(function (uuid) {
+                _self.send({type: 'file:pull', uuid: uuid});
+            });
         };
 
         this.sendFile = function (uuid, chunk, pos) {
@@ -453,8 +459,14 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
             this.send({ type: 'node:list:push', list: list});
         };
 
-        this.getNodeByUuid = function (uuid) {
-            this.send({ type: 'node:pull', uuid: uuid});
+        this.getNodeByUuid = function (uuids) {
+            if (!_.isArray(uuids)) {
+                uuids = [uuids];
+            }
+
+            uuids.forEach(function (uuid) {
+                _self.send({type: 'node:pull', uuid: uuid});
+            });
         };
 
         this.sendNode = function (nodes) {
@@ -478,9 +490,16 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
             this.send({ type: 'peer:list:push', list: list});
         };
 
-        this.getPeerByUuid = function () {
-            this.send({ type: 'peer:pull', uuid: uuid});
+        this.getPeerByUuid = function (uuids) {
+            if (!_.isArray(uuids)) {
+                uuids = [uuids];
+            }
+
+            uuids.forEach(function (uuid) {
+                _self.send({type: 'peer:pull', uuid: uuid});
+            });
         };
+
         this.sendPeer = function (peers) {
             if (!_.isArray(peers)) {
                 peers = [peers];
@@ -500,8 +519,14 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
             this.send({type: 'job:list:push', list: list});
         };
 
-        this.getJobByUuid = function (uuid) {
-            this.send({ type: 'job:pull', uuid: uuid});
+        this.getJobByUuid = function (uuids) {
+            if (!_.isArray(uuids)) {
+                uuids = [uuids];
+            }
+
+            uuids.forEach(function (uuid) {
+                _self.send({type: 'job:pull', uuid: uuid});
+            });
         };
 
         this.sendJob = function (jobs) {
@@ -522,9 +547,17 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
         this.sendResultList = function (list) {
             this.send({type: 'result:list:push', list: list});
         };
-        this.getResultByUuid = function (uuid) {
-            this.send({type: 'result:pull', uuid: uuid});
+
+        this.getResultByUuid = function (uuids) {
+            if (!_.isArray(uuids)) {
+                uuids = [uuids];
+            }
+
+            uuids.forEach(function (uuid) {
+                _self.send({type: 'result:pull', uuid: uuid});
+            })
         };
+
         this.sendResult = function (results) {
             if (!_.isArray(results)) {
                 results = [results];

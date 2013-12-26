@@ -90,6 +90,74 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
         }
 
 
+        function peerDisconnectHandler(e) {
+
+        }
+
+
+        function peerMessageHandler(e) {
+            var peer = e.target,
+                list;
+
+            if (!e.type) {
+                logger.log('Network', 'peer:message without type received');
+                return;
+            }
+            switch (e.type.toLowerCase()) {
+
+                case 'node:list:pull' :
+                    peer.sendNodeList(nodes.getNodeUuidsAsArray());
+                    break;
+                case 'peer:list:pull' :
+                    peer.sendPeerList(peers.getPeerUuidsAsArray());
+                    break;
+                case 'file:list:pull' :
+                    storage.getFileUuidsAsArray().then(function (list) {
+                        peer.sendFileList(list);
+                    });
+                    break;
+                case 'job:list:pull' :
+                    storage.getJobUuidsAsArray().then(function (list) {
+                        peer.sendJobList(list);
+                    });
+                    break;
+                case 'result:list:pull' :
+                    storage.getResultUuidsAsArray().then(function (list) {
+                        peer.sendResultList(list);
+                    });
+                    break;
+                case 'node:list:push':
+                    list = nodes.getMissingNodeUuidsAsArray(e.list);
+                    logger.log('Network', 'node:sync', list.length, 'differences.');
+                    peer.getNodeByUuid(list);
+                    break;
+                case 'peer:list:push':
+                    list = peers.getMissingPeerUuidsAsArray(e.list);
+                    logger.log('Network', 'peer:sync', list.length, 'differences.');
+                    peer.getPeerByUuid(list);
+                    break;
+                case 'file:list:push':
+                    storage.getMissingFileUuidsAsArray(e.list).then(function (list) {
+                        logger.log('Network', 'file:sync', list.length, 'differences.');
+                        peer.getFileByUuid(list);
+                    });
+                    break;
+                case 'job:list:push':
+                    storage.getMissingJobUuidsAsArray(e.list).then(function (list) {
+                        logger.log('Network', 'job:sync', list.length, 'differences.');
+                        peer.getJobByUuid(list);
+                    });
+                    break;
+                case 'result:list:push':
+                    storage.getMissingResultUuidsAsArray(e.list).then(function (list) {
+                        logger.log('Network', 'result:sync', list.length, 'differences.');
+                        peer.getResultByUuid(list);
+                    });
+                    break;
+            }
+        }
+
+
         return module.extend({
 
             /**
@@ -110,7 +178,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
 
                 // No need to do anything more if we are not online
                 if (!module.isOnline) {
-                    logger.warn('Network', 'not starting, no Internet connection.');
+                    logger.warn('Network', 'not starting, no internet-connection.');
                     return;
                 }
 
@@ -131,51 +199,18 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                     }
 
                     //TESTING
-                    else {
-                        //TESTING
-                        storage.fs.readFileChunkAsDataUrl({uuid: '8e6bcaccef241392cd7d3b127438ce4f41a8d31450f105c34438805dee7f6d1a'})
-                            .then(function (base64) {
-                                peer.sendFile('some uuid', base64, 0);
-                            });
-                    }
-
+                    /*else {
+                     //TESTING
+                     storage.fs.readFileChunkAsDataUrl({uuid: '8e6bcaccef241392cd7d3b127438ce4f41a8d31450f105c34438805dee7f6d1a'})
+                     .then(function (base64) {
+                     peer.sendFile('some uuid', base64, 0);
+                     });
+                     }
+                     */
                 });
 
-                peers.on('peer:message', function (e) {
-                    var peer = e.target;
-
-                    if (!e.type) {
-                        logger.log('Network', 'peer:message without type received');
-                        return;
-                    }
-                    switch (e.type.toLowerCase()) {
-                        case 'node:list:pull' :
-                            peer.sendNodeList(nodes.getNodeUuidsAsArray());
-                            break;
-                        case 'peer:list:pull' :
-                            peer.sendPeerList(peers.getPeerUuidsAsArray());
-                            break;
-                        case 'file:list:pull' :
-                            break;
-                        case 'job:list:pull' :
-                            break;
-                        case 'result:list:pull' :
-                            break;
-                        case 'node:list:push':
-                            break;
-                        case 'peer:list:push':
-                            break;
-                        case 'file:list:push':
-                            break;
-                        case 'job:list:push':
-                            break;
-                        case 'result:list:push':
-                            break;
-                    }
-                });
-
-                peers.on('peer:disconnect', function (peer) {
-                });
+                peers.on('peer:message', peerMessageHandler);
+                peers.on('peer:disconnect', peerDisconnectHandler);
 
 
                 // Detect geoLocation if needed
@@ -208,7 +243,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
              * @method stop
              */
             stop: function () {
-
+                //TODO deconstruct, remove listeners
             },
 
             /**

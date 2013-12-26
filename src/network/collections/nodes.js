@@ -56,6 +56,11 @@ define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, Musk
                 })
             },
 
+            getMissingNodeUuidsAsArray: function (externalList) {
+                var internalList = module.getNodeUuidsAsArray();
+                return _.without(externalList, internalList);
+            },
+
             getNodeByUuid: function (uuid) {
                 return _.find(_nodes, function (node) {
                     return node.uuid === uuid;
