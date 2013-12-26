@@ -106,17 +106,20 @@ define([
          */
         start: function (config) {
 
-            // Store configuration
-            this.config = config;
-
             // Combine project settings with defaults
             project = _.defaults(project, config.project);
 
             // Initialize storage module
             storage.init()
                 .then(function () {
+
+                    // Create a Uuid (which is a hash here) for each node
+                    config.nodes.forEach(function (node) {
+                        node.uuid = crypto.hash(node.host + node.port)
+                    });
+
                     // Store node configuration
-                    return storage.db.saveMultiple('nodes', config.nodes, {allowDuplicates: false})
+                    return storage.db.saveMultiple('nodes', config.nodes, {allowDuplicates: false, uuidIsHash: true})
                 })
                 .then(function () {
                     //Finallly initialize the network and computation module

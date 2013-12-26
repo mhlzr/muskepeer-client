@@ -120,7 +120,10 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
 
             getMissingPeerUuidsAsArray: function (externalList) {
                 var internalList = module.getPeerUuidsAsArray();
-                return _.without(externalList, internalList);
+                // The external list will always include the uuid of this peer,
+                // so we add it here
+                internalList.push(settings.uuid);
+                return _.difference(externalList, internalList);
             },
 
             update: function (peerData) {
@@ -158,7 +161,7 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
 
                 });
 
-                return;
+
                 //sort peers by their geolocation-distance
                 _peers = _.sortBy(_peers, function (peer) {
                     return peer.distance;

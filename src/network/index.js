@@ -97,6 +97,8 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
 
         function peerMessageHandler(e) {
             var peer = e.target,
+                externalList = e.list,
+                uuid = e.uuid,
                 list;
 
             if (!e.type) {
@@ -127,32 +129,59 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                     });
                     break;
                 case 'node:list:push':
-                    list = nodes.getMissingNodeUuidsAsArray(e.list);
-                    logger.log('Network', 'node:sync', list.length, 'differences.');
+                    list = nodes.getMissingNodeUuidsAsArray(externalList);
+                    logger.log('Network', 'node:sync with ' + peer.uuid, list.length, 'differences.');
                     peer.getNodeByUuid(list);
                     break;
                 case 'peer:list:push':
-                    list = peers.getMissingPeerUuidsAsArray(e.list);
-                    logger.log('Network', 'peer:sync', list.length, 'differences.');
+                    list = peers.getMissingPeerUuidsAsArray(externalList);
+                    logger.log('Network', 'peer:sync with ' + peer.uuid, list.length, 'differences.');
                     peer.getPeerByUuid(list);
                     break;
                 case 'file:list:push':
-                    storage.getMissingFileUuidsAsArray(e.list).then(function (list) {
-                        logger.log('Network', 'file:sync', list.length, 'differences.');
+                    storage.getMissingFileUuidsAsArray(externalList).then(function (list) {
+                        logger.log('Network', 'file:sync with ' + peer.uuid, list.length, 'differences.');
                         peer.getFileByUuid(list);
                     });
                     break;
                 case 'job:list:push':
-                    storage.getMissingJobUuidsAsArray(e.list).then(function (list) {
-                        logger.log('Network', 'job:sync', list.length, 'differences.');
+                    storage.getMissingJobUuidsAsArray(externalList).then(function (list) {
+                        logger.log('Network', 'job:sync with ' + peer.uuid, list.length, 'differences.');
                         peer.getJobByUuid(list);
                     });
                     break;
                 case 'result:list:push':
-                    storage.getMissingResultUuidsAsArray(e.list).then(function (list) {
-                        logger.log('Network', 'result:sync', list.length, 'differences.');
+                    storage.getMissingResultUuidsAsArray(externalList).then(function (list) {
+                        logger.log('Network', 'result:sync with ' + peer.uuid, list.length, 'differences.');
                         peer.getResultByUuid(list);
                     });
+                    break;
+
+                case 'node:pull':
+                    peer.sendPeer(nodes.getNodeByUuid(uuid).serialize());
+                    break;
+                case 'peer:pull':
+                    peer.sendPeer(peers.getPeerByUuid(uuid).serialize());
+                    break;
+                case 'file:pull':
+                    break;
+                case 'job:pull':
+                    break;
+                case 'result:pull':
+                    break;
+
+
+                case 'node:push':
+                    nodes.update(e.node);
+                    break;
+                case 'peer:push':
+                    peers.update(e.peer);
+                    break;
+                case 'file:push':
+                    break;
+                case 'job:push':
+                    break;
+                case 'result:push':
                     break;
             }
         }
@@ -191,12 +220,12 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                 peers.on('peer:connect', function (peer) {
 
                     // Am I the Source?
-                    if (peer.isTarget) {
+                    //if (peer.isTarget) {
 
                         peer.synchronize();
 
 
-                    }
+                    //}
 
                     //TESTING
                     /*else {

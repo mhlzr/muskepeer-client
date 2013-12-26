@@ -215,7 +215,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
                 msg = JSON.parse(e.data);
             }
 
-            logger.log('Peer', _self.uuid, 'sent', msg);
+            //logger.log('Peer', _self.uuid, 'sent', msg);
 
             _self.emit('peer:message', _.extend(msg, {target: _self}));
 
@@ -567,6 +567,15 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
                 _self.send({type: 'result:push', result: result});
             });
         };
+
+
+        this.serialize = function () {
+            return{
+                uuid: this.uuid,
+                location: this.location,
+                nodes: this.nodes
+            }
+        }
 
 
     };

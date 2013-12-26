@@ -50,7 +50,7 @@ define(['q', './database', './filesystem', 'project', 'muskepeer-module'], funct
 
             getUuidListFromStore(storeName)
                 .then(function (internalList) {
-                    deferred.resolve(_.without(externalList, internalList))
+                    deferred.resolve(_.difference(externalList, internalList))
                 });
 
             return deferred.promise;

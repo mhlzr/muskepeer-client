@@ -173,7 +173,17 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
                     self.emit('peer:candidate', {nodeUuid: self.uuid, targetPeerUuid: data.data.targetPeerUuid, candidate: data.data.candidate});
                     break;
             }
+        };
+
+
+        this.serialize = function () {
+            return{
+                host: this.host,
+                isSecure: this.isSecure,
+                port: this.port
+            }
         }
+
 
     };
 
