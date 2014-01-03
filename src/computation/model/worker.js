@@ -7,42 +7,41 @@ define(['eventemitter2'], function (EventEmitter) {
 
     var WebWorker = window.Worker;
 
-    var _webworker,
-        _ee = new EventEmitter({delimiter: ':'});
-
-
-    function workerErrorHandler(e) {
-        logger.log('Worker', 'error occured', e);
-    }
-
-    function workerMessageHandler(e) {
-        console.log(e.data);
-
-        switch (e.data.type.toLowerCase()) {
-            case 'result' :
-                _ee.emit('result', e.data.data);
-                break;
-            case 'error' :
-                _ee.emit('error', e.data.data);
-                break;
-            case 'dependency' :
-                _ee.emit('dependency', e.data.data);
-                break;
-        }
-    }
-
-
     return function Worker(url) {
+
+        var _self = this,
+            _webworker,
+            _ee = new EventEmitter({delimiter: ':'});
 
         this.id = null;
 
         this.emit = _ee.emit;
         this.on = _ee.on;
         this.off = _ee.off;
-        this.any = _ee.any;
+        this.onAny = _ee.onAny;
 
         this.isRunning = false;
         this.isPaused = false;
+
+
+        function workerErrorHandler(e) {
+            logger.log('Worker', 'error occured', e);
+        }
+
+        function workerMessageHandler(e) {
+
+            switch (e.data.type.toLowerCase()) {
+                case 'result' :
+                    _self.emit('result', {id: _self.id, result: e.data.data });
+                    break;
+                case 'error' :
+                    _self.emit('error', e.data.data);
+                    break;
+                case 'dependency' :
+                    _self.emit('dependency', e.data.data);
+                    break;
+            }
+        }
 
         this.start = function () {
 
@@ -76,14 +75,6 @@ define(['eventemitter2'], function (EventEmitter) {
             this.isPaused = false;
             this.isRunning = true;
         };
-
-        this.process = function (job) {
-            if (this.isRunning && !this.isPaused) {
-                _job = job;
-                _webworker.postMessage({cmd: 'process', job: job});
-            }
-        };
-
 
     };
 });

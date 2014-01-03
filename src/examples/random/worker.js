@@ -1,3 +1,6 @@
+var interval,
+    isRunning;
+
 self.addEventListener('message', function (e) {
 
     if (!e.data.cmd) {
@@ -6,25 +9,30 @@ self.addEventListener('message', function (e) {
 
     switch (e.data.cmd.toLowerCase()) {
         case 'pause':
-            self.postMessage({type: 'pause'});
             break;
         case 'resume':
-            self.postMessage({type: 'resume'});
             break;
         case 'start':
-            self.postMessage({type: 'start'});
-            process();
+            start();
             break;
         case 'stop':
-            self.postMessage({type: 'stop'});
+            stop();
             break;
         default:
             break;
     }
 });
 
-function process() {
-    setInterval(function () {
-        self.postMessage({type: 'result', data: (Math.random() * 5000) | 0});
-    }, Math.random() * 60000);
+function start() {
+    interval = setInterval(function () {
+        //self.postMessage({type: 'result', data: ( Math.random() * Number.MAX_VALUE )});
+        self.postMessage({type: 'result', data: parseInt(Math.random() * 20)});
+    }, (Math.random() * 60000) | 0);
+    isRunning = true;
+}
+
+
+function stop() {
+    if (interval) clearInterval(interval);
+    isRunning = false;
 }

@@ -5,7 +5,7 @@
  * @extends MuskepeerModule
  */
 
-define(['muskepeer-module', '../storage/index', '../project', './collection/workers', './collection/jobs', './model/job'], function (MuskepeerModule, storage, project, workers, jobs, Job) {
+define(['muskepeer-module', '../storage/index', '../project', './collection/workers', 'crypto/index', './collection/jobs'], function (MuskepeerModule, storage, project, workers, crypto, jobs) {
 
     var module = new MuskepeerModule();
 
@@ -14,12 +14,50 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
      * @method addWorkerListeners
      */
     function addWorkerListeners() {
-        /*workers.on('job:required');
+
+        workers.on('job', function (id) {
+            logger.log('Worker ' + id, 'needs job');
+            //workers.getWorkerById(id).process({foo: 'bar'});
+        });
+
+        workers.on('result', function (data) {
+
+            var isNew = true,
+                result = {
+                    iteration: 0,
+                    local: true,
+                    uuid: crypto.hash(data.result),
+                    data: data.result
+                };
+
+            logger.log('Worker ' + data.id, 'has result', result.uuid);
+
+            // Already existent?
+            storage.db.read('results', result.uuid, {uuidIsHash: true})
+                .then(function (resultInStorage) {
+                    if (resultInStorage) {
+                        isNew = false;
+                        result.iteration = resultInStorage.iteration++;
+                    }
+                })
+                .then(function () {
+                    //Store result to database
+                    storage.db.save('results', result, {uuidIsHash: true})
+                })
+                .then(function () {
+                    //Broadcast if new || mutipleIterations
+                });
+                //Send to externalStorage
+        });
+
+        /*
+         workers.on('job:required');
          workers.on('job:complete');
          workers.on('job:started');
+
+         workers.on('file:required');
          workers.on('result:required');
-         workers.on('result:found');
-         workers.on('data:required');*/
+         */
     }
 
 

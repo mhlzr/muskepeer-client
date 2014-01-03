@@ -3,31 +3,31 @@
  * @date 08.12.13
  */
 
-define(['../model/worker'], function (Worker) {
+define(['eventemitter2', '../model/worker', 'settings'], function (EventEmitter, Worker, settings) {
 
-    var MAX_WORKERS = 2;
 
-    var _workers = [];
+    var _workers = [],
+        _ee = new EventEmitter({delimiter: ':'});
 
     return {
+
+        emit: _ee.emit,
+        on: _ee.on,
+        off: _ee.off,
+        any: _ee.any,
 
         size: _workers.length || 0,
 
         create: function (url) {
             var self = this;
 
-            for (var i = 0; i < MAX_WORKERS; i++) {
+            for (var i = 0; i < settings.maxWorkers; i++) {
                 var worker = new Worker(url);
                 worker.id = i + 1;
 
-                worker.on('job', function (id) {
-                    logger.log('Worker ' + id, 'needs job');
-                    self.getWorkerById(id).process({foo: 'bar'});
-                });
-
-                worker.on('result', function (id, result) {
-                    logger.log('Worker ' + id, result, 'has result');
-
+                // Pass-through events
+                worker.onAny(function (e) {
+                    self.emit(this.event, e);
                 });
 
                 _workers.push(worker);
@@ -64,6 +64,6 @@ define(['../model/worker'], function (Worker) {
         }
 
 
-
     };
-});
+})
+;

@@ -1,7 +1,7 @@
 {
     "uuid": "2345678902765456789",
     "title": "Random Result Generator",
-    "description": "Will create random results between 0 and 10.000",
+    "description": "Will create random results between 0 and Number.MAX_VALUE",
     "publicKey": "",
 
     "author": "Matthieu Holzer",
