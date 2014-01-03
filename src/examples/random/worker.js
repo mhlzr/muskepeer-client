@@ -13,13 +13,10 @@ self.addEventListener('message', function (e) {
             break;
         case 'start':
             self.postMessage({type: 'start'});
+            process();
             break;
         case 'stop':
             self.postMessage({type: 'stop'});
-            break;
-        case 'process':
-            self.postMessage({type: 'process'});
-            // process();
             break;
         default:
             break;
@@ -28,6 +25,6 @@ self.addEventListener('message', function (e) {
 
 function process() {
     setInterval(function () {
-        self.postMessage({type: 'result', data: Math.random() * 5000});
-    }, Math.random() * 1000);
+        self.postMessage({type: 'result', data: (Math.random() * 5000) | 0});
+    }, Math.random() * 60000);
 }

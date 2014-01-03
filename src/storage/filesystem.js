@@ -501,7 +501,10 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
                     files.forEach(function (file) {
 
-                        var promise = downloadViaXHR(file)
+                        var deferred = Q.defer();
+                        promises.push(deferred.promise);
+
+                        downloadViaXHR(file)
                             .progress(function (data) {
 
                                 // We gort some chunks
@@ -519,19 +522,19 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
                             })
                             .catch(function (err) {
-                                logger.error('FileStorage', file.uri, 'error during download!');
+                                logger.error('FileSystem', file.uri, 'error during download!');
                             })
                             .done(function (data) {
 
-                                logger.log('FileStorage', file.uri, 'download complete!');
+                                logger.log('FileSystem', file.uri, 'download complete!');
 
                                 _db.update('files', {uuid: file.uuid, isComplete: true, position: data.blob.size, size: data.blob.size}, {uuidIsHash: true});
 
-                                return _self.write(file, data.blob).then(updateFileList);
+                                _self.write(file, data.blob).then(updateFileList);
+
+                                deferred.resolve();
+
                             });
-
-                        promises.push(promise);
-
 
                     });
 

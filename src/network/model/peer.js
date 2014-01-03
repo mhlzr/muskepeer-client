@@ -529,6 +529,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
             });
         };
 
+
         this.sendJob = function (jobs) {
             if (!_.isArray(jobs)) {
                 jobs = [jobs];

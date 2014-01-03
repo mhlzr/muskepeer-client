@@ -122,18 +122,17 @@ define([
                     return storage.db.saveMultiple('nodes', config.nodes, {allowDuplicates: false, uuidIsHash: true})
                 })
                 .then(function () {
-                    //Finallly initialize the network and computation module
-                    network.start();
-                    //computation.start();
-                    //TESTING
-                    storage.fs.add(project.files)
-                        .then(function () {
-                            return storage.fs.downloadIncompleteFiles();
-                        })
-                        .then(function () {
-                            logger.log('DONE!');
-                        });
-
+                    // Store fileInfos to fileSystem
+                    return storage.fs.add(_.union(project.files, [project.computation.workerUrl]))
+                })
+                .then(function () {
+                    //TODO Currently all files get downloaded not loaded from other peers
+                    return storage.fs.downloadIncompleteFiles();
+                })
+                .done(function () {
+                    // Finallly initialize the network and computation module
+                    //network.start();
+                    computation.start();
                 });
 
             return this;
