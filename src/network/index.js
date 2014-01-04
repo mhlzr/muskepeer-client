@@ -193,10 +193,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                     console.log('got a result broadcast');
                     // Store the result
                     storage.db.save('results', e.data, {uuidIsHash: true});
-                    // Remove own uuid from list
-                    e.list = _.reject(e.list, function (peerUuid) {
-                        return peerUuid === settings.uuid;
-                    });
+
                     // Rebroadcast
                     peers.broadcast('result', e.data, e.list);
                     break;

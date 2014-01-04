@@ -31,8 +31,8 @@ define(['eventemitter2'], function (EventEmitter) {
         function workerMessageHandler(e) {
 
             switch (e.data.type.toLowerCase()) {
-                case 'result' :
-                    _self.emit('result', {id: _self.id, result: e.data.data });
+                case 'result:found' :
+                    _self.emit('result:found', {id: _self.id, result: e.data.data });
                     break;
                 case 'error' :
                     _self.emit('error', e.data.data);

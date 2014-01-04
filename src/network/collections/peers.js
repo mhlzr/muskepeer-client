@@ -188,6 +188,7 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
                     list = _.pluck(peers, 'uuid');
                 }
 
+                // It's a rebroadcast
                 else {
                     peers = [];
                     _.each(list, function (peerUuid) {
@@ -196,10 +197,15 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
                     })
                 }
 
+                // Remove own uuid from list
+                list = _.reject(list, function (peerUuid) {
+                    return peerUuid === settings.uuid;
+                });
+
+                // Broadcast to all connected peers
                 peers.forEach(function (peer) {
                     if (!peer.isConnected) return;
                     peer.broadcast(type, data, list);
-
                 });
             }
 

@@ -26,7 +26,7 @@ self.addEventListener('message', function (e) {
 function start() {
     interval = setInterval(function () {
         //self.postMessage({type: 'result', data: ( Math.random() * Number.MAX_VALUE )});
-        self.postMessage({type: 'result', data: parseInt(Math.random() * 20)});
+        self.postMessage({type: 'result:found', data: parseInt(Math.random() * 20)});
     }, (Math.random() * 60000) | 0);
     isRunning = true;
 }
