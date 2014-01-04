@@ -23,10 +23,19 @@ define([], function () {
             "storages": [
                 {
                     "enabled": true,
-                    "type": "rest",
-                    "url": "http://www.parse.com",
-                    "method": "post",
-                    "params": {}
+                    "url": "https://api.parse.com/1/classes/Results/",
+                    "type": "REST",
+                    "params": {},
+                    "headers": [
+                        {
+                            "key": "X-Parse-Application-Id",
+                            "value": "ZzIHMKfVQmIni0K5fBdYgXxTlXyoovbm4gm0Epdq"
+                        },
+                        {
+                            "key": "X-Parse-REST-API-Key",
+                            "value": "4Izw5bddA34RFUmOuGCYrMHn4zY5dz62ETAVb2g5"
+                        }
+                    ]
                 }
             ]
         },

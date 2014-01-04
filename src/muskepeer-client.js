@@ -34,10 +34,10 @@ define([
                 { name: 'indexedDB', test: indexedDB },
                 { name: 'GeoLocation API', test: navigator.geolocation },
                 { name: 'WebRTC API', test: (window.mozRTCPeerConnection || window.webkitRTCPeerConnection || RTCPeerConnection) },
-                { name: 'Object.observe', test: Object.observe },
                 { name: 'FileSystem API', test: (navigator.webkitPersistentStorage || window.webkitStorageInfo) }
             ],
             features = [
+                { name: 'Object.observe', test: Object.observe }
             ],
             result = {
                 isCompatible: false,

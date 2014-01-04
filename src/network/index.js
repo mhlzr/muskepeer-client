@@ -222,7 +222,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                     // Am I the Source?
                     //if (peer.isTarget) {
 
-                        peer.synchronize();
+                    peer.synchronize();
 
 
                     //}

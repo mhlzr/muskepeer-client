@@ -5,9 +5,10 @@
  * @extends MuskepeerModule
  */
 
-define(['muskepeer-module', '../storage/index', '../project', './collection/workers', 'crypto/index', './collection/jobs'], function (MuskepeerModule, storage, project, workers, crypto, jobs) {
+define(['muskepeer-module', '../storage/index', '../project', './collection/workers', 'crypto/index', './collection/jobs', '../storage/model/storageService'], function (MuskepeerModule, storage, project, workers, crypto, jobs, StorageService) {
 
-    var module = new MuskepeerModule();
+    var module = new MuskepeerModule(),
+        externalStorageServices = [];
 
     /**
      * @private
@@ -47,7 +48,7 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
                 .then(function () {
                     //Broadcast if new || mutipleIterations
                 });
-                //Send to externalStorage
+            //Send to externalStorage
         });
 
         /*
@@ -84,6 +85,18 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
          */
         start: function () {
 
+            // Create external storage services
+            if (project.computation.storages && project.computation.storages.length > 0) {
+                project.computation.storages.forEach(function (settings) {
+                    if (!settings.enabled) return;
+                    externalStorageServices.push(new StorageService(settings));
+                });
+
+            }
+
+            this.services = externalStorageServices;;
+
+
             // are there any jobs left, that are related to this project?
             storage.db.findAndReduceByObject('jobs', {filterDuplicates: false}, {projectUuid: project.uuid})
                 .progress(function (job) {
@@ -109,7 +122,7 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
                                 addWorkerListeners();
 
                                 // Start the workers
-                                workers.start();
+                                //workers.start();
 
                                 logger.log('Computation', 'workers started');
 

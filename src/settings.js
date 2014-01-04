@@ -6,7 +6,7 @@
  * @class Settings
  */
 
-define(['lodash', './uuid'], function (_, uuid) {
+define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
 
     /**
      *
@@ -42,7 +42,8 @@ define(['lodash', './uuid'], function (_, uuid) {
 
 
     //Chrome is currently the only one supporting this
-    Object.observe(_settings, storeSettingsToLocalStorage);
+    //Object.observe(_settings, storeSettingsToLocalStorage);
+    var observer = new ObjectObserver(_settings, storeSettingsToLocalStorage);
 
     //Defaults
     _.defaults(_settings, {
