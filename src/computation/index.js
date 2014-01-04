@@ -5,10 +5,80 @@
  * @extends MuskepeerModule
  */
 
-define(['muskepeer-module', '../storage/index', '../project', './collection/workers', 'crypto/index', './collection/jobs', '../storage/model/storageService'], function (MuskepeerModule, storage, project, workers, crypto, jobs, StorageService) {
+define(['muskepeer-module', '../storage/index', '../project', './collection/workers', 'crypto/index', './collection/jobs', './model/job', '../storage/model/storageService'], function (MuskepeerModule, storage, project, workers, crypto, jobs, Job, StorageService) {
 
     var module = new MuskepeerModule(),
         externalStorageServices = [];
+
+    /**
+     * @private
+     * @method jobFactoryMessageHandler
+     */
+    function jobFactoryMessageHandler(message) {
+        var job = new Job(message.data);
+
+        // Add job to queue (if redundant it will be ignored)
+        jobs.add(job);
+
+        // Save job to storage (same as above)
+        storage.db.save('jobs', job, {uuidIsHash: true});
+    }
+
+    /**
+     * @private
+     * @method jobFactoryErrorHandler
+     */
+    function jobFactoryErrorHandler() {
+        logger.error('JobFactory', 'an error occured');
+    }
+
+
+    function workerResultRequiredHandler() {
+    }
+
+    function workerJobRequiredHandler() {
+        logger.log('Worker ' + id, 'needs job');
+        //workers.getWorkerById(id).process({foo: 'bar'});
+    }
+
+
+    function workerResultFoundHandler(data) {
+        var isNew = true,
+            result = {
+                iteration: 0,
+                local: true,
+                uuid: crypto.hash(data.result),
+                data: data.result
+            };
+
+        logger.log('Worker ' + data.id, 'has result', result.uuid);
+
+        // Already existent?
+        storage.db.read('results', result.uuid, {uuidIsHash: true})
+            .then(function (resultInStorage) {
+                if (resultInStorage) {
+                    isNew = false;
+                    result.iteration = resultInStorage.iteration++;
+                }
+            })
+            .then(function () {
+
+                // Store result to local database
+                storage.db.save('results', result, {uuidIsHash: true});
+
+                // Send to externalStorages
+                externalStorageServices.forEach(function (service) {
+                    service.save(result);
+                });
+
+                //Broadcast if new || mutipleIterations
+            })
+    }
+
+
+    function workerFileFoundHandler() {
+
+    }
 
     /**
      * @private
@@ -16,49 +86,16 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
      */
     function addWorkerListeners() {
 
-        workers.on('job', function (id) {
-            logger.log('Worker ' + id, 'needs job');
-            //workers.getWorkerById(id).process({foo: 'bar'});
-        });
+        workers.on('job:required', workerJobRequiredHandler);
+        workers.on('result:found', workerResultFoundHandler);
+        workers.on('result:required', workerResultRequiredHandler);
+        workers.on('file:required', workerResultRequiredHandler);
 
-        workers.on('result', function (data) {
+        // It's possible, that during computing a Worker finds an (unsolved) job
+        workers.on('job:found', jobFactoryMessageHandler);
+        // Or even found a new file (created one)
+        workers.on('file:found', workerFileFoundHandler);
 
-            var isNew = true,
-                result = {
-                    iteration: 0,
-                    local: true,
-                    uuid: crypto.hash(data.result),
-                    data: data.result
-                };
-
-            logger.log('Worker ' + data.id, 'has result', result.uuid);
-
-            // Already existent?
-            storage.db.read('results', result.uuid, {uuidIsHash: true})
-                .then(function (resultInStorage) {
-                    if (resultInStorage) {
-                        isNew = false;
-                        result.iteration = resultInStorage.iteration++;
-                    }
-                })
-                .then(function () {
-                    //Store result to database
-                    storage.db.save('results', result, {uuidIsHash: true})
-                })
-                .then(function () {
-                    //Broadcast if new || mutipleIterations
-                });
-            //Send to externalStorage
-        });
-
-        /*
-         workers.on('job:required');
-         workers.on('job:complete');
-         workers.on('job:started');
-
-         workers.on('file:required');
-         workers.on('result:required');
-         */
     }
 
 
@@ -81,6 +118,11 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
         jobs: jobs,
 
         /**
+         * @property {Worker} jobFactory
+         */
+        jobFactory: null,
+
+        /**
          * @method start
          */
         start: function () {
@@ -91,11 +133,26 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
                     if (!settings.enabled) return;
                     externalStorageServices.push(new StorageService(settings));
                 });
-
             }
 
-            this.services = externalStorageServices;;
 
+            // Instantiate JobFactory if enabled
+            if (project.computation.useJobList) {
+
+                storage.fs.getFileInfoByUri(project.computation.jobFactoryUrl)
+                    .then(function (fileInfos) {
+                        return storage.fs.readFileAsLocalUrl(fileInfos[0]);
+                    })
+                    .then(function (localUrl) {
+                        this.jobFactory = new Worker(localUrl);
+                        this.jobFactory.addEventListener('message', jobFactoryMessageHandler);
+                        this.jobFactory.addEventListener('error', jobFactoryErrorHandler);
+                        this.jobFactory.postMessage({cmd: 'start'});
+
+                        logger.log('Computation', 'JobFactory started');
+                    });
+
+            }
 
             // are there any jobs left, that are related to this project?
             storage.db.findAndReduceByObject('jobs', {filterDuplicates: false}, {projectUuid: project.uuid})
@@ -104,7 +161,7 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
                 })
                 .then(function (results) {
 
-                    logger.log('Computation', 'available local jobs', results.length);
+                    logger.log('Computation', 'has ' + results.length + ' local jobs');
 
                     // Create workers
                     if (workers.size === 0) {
@@ -124,7 +181,7 @@ define(['muskepeer-module', '../storage/index', '../project', './collection/work
                                 // Start the workers
                                 //workers.start();
 
-                                logger.log('Computation', 'workers started');
+                                logger.log('Computation', 'Workers started');
 
                                 this.isRunning = true;
                                 this.isPaused = false;

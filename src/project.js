@@ -4,6 +4,7 @@
 
 define([], function () {
     return {
+
         "uuid": "2345678902765456789",
         "title": "Random Result Generator",
         "description": "Will create random results between 0 and 10.000",
@@ -15,11 +16,17 @@ define([], function () {
         "active": true,
 
         "computation": {
+
             "offlineAllowed": true,
+
             "workerUrl": "https://dl.dropboxusercontent.com/u/959008/random.js",
-            "useJobList": false, //create and store jobs from worker
             "resultGroupSize": 1, //how much results to collect before broadcast
             "validationIterations": -1, //-1 : Inifinite, 0 : None; >0 : Amount,
+
+            "useJobList": true, //create and store jobs from worker
+            "jobFactoryUrl": "https://dl.dropboxusercontent.com/u/959008/factory.js",
+            "jobGroupSize": 1, //how much jobs to create before broadcast
+
             "storages": [
                 {
                     "enabled": true,

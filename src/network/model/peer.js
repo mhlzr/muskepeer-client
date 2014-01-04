@@ -215,8 +215,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
                 msg = JSON.parse(e.data);
             }
 
-            //logger.log('Peer', _self.uuid, 'sent', msg);
-
             _self.emit('peer:message', _.extend(msg, {target: _self}));
 
         }
@@ -576,6 +574,14 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
                 location: this.location,
                 nodes: this.nodes
             }
+        };
+
+
+        /**
+         * @method broadcast
+         */
+        this.broadcast = function (type, data, list) {
+            _self.send({type: 'broadcast:' + type, data: data, list: list});
         }
 
 

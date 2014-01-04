@@ -4,7 +4,7 @@
  */
 
 
-define(function () {
+define(['storage/index'], function () {
 
     var _jobs = [];
 
@@ -16,7 +16,6 @@ define(function () {
         add: function (job) {
 
             if (!job.uuid || this.getJobByUuid(job.uuid) != null) return;
-
             _jobs.push(job);
             this.size = _jobs.length;
         },

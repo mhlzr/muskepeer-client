@@ -8,7 +8,6 @@ define(['crypto/index'], function (crypto) {
         this.parameters = parameters;
         this.uuid = crypto.hash(this.parameters);
 
-        console.log(this.parameters, this.uuid);
         return this;
     };
 });

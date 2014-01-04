@@ -9,9 +9,9 @@
  *
  */
 
-define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'muskepeer-module', './collections/nodes', './collections/peers'],
+define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', 'computation/index'],
 
-    function (Q, _, storage, project, settings, geolocation, MuskepeerModule, nodes, peers) {
+    function (Q, _, storage, project, settings, geolocation, MuskepeerModule, nodes, peers, computation) {
 
         var module = new MuskepeerModule();
 
@@ -166,10 +166,12 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                 case 'file:pull':
                     break;
                 case 'job:pull':
+                    storage.db.read('jobs', uuid, {uuidIsHash: true}).then(function (job) {
+                        peer.sendJob(job);
+                    });
                     break;
                 case 'result:pull':
                     break;
-
 
                 case 'node:push':
                     nodes.update(e.node);
@@ -180,8 +182,27 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                 case 'file:push':
                     break;
                 case 'job:push':
+                    storage.db.save('jobs', e.job, {uuidIsHash: true});
                     break;
                 case 'result:push':
+                    break;
+
+                case 'broadcast:job':
+                    break;
+                case 'broadcast:result':
+                    console.log('got a result broadcast');
+                    // Store the result
+                    storage.db.save('results', e.data, {uuidIsHash: true});
+                    // Remove own uuid from list
+                    e.list = _.reject(e.list, function (peerUuid) {
+                        return peerUuid === settings.uuid;
+                    });
+                    // Rebroadcast
+                    peers.broadcast('result', e.data, e.list);
+                    break;
+                case 'broadcast:peer':
+                    break;
+                case 'broadcast:file':
                     break;
             }
         }
@@ -273,25 +294,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
              */
             stop: function () {
                 //TODO deconstruct, remove listeners
-            },
-
-            /**
-             * Send data to all nodes and peers
-             *
-             * @method broadcast
-             * @param type {String} Type of data
-             * @param data {Object}
-             */
-            broadcast: function (type, data) {
-
-
-                nodes.list.forEach(function (node) {
-                    node.send(type, data);
-                });
-
-                peers.broadcast(type, data);
             }
-
 
         });
     });

@@ -170,17 +170,36 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
 
 
             /**
-             * Send data to all connected peers
+             * Broadcast data to peers.
+             * Will be broadcast to all connected peers if no list is passed.
              *
              * @method broadcast
              * @param type
              * @param data
+             * @param {Array} [list]
              */
-            broadcast: function (type, data) {
+            broadcast: function (type, data, list) {
 
-                _peers.forEach(function (peer) {
+                var peers;
+
+                // No Rebroadcast, but origin
+                if (!list) {
+                    peers = _peers;
+                    list = _.pluck(peers, 'uuid');
+                }
+
+                else {
+                    peers = [];
+                    _.each(list, function (peerUuid) {
+                        var peer = module.getPeerByUuid(peerUuid);
+                        if (peer) peers.push(peer);
+                    })
+                }
+
+                peers.forEach(function (peer) {
                     if (!peer.isConnected) return;
-                    peer.send(type, data);
+                    peer.broadcast(type, data, list);
+
                 });
             }
 

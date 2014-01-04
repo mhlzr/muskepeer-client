@@ -122,8 +122,16 @@ define([
                     return storage.db.saveMultiple('nodes', config.nodes, {allowDuplicates: false, uuidIsHash: true})
                 })
                 .then(function () {
-                    // Store fileInfos to fileSystem
-                    return storage.fs.add(_.union(project.files, [project.computation.workerUrl]))
+
+                    // Collection files
+                    var requiredFiles = [project.computation.workerUrl];
+
+                    // Do we need to include a JobFactory script?
+                    if (project.computation.useJobList) {
+                        requiredFiles.push(project.computation.jobFactoryUrl);
+                    }
+                    // Store fileInfo to fileSystem
+                    return storage.fs.add(_.union(project.files, requiredFiles))
                 })
                 .then(function () {
                     //TODO Currently all files get downloaded not loaded from other peers
@@ -131,8 +139,8 @@ define([
                 })
                 .done(function () {
                     // Finallly initialize the network and computation module
-                    //network.start();
-                    computation.start();
+                    network.start();
+                    //computation.start();
                 });
 
             return this;
