@@ -15,7 +15,8 @@
 
         "workerUrl": "https://dl.dropboxusercontent.com/u/959008/random.js",
         "resultGroupSize": 1, //how much results to collect before broadcast
-        "validationIterations": -1, //-1 : Inifinite, 0 : None; >0 : Amount,
+        "validationIterations": -1, //-1 : Inifinite, 0 : None; >0 : Amount
+        "expectedResults": 20, //-1 : Inifinite, 0 : None; >0 : Amount
 
         "useJobList": false, //create and store jobs from worker
         "jobFactoryUrl": "https://dl.dropboxusercontent.com/u/959008/factory.js",

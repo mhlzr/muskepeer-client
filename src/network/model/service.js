@@ -1,15 +1,15 @@
 /**
- * External Storage Service to store result data to
+ * External  Service to store result data to
  * a service using HTTP and XHR.
  * Tested for parse.com
  *
- * @module StorageService
- * @class storageService
+ * @module Service
+ * @class Service
  */
 
 define([], function () {
 
-    return function StorageService(options) {
+    return function Service(options) {
 
         this.url = options.url;
         this.type = options.type;
@@ -41,6 +41,20 @@ define([], function () {
 
             xhr.send(JSON.stringify(data));
 
+        };
+
+
+        this.update = function (uuid, data) {
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('PUT', this.url + '/' + uuid + serialize(this.params), true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            this.headers.forEach(function (header) {
+                xhr.setRequestHeader(header.key, header.value);
+            });
+
+            xhr.send(JSON.stringify(data));
         }
     };
 });

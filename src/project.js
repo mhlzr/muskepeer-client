@@ -21,15 +21,21 @@ define([], function () {
 
             "workerUrl": "https://dl.dropboxusercontent.com/u/959008/random.js",
             "resultGroupSize": 1, //how much results to collect before broadcast
-            "validationIterations": -1, //-1 : Inifinite, 0 : None; >0 : Amount,
+            "validationIterations": 10, //-1 : Inifinite, 0 : None; >0 : Amount
+            "expectedResults": 20, //-1 : Inifinite, 0 : None; >0 : Amount
 
             "useJobList": true, //create and store jobs from worker
             "jobFactoryUrl": "https://dl.dropboxusercontent.com/u/959008/factory.js",
-            "jobGroupSize": 1, //how much jobs to create before broadcast
+            "jobGroupSize": 1 //how much jobs to create before broadcast
 
-            "storages": [
+
+        },
+
+        "network": {
+            "useGeoLocation": true,
+            "services": [
                 {
-                    "enabled": true,
+                    "enabled": false,
                     "url": "https://api.parse.com/1/classes/Results/",
                     "type": "REST",
                     "params": {},
@@ -45,10 +51,6 @@ define([], function () {
                     ]
                 }
             ]
-        },
-
-        "network": {
-            "useGeoLocation": true
         },
 
         "files": [

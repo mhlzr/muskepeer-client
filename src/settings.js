@@ -41,8 +41,8 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
     }
 
 
-    //Chrome is currently the only one supporting this
-    //Object.observe(_settings, storeSettingsToLocalStorage);
+    //Chrome is currently the only one supporting native O_o
+    //which would be Object.observe(_settings, storeSettingsToLocalStorage);
     var observer = new ObjectObserver(_settings, storeSettingsToLocalStorage);
 
     //Defaults
@@ -51,10 +51,11 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
         uuid: uuid.generate(), //everyone will know (public)
         authToken: uuid.generate(), //will never be sent to any peer (private)
         maxWorkers: 2,
+        maxPeers: 3,
         fileStorageSize: 500 * 1024 * 1024 //500MB
     });
 
-    //TESTING
+    //TODO remove testing-line
     _settings.uuid = uuid.generate();
 
     return _settings;

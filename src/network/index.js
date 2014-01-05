@@ -9,9 +9,9 @@
  *
  */
 
-define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', 'computation/index'],
+define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', 'computation/index', './model/service'],
 
-    function (Q, _, storage, project, settings, geolocation, MuskepeerModule, nodes, peers, computation) {
+    function (Q, _, storage, project, settings, geolocation, MuskepeerModule, nodes, peers, Service) {
 
         var module = new MuskepeerModule();
 
@@ -32,6 +32,24 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
             }
             else {
                 logger.warn('Network', 'offline!');
+            }
+        }
+
+
+        /**
+         * @private
+         * @method registerExternalServices
+         */
+        function registerExternalServices() {
+
+            // Create external storage services
+            if (project.network.services.length > 0) {
+                project.network.services.forEach(function (settings) {
+                    if (!settings.enabled) return;
+                    module.services.push(new Service(settings));
+                });
+
+                logger.log('Network', 'ExternalStorages registered');
             }
         }
 
@@ -216,6 +234,8 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
             nodes: nodes,
             peers: peers,
 
+            services: [],
+
             /**
              * Start the network-module
              *
@@ -259,6 +279,8 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                 peers.on('peer:message', peerMessageHandler);
                 peers.on('peer:disconnect', peerDisconnectHandler);
 
+
+                registerExternalServices();
 
                 // Detect geoLocation if needed
                 geolocation.getGeoLocation()

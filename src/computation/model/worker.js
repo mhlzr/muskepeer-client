@@ -29,18 +29,9 @@ define(['eventemitter2'], function (EventEmitter) {
         }
 
         function workerMessageHandler(e) {
+            // Convert worker-message to event
+            _self.emit(e.data.type.toLowerCase(), {id: _self.id, data: e.data.data });
 
-            switch (e.data.type.toLowerCase()) {
-                case 'result:found' :
-                    _self.emit('result:found', {id: _self.id, result: e.data.data });
-                    break;
-                case 'error' :
-                    _self.emit('error', e.data.data);
-                    break;
-                case 'dependency' :
-                    _self.emit('dependency', e.data.data);
-                    break;
-            }
         }
 
         this.start = function () {
@@ -74,6 +65,18 @@ define(['eventemitter2'], function (EventEmitter) {
             _webworker.postMessage({cmd: 'resume'});
             this.isPaused = false;
             this.isRunning = true;
+        };
+
+        this.pushJob = function (job) {
+            _webworker.postMessage({cmd: 'job', job: job});
+        };
+
+        this.pushFile = function (fileInfo, file) {
+            _webworker.postMessage({cmd: 'file', fileInfo: fileInfo, file: file});
+        };
+
+        this.pushResult = function (result) {
+            _webworker.postMessage({cmd: 'result', result: result});
         };
 
     };

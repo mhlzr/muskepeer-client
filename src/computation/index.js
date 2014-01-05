@@ -5,10 +5,9 @@
  * @extends MuskepeerModule
  */
 
-define(['muskepeer-module', '../storage/index', '../network/index', '../project', './collection/workers', 'crypto/index', './collection/jobs', './model/job', '../storage/model/storageService'], function (MuskepeerModule, storage, network, project, workers, crypto, jobs, Job, StorageService) {
+define(['muskepeer-module', '../storage/index', '../network/index', '../project', './collection/workers', 'crypto/index', './collection/jobs', './model/job', './model/result'], function (MuskepeerModule, storage, network, project, workers, crypto, jobs, Job, Result) {
 
-    var module = new MuskepeerModule(),
-        externalStorageServices = [];
+    var module = new MuskepeerModule();
 
 
     /**
@@ -21,7 +20,7 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
         if (workers.size !== 0) return;
 
         // Get the cached worker-script from local fileSystem
-        return  storage.fs.getFileInfoByUri(project.computation.workerUrl)
+        return storage.fs.getFileInfoByUri(project.computation.workerUrl)
             .then(function (fileInfos) {
                 return storage.fs.readFileAsLocalUrl(fileInfos[0]);
             })
@@ -63,71 +62,123 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
      * @private
      * @method jobFactoryErrorHandler
      */
-    function jobFactoryErrorHandler() {
-        logger.error('JobFactory', 'an error occured');
+    function jobFactoryErrorHandler(error) {
+        logger.error('JobFactory', 'an error occurred');
     }
 
     /**
      * @private
      * @method workerResultRequiredHandler
      */
-    function workerResultRequiredHandler() {
+    function workerResultRequiredHandler(message) {
+
+        if (!message.data.uuid) return;
+
+        logger.log('Worker ' + message.id, 'needs result ' + message.data.uuid);
+
+        // Get result from storage
+        storage.db.read('results', message.data.uuid)
+            .then(function (result) {
+                // Push to worker
+                workers.getWorkerById(message.id).pushResult(result);
+            });
+
     }
 
     /**
      * @private
      * @method workerJobRequiredHandler
      */
-    function workerJobRequiredHandler() {
-        logger.log('Worker ' + id, 'needs job');
-        //workers.getWorkerById(id).process({foo: 'bar'});
+    function workerJobRequiredHandler(message) {
+
+        // Specific job?
+        if (message.data && message.data.uuid) {
+
+            logger.log('Worker ' + message.id, 'needs specific job ' + message.data.uuid);
+
+            storage.db.read('jobs', message.data.uuid)
+                .then(function (job) {
+                    // Push to worker
+                    workers.getWorkerById(message.id).pushJob(job);
+                });
+        }
+        // Next job in queue
+        else {
+            logger.log('Worker ' + message.id, 'needs job');
+            workers.getWorkerById(message.id).pushJob(jobs.getNext());
+        }
+
     }
 
     /**
      * @private
      * @method workerResultFoundHandler
      */
-    function workerResultFoundHandler(data) {
-        var isNew = true,
-            result = {
-                iteration: 0,
-                local: true,
-                uuid: crypto.hash(data.result),
-                data: data.result
-            };
+    function workerResultFoundHandler(message) {
 
-        logger.log('Worker ' + data.id, 'has result', result.uuid);
+        var isNew = true,
+            result = new Result(message.data);
+
+        logger.log('Worker ' + message.id, 'has result', result.uuid, message.data);
 
         // Already existent?
         storage.db.read('results', result.uuid, {uuidIsHash: true})
             .then(function (resultInStorage) {
                 if (resultInStorage) {
                     isNew = false;
-                    result.iteration = resultInStorage.iteration++;
+                    result.iteration = resultInStorage.iteration + 1;
                 }
             })
             .then(function () {
 
+                // Already did enough iterations, no need to save/update
+                if (project.computation.validationIterations > 0
+                    && result.iteration > project.computation.validationIterations) {
+                    return;
+                }
+
                 // Store result to local database
                 storage.db.save('results', result, {uuidIsHash: true});
 
-                // Send to externalStorages
-                externalStorageServices.forEach(function (service) {
-                    service.save(result);
-                });
 
-                //Broadcast if new || mutipleIterations
+                if (isNew) {
+                    externalStorageServices.forEach(function (service) {
+                        if (isNew) {
+                            // Save to externalStorages
+                            service.save(result);
+                        }
+                        else {
+                            // Update
+                            service.update(result.uuid, result);
+                        }
+                    });
+                }
+
+
+                // Broadcast if new || mutipleIterations
                 network.peers.broadcast('result', result);
 
+                // Count amount of results
+                if (project.computation.validationIterations > 0) {
+                    return storage.db.findAndReduceByObject('results', {}, {iteration: project.computation.validationIterations });
+                }
             })
+            .then(function (results) {
+                // We already have all results?
+                if (results.length >= project.computation.expectedResults) {
+                    this.stop();
+                    logger.log('Computatiion', 'all results found');
+                }
+            }
+        )
     }
 
     /**
      * @private
      * @method workerFileFoundHandler
      */
-    function workerFileFoundHandler() {
-
+    function workerFileFoundHandler(message) {
+        logger.log('Worker ' + message.id, 'found a file');
     }
 
 
@@ -158,16 +209,6 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
          * @method start
          */
         start: function () {
-
-            // Create external storage services
-            if (project.computation.storages && project.computation.storages.length > 0) {
-                project.computation.storages.forEach(function (settings) {
-                    if (!settings.enabled) return;
-                    externalStorageServices.push(new StorageService(settings));
-                });
-
-                logger.log('Computation', 'ExternalStorages registered');
-            }
 
 
             if (project.computation.useJobList) {
@@ -233,4 +274,5 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
         }
 
     });
-});
+})
+;

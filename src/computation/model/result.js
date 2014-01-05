@@ -5,9 +5,10 @@
  * @class result
  */
 
-define([], function () {
-    return function Result(parameters) {
-        this.parameters = parameters;
-        this.uuid = crypto.hash(this.parameters);
+define(['crypto/index'], function (crypto) {
+    return function Result(data) {
+        this.data = data;
+        this.uuid = crypto.hash(this.data);
+        this.iteration = 1;
     };
 });
