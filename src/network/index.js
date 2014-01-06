@@ -143,7 +143,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
          */
         function peerDisconnectHandler(e) {
             if (peers.getConnectedPeers().length < settings.maxPeers) {
-                //peers.connectToNeighbourPeers();
+                peers.connectToNeighbourPeers();
             }
         }
 

@@ -195,12 +195,20 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
 
         function iceConnectionStateChangeHandler(e) {
 
-            // Do we have lift off?
+            // Everything is fine
             if (_connection.iceConnectionState === 'connected' &&
                 _connection.iceGatheringState === 'complete') {
 
                 logger.log('Peer', _self.uuid, 'connection established');
             }
+            // Connection has closed
+            else if (_connection.iceConnectionState === 'disconnected') {
+                logger.log('Peer', _self.uuid, 'connection closed');
+
+                _self.isConnected = false;
+                _self.emit('peer:disconnect', _self);
+            }
+
 
         }
 
@@ -232,7 +240,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
         }
 
         function channelCloseHandler(e) {
-            logger.log('Peer', _self.uuid, ' data-channel is closed');
+            logger.log('Peer', _self.uuid, 'data-channel is closed');
             _self.isConnected = false;
             _self.emit('peer:disconnect', _self);
         }
@@ -264,12 +272,12 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
             this.isSource = true;
             this.isTarget = false;
 
-            //create  data-channel with a pseudo-random name
+            // Create  data-channel with a pseudo-random name
             _channel = _connection.createDataChannel('RTCDataChannel' + (Math.random() * 1000 | 0), {
                 reliable: true
             });
 
-            //add listeners to channel
+            // Add listeners to channel
             _channel.onclose = channelCloseHandler;
             _channel.onerror = channelErrorHandler;
             _channel.onmessage = channelMessageHandler;
@@ -277,6 +285,8 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
 
             var deferred = Q.defer,
                 signal = this.getSignalChannel();
+
+            //TODO implement a timeout function
 
             //2. Alice creates an offer (an SDP session description) with the RTCPeerConnection createOffer() method.
             _connection.createOffer(function (sessionDescription) {
@@ -289,7 +299,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
 
                 },
                 function (err) {
-                    logger.log(err);
+                    logger.error(err);
                 },
                 MEDIA_CONSTRAINTS);
 
