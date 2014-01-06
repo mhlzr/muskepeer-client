@@ -1,33 +1,44 @@
 /**
- * @author Matthieu Holzer
- * @date 05.11.13
+ * Collection for Node-Instances
+ *
+ * @module Network
+ * @class Nodes
+ *
  */
 
 define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, MuskepeerModule) {
+
     var _nodes = [],
         module = new MuskepeerModule();
 
     return module.extend(
         {
+            /**
+             * @property list
+             * @type {Array}
+             */
             list: _nodes,
 
+            /**
+             * @method connect
+             * @return {Promise}
+             */
             connect: function () {
                 var promises = [];
 
                 logger.log('Nodes', 'connect');
 
                 _nodes.forEach(function (node) {
-                    var deferred = Q.defer();
-                    node.connect(function () {
-                        deferred.resolve();
-                    });
-
-                    promises.push(deferred.promise);
+                    promises.push(node.connect());
                 });
 
                 return Q.all(promises);
             },
 
+            /**
+             * @method update
+             * @param {Array} nodeData
+             */
             update: function (nodeData) {
                 var node;
                 nodeData.forEach(function (data) {
@@ -42,31 +53,58 @@ define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, Musk
 
                     _nodes.push(node);
                 });
+
+                //Update public list
+                this.list = _nodes;
             },
 
+            /**
+             * @method getNodeByUrl
+             * @param {String} url
+             * @return {Node}
+             */
             getNodeByUrl: function (url) {
                 return _.find(_nodes, function (node) {
                     return node.url === url;
                 });
             },
 
+            /**
+             * @method getNodeUuidsAsArray
+             * @return {Array}
+             */
             getNodeUuidsAsArray: function () {
                 return _.map(_nodes, function (node) {
                     return node.uuid;
                 })
             },
 
+            /**
+             * @method getMissingNodeUuidsAsArray
+             * @param {Array} externalList
+             * @return {Array}
+             */
             getMissingNodeUuidsAsArray: function (externalList) {
                 var internalList = module.getNodeUuidsAsArray();
                 return _.difference(externalList, internalList);
             },
 
+
+            /**
+             * @method getNodeByUuid
+             * @param {String} uuid
+             * @return {Node}
+             */
             getNodeByUuid: function (uuid) {
                 return _.find(_nodes, function (node) {
                     return node.uuid === uuid;
                 });
             },
 
+            /**
+             * @method authenticate
+             * @return {Promise}
+             */
             authenticate: function () {
                 var promises = [];
 
@@ -76,6 +114,7 @@ define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, Musk
                     var deferred = Q.defer();
                     node.sendAuthentication()
                         .then(function () {
+
                             deferred.resolve();
                         });
                     promises.push(deferred.promise);
@@ -86,6 +125,10 @@ define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, Musk
 
             },
 
+            /**
+             * @method getRelatedPeers
+             * @return {Array}
+             */
             getRelatedPeers: function () {
                 var promises = [];
 

@@ -1,8 +1,6 @@
 /**
  *
- *
- * @module result
- * @class result
+ * @class Result
  */
 
 define(['crypto/index'], function (crypto) {

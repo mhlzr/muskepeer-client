@@ -1,6 +1,6 @@
 /**
- * @author Matthieu Holzer
- * @date 08.12.13
+ * @class Worker
+ *
  */
 
 define(['eventemitter2'], function (EventEmitter) {

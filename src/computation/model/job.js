@@ -1,5 +1,5 @@
 /**
- * Created by Matthieu Holzer on 15.10.13.
+ * @class Job
  */
 define(['crypto/index'], function (crypto) {
 

@@ -1,8 +1,10 @@
 /**
+ *
  * @module Network
+ *
  */
 
-define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], function (_, Q, EventEmitter2, settings, project, geolocation) {
+define(['lodash', 'q', 'eventemitter2', 'settings', 'project', '../geolocation'], function (_, Q, EventEmitter2, settings, project, geolocation) {
 
     var ee = new EventEmitter2({
         wildcard: true,
@@ -13,9 +15,13 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
 
 
     /**
+     * A Node represents a WebSocketServer which is required
+     * for signaling between Peers.
+     *
      * @class Node
-     * @param config
      * @constructor
+     *
+     * @param {Object} config
      */
     var Node = function (config) {
 
@@ -37,7 +43,13 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
 
         this.isConnected = false;
 
-        this.connect = function (callback) {
+        /**
+         * @method connect
+         * @return {Promise}
+         */
+        this.connect = function () {
+
+            var deferred = Q.defer();
 
             try {
                 this.socket = new WebSocket((this.isSecure ? 'wss' : 'ws') + '://' + this.host + ':' + this.port);
@@ -48,7 +60,7 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
                 this.socket.addEventListener('open', function () {
                     logger.log('Node' + self.id + ' ' + self.url, 'connected');
                     self.isConnected = true;
-                    callback();
+                    deferred.resolve();
                 });
 
                 this.socket.addEventListener('error', function (e) {
@@ -68,10 +80,11 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
                 });
             }
             catch (e) {
+                deferred.reject();
                 self.disconnect();
             }
 
-            return this;
+            return deferred.promise;
         };
 
         /**
@@ -87,7 +100,8 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
 
         this.send = function (cmd, data, waitForResponse) {
 
-            var deferred = Q.defer();
+            var self = this,
+                deferred = Q.defer();
 
             if (!this.isConnected) {
                 deferred.reject('Not connected to node!');
@@ -113,13 +127,20 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', 'geolocation'], f
             this.socket.send(JSON.stringify(data));
 
 
-            //if we need to wait for the answer
+            // If we need to wait for the answer
             if (waitForResponse) {
-                this.socket.addEventListener('message', function (e) {
-                    //TODO change this to be able to unregister eventListener
+
+                function responseHandler(e) {
                     var response = JSON.parse(e.data);
-                    if (response.cmd === cmd) deferred.resolve(response.data);
-                })
+                    if (response.cmd === cmd) {
+                        self.socket.removeEventListener('message', responseHandler);
+                        deferred.resolve(response.data);
+                    }
+                }
+
+                this.socket.addEventListener('message', responseHandler);
+
+                // No need to wait
             } else {
                 deferred.resolve();
             }

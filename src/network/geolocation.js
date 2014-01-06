@@ -1,7 +1,5 @@
 /**
  *
- * @author Matthieu Holzer
- *
  * @module GeoLocation
  * @class GeoLocation
  * @requires q, project
@@ -12,6 +10,7 @@ define(['q', 'project'], function (Q, project) {
 
     /**
      * Earth-radius in kilometers
+     *
      * @private
      * @property EARH_RADIUS
      * @type {Number}

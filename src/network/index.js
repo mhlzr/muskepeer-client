@@ -9,7 +9,7 @@
  *
  */
 
-define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', 'computation/index', './model/service'],
+define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', 'computation/index', './model/service'],
 
     function (Q, _, storage, project, settings, geolocation, MuskepeerModule, nodes, peers, Service) {
 
@@ -49,7 +49,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                     module.services.push(new Service(settings));
                 });
 
-                logger.log('Network', 'ExternalStorages registered');
+                logger.log('Network', 'ExternalServices registered');
             }
         }
 
@@ -98,6 +98,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
         /**
          * Event-Handler, gets called when another Peer sends candidate-data.
          * Adds the candidate-data to the Peer it came from
+         *
          * @private
          * @method peerCandidateHandler
          * @param {Object} data
@@ -108,11 +109,50 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
         }
 
 
-        function peerDisconnectHandler(e) {
+        /**
+         * Event-Handler, gets called when a Peer-connection is completely established.
+         *
+         * @private
+         * @method peerConnectedHandler
+         * @param {Peer} peer
+         */
+        function peerConnectedHandler(peer) {
+            peer.synchronize();
 
+
+            //}
+
+            //TESTING
+            /*else {
+             //TESTING
+             storage.fs.readFileChunkAsDataUrl({uuid: '8e6bcaccef241392cd7d3b127438ce4f41a8d31450f105c34438805dee7f6d1a'})
+             .then(function (base64) {
+             peer.sendFile('some uuid', base64, 0);
+             });
+             }
+             */
+        }
+
+        /**
+         * Event-Handler, gets called when a Peer-connection is closed.
+         * Causes a reconnect to nearest Peers if needed.
+         *
+         * @private
+         * @method peerDisconnectHandler
+         * @param {Object} e
+         */
+        function peerDisconnectHandler(e) {
+            if (peers.getConnectedPeers().length < settings.maxPeers) {
+                //peers.connectToNeighbourPeers();
+            }
         }
 
 
+        /**
+         * Event-Handler, gets called when a Peer receives a message.
+         *
+         * @param {Object} e
+         */
         function peerMessageHandler(e) {
             var peer = e.target,
                 externalList = e.list,
@@ -249,38 +289,19 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
                     return;
                 }
 
-                // Adding listeners to nodes module
+                // Adding listeners to nodes collection
                 nodes.on('peer:offer', peerOfferHandler);
                 nodes.on('peer:answer', peerAnswerHandler);
                 nodes.on('peer:candidate', peerCandidateHandler);
 
-                // Adding listeners to peers module
-                peers.on('peer:connect', function (peer) {
-
-                    // Am I the Source?
-                    //if (peer.isTarget) {
-
-                    peer.synchronize();
-
-
-                    //}
-
-                    //TESTING
-                    /*else {
-                     //TESTING
-                     storage.fs.readFileChunkAsDataUrl({uuid: '8e6bcaccef241392cd7d3b127438ce4f41a8d31450f105c34438805dee7f6d1a'})
-                     .then(function (base64) {
-                     peer.sendFile('some uuid', base64, 0);
-                     });
-                     }
-                     */
-                });
-
+                // Adding listeners to peers collection
+                peers.on('peer:connect', peerConnectedHandler);
                 peers.on('peer:message', peerMessageHandler);
                 peers.on('peer:disconnect', peerDisconnectHandler);
 
 
                 registerExternalServices();
+
 
                 // Detect geoLocation if needed
                 geolocation.getGeoLocation()
@@ -313,6 +334,21 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', 'geolocation', 'm
              */
             stop: function () {
                 //TODO deconstruct, remove listeners
+            },
+
+
+            /**
+             *@method publish
+             */
+            publish: function (type, data) {
+
+                // Broadcast to peers
+                peers.broadcast(type, data);
+
+                // Broadcast to services
+                module.services.forEach(function (service) {
+                    service.save(data);
+                });
             }
 
         });

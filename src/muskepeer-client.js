@@ -139,7 +139,7 @@ define([
                 })
                 .done(function () {
                     // Finallly initialize the network and computation module
-                    //network.start();
+                    network.start();
                     //computation.start();
                 });
 

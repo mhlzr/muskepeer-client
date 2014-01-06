@@ -140,23 +140,8 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
                 // Store result to local database
                 storage.db.save('results', result, {uuidIsHash: true});
 
-
-                if (isNew) {
-                    externalStorageServices.forEach(function (service) {
-                        if (isNew) {
-                            // Save to externalStorages
-                            service.save(result);
-                        }
-                        else {
-                            // Update
-                            service.update(result.uuid, result);
-                        }
-                    });
-                }
-
-
-                // Broadcast if new || mutipleIterations
-                network.peers.broadcast('result', result);
+                // Inform network module which will broadcast/publish
+                network.publish('result', result);
 
                 // Count amount of results
                 if (project.computation.validationIterations > 0) {

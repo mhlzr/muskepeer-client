@@ -1,51 +1,40 @@
 /**
- * @author Matthieu Holzer
- * @date 05.11.13
+ * Collection for Peer-Instances
+ *
+ * @module Network
+ * @class Peers
+ *
  */
 
-define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../model/peer'], function (Q, _, settings, geolocation, MuskepeerModule, Peer) {
+define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '../model/peer'], function (Q, _, settings, geolocation, MuskepeerModule, Peer) {
 
         var module = new MuskepeerModule(),
-            _peers = [],
-            _nextPeer,
-            _previousPeer;
+            _peers = [];
 
-        /**
-         * @private
-         * @method findNextPeer
-         * @return {Peer}
-         */
-        function findNextPeer() {
-            if (_peers.length >= 1) {
-                return _peers[0];
-            }
-            return null;
-        }
-
-        /**
-         * @private
-         * @method findPreviousPeer
-         * @return {Peer}
-         */
-        function findPreviousPeer() {
-            if (_peers.length >= 2) {
-                return _peers[1];
-            } else if (_peers.length == 1) {
-                return _peers[0];
-            }
-            return null;
-        }
 
         return module.extend({
 
+            /**
+             * @property list
+             * @type {Array}
+             */
             list: _peers,
 
+            /**
+             * @method add
+             * @param peer
+             */
             add: function (peer) {
                 if (!module.getPeerByUuid(peer.uuid)) {
                     _peers.push(peer);
                 }
             },
 
+            /**
+             * @method connect
+             * @param {Array} [peers]
+             * @return {Promise}
+             */
             connect: function (peers) {
 
                 //pass peers, otherwise will take all
@@ -58,20 +47,21 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
                     // Never connect to null or self
                     if (!peer || peer.uuid === settings.uuid) return;
 
-                    promises.push(peer.createConnection());
+                    // No need to connect if already connected
+                    if (!peer.isConnected) {
+                        promises.push(peer.createConnection());
+                    }
+
                 });
 
                 return Q.all(promises);
             },
 
+            /**
+             * @method connectToNeighbourPeers
+             * @return {Promise}
+             */
             connectToNeighbourPeers: function () {
-                var neighbours = module.getNeighbourPeers();
-
-                //if next === previous
-                if (neighbours[0] === neighbours[1]) {
-                    return module.connect([neighbours[0]]);
-                }
-
                 return module.connect(module.getNeighbourPeers());
             },
 
@@ -89,26 +79,19 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
 
             /**
              * @method getNeighbourPeers
-             * @returns {Array}
+             * @return {Array}
              */
             getNeighbourPeers: function () {
-                return [this.getNextPeer(), this.getPreviousPeer()];
-            },
-
-            getNextPeer: function () {
-                if (!_nextPeer) _nextPeer = findNextPeer();
-                return _nextPeer;
-            },
-
-            getPreviousPeer: function () {
-                if (!_previousPeer) _previousPeer = findPreviousPeer();
-                return _previousPeer;
+                // Assuming they are already sorted in a specific way
+                // e.g. geolocation-distance
+                return _peers.slice(0, settings.maxPeers || 2);
             },
 
 
             /**
              * Get all known Peers Uuids as an array
              *
+             * @method getPeerUuidsAsArray
              * @return {Array}
              */
             getPeerUuidsAsArray: function () {
@@ -117,19 +100,31 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
                 })
             },
 
+            /**
+             * Compare a list of given peers to the local one,
+             * return the ones that are missing locally.
+             *
+             * @method getPeerUugetMissingPeerUuidsAsArrayidsAsArray
+             * @param {Array} externalList
+             * @return {Array}
+             */
 
             getMissingPeerUuidsAsArray: function (externalList) {
                 var internalList = module.getPeerUuidsAsArray();
                 // The external list will always include the uuid of this peer,
-                // so we add it here
+                // so we add it herejust for the comparison
                 internalList.push(settings.uuid);
                 return _.difference(externalList, internalList);
             },
 
+
+            /**
+             * @method update
+             * @param {Object} peerData
+             */
             update: function (peerData) {
 
-                logger.log('Peers', 'update');
-                //multidimensional array form multiple nodes
+                // Multidimensional array form multiple nodes needs to be flattened
                 peerData = _.flatten(peerData);
 
                 peerData.forEach(function (data) {
@@ -162,10 +157,13 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
                 });
 
 
-                //sort peers by their geolocation-distance
+                // Sort peers by their geolocation-distance
                 _peers = _.sortBy(_peers, function (peer) {
                     return peer.distance;
                 });
+
+                // Update public list
+                this.list = _peers;
             },
 
 
@@ -203,10 +201,20 @@ define(['q', 'lodash', 'settings', 'geolocation', '../../muskepeer-module', '../
                 });
 
                 // Broadcast to all connected peers
-                peers.forEach(function (peer) {
-                    if (!peer.isConnected) return;
+                module.getConnectedPeers().forEach(function (peer) {
                     peer.broadcast(type, data, list);
                 });
+            },
+
+            /**
+             * Get a list of all peers to which there is an active connection.
+             *
+             * @method getConnectedPeers
+             *
+             * @return {Array}
+             */
+            getConnectedPeers: function () {
+                return _.where(_peers, {isConnected: true});
             }
 
         });

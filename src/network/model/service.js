@@ -1,13 +1,21 @@
 /**
- * External  Service to store result data to
- * a service using HTTP and XHR.
- * Tested for parse.com
  *
- * @module Service
- * @class Service
+ * @module Network
+ *
  */
 
 define([], function () {
+
+    /**
+     * External  Service to store result data to
+     * a service using HTTP and XHR.
+     * Tested for parse.com
+     *
+     * @class Service
+     * @constructor
+     *
+     * @param {Object} options
+     */
 
     return function Service(options) {
 
@@ -16,6 +24,12 @@ define([], function () {
         this.params = options.params;
         this.headers = options.headers;
 
+        /**
+         * @private
+         * @method serialize
+         * @param {Object} mapping
+         * @return {String}
+         */
         function serialize(mapping) {
             var values = [];
 
@@ -28,6 +42,10 @@ define([], function () {
             return values.join('&');
         }
 
+        /**
+         * @method save
+         * @param data
+         */
         this.save = function (data) {
 
             var xhr = new XMLHttpRequest();
@@ -43,18 +61,5 @@ define([], function () {
 
         };
 
-
-        this.update = function (uuid, data) {
-            var xhr = new XMLHttpRequest();
-
-            xhr.open('PUT', this.url + '/' + uuid + serialize(this.params), true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-
-            this.headers.forEach(function (header) {
-                xhr.setRequestHeader(header.key, header.value);
-            });
-
-            xhr.send(JSON.stringify(data));
-        }
     };
 });

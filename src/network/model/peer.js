@@ -1,7 +1,7 @@
 /**
+ *
  * @module Network
  *
- * @see http://www.html5rocks.com/en/tutorials/webrtc/infrastructure/
  */
 
 define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q, EventEmitter2, nodes) {
@@ -32,6 +32,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
 
     /**
      * Facade for RTCPeerConnection
+     *
      * @private
      * @class MRTCPeerConnection
      * @for Peer
@@ -45,6 +46,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
 
     /**
      * Facade for RTCIceCandidate
+     *
      * @private
      * @class MRTCIceCandidate
      * @for Peer
@@ -57,6 +59,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
 
     /**
      * Facade for RTCSessionDescription
+     *
      * @private
      * @class MRTCSessionDescription
      * @for Peer
@@ -69,9 +72,13 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
 
 
     /**
+     * A Peer represents another Browser which is connected via
+     * WebRTCs DataChannel
+     *
      * @class Peer
-     * @param config
      * @constructor
+     *
+     * @param {Object} config
      */
     var Peer = function (config) {
 
@@ -176,7 +183,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
         }
 
         function dataChannelHandler(e) {
-            logger.log('Peer', _self.uuid, ' got remote datachannel');
+            logger.log('Peer', _self.uuid, 'got remote datachannel');
 
             _channel = e.channel;
 
@@ -192,10 +199,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
             if (_connection.iceConnectionState === 'connected' &&
                 _connection.iceGatheringState === 'complete') {
 
-                logger.log('Peer', 'connection established');
-            }
-            else {
-                logger.log('Peer', _self.uuid, 'connection closed');
+                logger.log('Peer', _self.uuid, 'connection established');
             }
 
         }
@@ -380,11 +384,11 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
          */
         this.send = function (data) {
 
-            if (!this.isConnected || _channel.readyState !== 'open') {
-                logger.err('Peer', 'attempt to send, but channel is not open!');
+            if (!_self.isConnected || _channel.readyState !== 'open') {
+                logger.error('Peer', 'attempt to send, but channel is not open!');
                 return;
             }
-            //actually it should be possible to send a blob
+            // Actually it should be possible to send a blob
             if (data instanceof Blob) {
                 _channel.send(data);
             }
