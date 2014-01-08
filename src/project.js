@@ -2,30 +2,21 @@
  * @class Project
  */
 
-define([], function () {
-    return {
+define(['q', 'lodash'], function (Q, _) {
 
-        "uuid": "2345678902765456789",
-        "title": "Random Result Generator",
-        "description": "Will create random results between 0 and 10.000",
-        "publicKey": "",
+    // Defaults
+    var defaults = {
 
-        "author": "Matthieu Holzer",
-        "website": "",
-        "version": "0.0.1",
         "active": true,
 
         "computation": {
 
             "offlineAllowed": true,
 
-            "workerUrl": "https://dl.dropboxusercontent.com/u/959008/random.js",
             "resultGroupSize": 1, //how much results to collect before broadcast
-            "validationIterations": 10, //-1 : Inifinite, 0 : None; >0 : Amount
-            "expectedResults": 20, //-1 : Inifinite, 0 : None; >0 : Amount
+            "validationIterations": 0, //-1 : Inifinite, 0 : None; >0 : Amount
 
-            "useJobList": true, //create and store jobs from worker
-            "jobFactoryUrl": "https://dl.dropboxusercontent.com/u/959008/factory.js",
+            "useJobList": false, //create and store jobs from worker
             "jobGroupSize": 1 //how much jobs to create before broadcast
 
 
@@ -33,29 +24,47 @@ define([], function () {
 
         "network": {
             "useGeoLocation": true,
-            "services": [
-                {
-                    "enabled": false,
-                    "url": "https://api.parse.com/1/classes/Results/",
-                    "type": "REST",
-                    "params": {},
-                    "headers": [
-                        {
-                            "key": "X-Parse-Application-Id",
-                            "value": "ZzIHMKfVQmIni0K5fBdYgXxTlXyoovbm4gm0Epdq"
-                        },
-                        {
-                            "key": "X-Parse-REST-API-Key",
-                            "value": "4Izw5bddA34RFUmOuGCYrMHn4zY5dz62ETAVb2g5"
-                        }
-                    ]
-                }
-            ]
+            "services": []
+
         },
 
-        "files": [
-            "https://dl.dropboxusercontent.com/u/959008/webstorm.pdf",
-            "https://dl.dropboxusercontent.com/u/959008/download.pdf"
-        ]
+        "files": []};
+
+
+    function isValidUrl(url) {
+        //TODO
+        return true;
+    }
+
+
+    function downloadJSON(url) {
+        //TODO
+    }
+
+    function combineWithDefaults(project) {
+        // Combine passed project settings with defaults
+        return _.defaults(project, defaults);
+    }
+
+    return {
+        create: function (config) {
+
+            var deferred = Q.defer();
+
+            if (_.isObject(config)) {
+                _.extend(this, combineWithDefaults(config));
+                deferred.resolve();
+            }
+            else if (_.isString(config) && isValidUrl(config)) {
+                downloadJSON().then(function (config) {
+                    _.extend(this, combineWithDefaults(config));
+                    deferred.resolve();
+                })
+            }
+
+
+            return deferred.promise;
+
+        }
     }
 });
