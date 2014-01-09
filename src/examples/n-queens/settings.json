@@ -12,11 +12,11 @@
     "computation": {
 
         "offlineAllowed": true,
-        "workerUrl": "https://dl.dropboxusercontent.com/u/959008/examples/n-queens/worker.js",
+        "workerUrl": "https://www.muskepeer.net/examples/n-queens/worker.js",
         "resultGroupSize": 1,
         "validationIterations": 0,
 
-        "expectedResults": 2680, //11 queens
+        "expectedResults": 2680,
 
         "useJobList": false,
 

@@ -410,6 +410,31 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
 
 
                 return deferred.promise;
+            },
+
+
+            /**
+             * Find out if a store has s specific dataset
+             *
+             * @method has
+             * @param {String} storeName
+             * @param {String} key
+             */
+            has: function (storeName, key) {
+                var deferred = Q.defer(),
+                    store = getStoreByName(storeName);
+
+                if (!store) {
+                    deferred.reject(ERRORS.STORE_NOT_FOUND);
+                    return deferred.promise;
+                }
+
+                store.get(key, function (result) {
+                    if (result) deferred.resolve(true);
+                    else  deferred.resolve(false);
+                }, deferred.reject);
+
+                return deferred.promise;
             }
 
         }

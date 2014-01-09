@@ -268,7 +268,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
                     storage.db.save('results', e.data, {uuidIsHash: true});
 
                     // Rebroadcast
-                    peers.broadcast('result', e.data, e.list);
+                    //peers.broadcast('result', e.data);
                     break;
                 case 'broadcast:peer':
                     break;

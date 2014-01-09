@@ -25,53 +25,7 @@ require(['muskepeer-client', 'util/logger', 'domready'], function (Muskepeer, Lo
     window.logger = Logger;
 
     Muskepeer.start({
-        project: {
-            "uuid": "d34ebd37-927a-426a-b762-87fb73c04159",
-            "title": "n-Queens solver",
-            "description": "Will find distinct solutions for the n-queens problem.",
-            "publicKey": "",
-
-            "author": "Matthieu Holzer",
-            "website": "",
-            "version": "0.0.1",
-            "active": true,
-
-            "computation": {
-
-                "offlineAllowed": true,
-                "workerUrl": "https://dl.dropboxusercontent.com/u/959008/examples/n-queens/worker.js",
-                "resultGroupSize": 1,
-                "validationIterations": 0,
-
-                "expectedResults": 2680, //11 queens
-
-                "useJobList": false,
-
-                "storages": [
-                    {
-                        "enabled": true,
-                        "url": "https://api.parse.com/1/classes/Queens/",
-                        "type": "REST",
-                        "params": {},
-                        "headers": [
-                            {
-                                "key": "X-Parse-Application-Id",
-                                "value": "ZzIHMKfVQmIni0K5fBdYgXxTlXyoovbm4gm0Epdq"
-                            },
-                            {
-                                "key": "X-Parse-REST-API-Key",
-                                "value": "4Izw5bddA34RFUmOuGCYrMHn4zY5dz62ETAVb2g5"
-                            }
-                        ]
-                    }
-                ]
-            },
-
-            "network": {
-                "useGeoLocation": true
-            }
-
-        },
+        project: 'https://www.muskepeer.net/examples/n-queens/settings.json',
         nodes: [
             {
                 host: 'node01-muskepeer.rhcloud.com',
@@ -82,13 +36,7 @@ require(['muskepeer-client', 'util/logger', 'domready'], function (Muskepeer, Lo
                 host: 'node02-muskepeer.rhcloud.com',
                 isSecure: true,
                 port: 8443
-            }/*,
-             {
-             host: '192.168.178.26',
-             isSecure: false,
-             port: 8080
-             }*/
-
+            }
         ]
     });
 

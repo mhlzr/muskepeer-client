@@ -184,10 +184,12 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
          * @private
          * @method timerCompleteHandler
          */
-        function timerCompleteHandler() {
+        function timerCompleteHandler(e) {
             if (!_self.isConnected) {
                 _self.timeout = Date.now();
                 _self.emit('peer:timeout');
+                logger.log('Peer', _self.uuid, 'timed out');
+
             }
             else _self.timeout = undefined;
         }
@@ -293,10 +295,11 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
          * @return {Promise}
          */
         this.createConnection = function () {
-            logger.log('Peer', this.uuid, 'creating connection');
 
             this.isSource = true;
             this.isTarget = false;
+
+            logger.log('Peer', this.uuid, 'creating connection');
 
             // Start timeout countdown
             _.delay(timerCompleteHandler, TIMEOUT_WAIT_TIME);
@@ -311,6 +314,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
                 this.isConnected = false;
                 timerCompleteHandler();
             }
+
 
             // Add listeners to channel
             _channel.onclose = channelCloseHandler;
@@ -644,8 +648,8 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         /**
          * @method broadcast
          */
-        this.broadcast = function (type, data, list) {
-            _self.send({type: 'broadcast:' + type, data: data, list: list});
+        this.broadcast = function (type, data) {
+            _self.send({type: 'broadcast:' + type, data: data});
         }
 
 
