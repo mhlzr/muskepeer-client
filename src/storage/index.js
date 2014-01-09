@@ -71,6 +71,7 @@ define(['q', './database', './filesystem', 'project', 'muskepeer-module'], funct
                         return fileSystem.init(database);
                     })
                     .then(function () {
+
                         logger.log('FileSystem', 'ready');
                         module.db = database;
                         module.fs = fileSystem;

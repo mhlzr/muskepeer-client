@@ -43,7 +43,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
         function registerExternalServices() {
 
             // Create external storage services
-            if (project.network.services.length > 0) {
+            if (project.network.services && project.network.services.length > 0) {
                 project.network.services.forEach(function (settings) {
                     if (!settings.enabled) return;
                     module.services.push(new Service(settings));
@@ -117,7 +117,10 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
          * @param {Peer} peer
          */
         function peerConnectedHandler(peer) {
-            peer.synchronize();
+
+            if (peer.isTarget) {
+                peer.synchronize();
+            }
 
 
             //}
@@ -145,6 +148,18 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
             if (peers.getConnectedPeers().length < settings.maxPeers) {
                 peers.connectToNeighbourPeers();
             }
+        }
+
+        /**
+         * Event-Handler, gets called when a Peer-connection
+         * can't be established after a specific time interval and a timeout occured.
+         *
+         * @private
+         * @method peerTimeoutHandler
+         * @param {Object} e
+         */
+        function peerTimeoutHandler(e) {
+            peerDisconnectHandler(e);
         }
 
 
@@ -298,6 +313,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
                 peers.on('peer:connect', peerConnectedHandler);
                 peers.on('peer:message', peerMessageHandler);
                 peers.on('peer:disconnect', peerDisconnectHandler);
+                peers.on('peer:timeout', peerTimeoutHandler);
 
 
                 registerExternalServices();

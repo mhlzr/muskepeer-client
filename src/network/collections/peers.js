@@ -8,6 +8,9 @@
 
 define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '../model/peer'], function (Q, _, settings, geolocation, MuskepeerModule, Peer) {
 
+
+        var TIMEOUT_RETRY_TIME = 60000; //60s
+
         var module = new MuskepeerModule(),
             _peers = [];
 
@@ -84,7 +87,14 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
             getNeighbourPeers: function () {
                 // Assuming they are already sorted in a specific way
                 // e.g. geolocation-distance
-                return _peers.slice(0, settings.maxPeers || 2);
+
+                // Remove all peers that had a timeout shortly
+                var peers = _peers.filter(function (peer) {
+                    // Timeout at all? && Timeout was long ago
+                    return !peer.timeout || peer.timeout + TIMEOUT_RETRY_TIME < Date.now();
+                });
+
+                return peers.slice(0, settings.maxPeers || 2);
             },
 
 

@@ -6,6 +6,7 @@
  */
 
 define([
+    'q',
     'lodash',
     './computation/index',
     './crypto/index',
@@ -13,7 +14,7 @@ define([
     './project',
     './settings',
     './storage/index'
-], function (_, computation, crypto, network, project, settings, storage) {
+], function (Q, _, computation, crypto, network, project, settings, storage) {
 
     'use strict';
 
@@ -106,11 +107,9 @@ define([
          */
         start: function (config) {
 
-            // Combine project settings with defaults
-            project = _.defaults(project, config.project);
-
-            // Initialize storage module
-            storage.init()
+            // Create project object from passed options
+            project.create(config.project)
+                .then(storage.init)
                 .then(function () {
 
                     // Create a Uuid (which is a hash here) for each node

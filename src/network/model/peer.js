@@ -4,17 +4,20 @@
  *
  */
 
-define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q, EventEmitter2, nodes) {
+define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], function (_, Q, EventEmitter2, nodes, settings) {
 
-    var ICE_SERVER_SETTINGS = {
+    var TIMEOUT_WAIT_TIME = 10000, //10s
+        ICE_SERVER_SETTINGS = {
             iceServers: [
-                { url: "stun:stun.l.google.com:19302" }
+                { url: settings.stunServer }
             ]},
         OPTIONAL_SETTINGS = {
             optional: [
                 {RtpDataChannels: true}
             ]
         },
+    //FORCE SCTP
+    //OPTIONAL_SETTINGS = null,
         MEDIA_CONSTRAINTS = {
             optional: [],
             mandatory: {
@@ -148,6 +151,16 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
 
 
         /**
+         * A timestamp to prove when the last timout
+         * occured when trying to connect to the peer.
+         * @property timeout
+         * @default undefined
+         * @type {Number}
+         */
+        this.timeout = undefined;
+
+
+        /**
          * Find a signaling-channel two a given peer
          *
          * @method getSignalChannel
@@ -166,6 +179,18 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
 
             return signal;
         };
+
+        /**
+         * @private
+         * @method timerCompleteHandler
+         */
+        function timerCompleteHandler() {
+            if (!_self.isConnected) {
+                _self.timeout = Date.now();
+                _self.emit('peer:timeout');
+            }
+            else _self.timeout = undefined;
+        }
 
         /* Event Handler Start */
         function iceCandidateHandler(e) {
@@ -191,6 +216,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
             _channel.onerror = channelErrorHandler;
             _channel.onmessage = channelMessageHandler;
             _channel.onopen = channelOpenHandler;
+
         }
 
         function iceConnectionStateChangeHandler(e) {
@@ -267,15 +293,24 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
          * @return {Promise}
          */
         this.createConnection = function () {
-            logger.log('Peer', _self.uuid, 'creating connection');
+            logger.log('Peer', this.uuid, 'creating connection');
 
             this.isSource = true;
             this.isTarget = false;
 
-            // Create  data-channel with a pseudo-random name
-            _channel = _connection.createDataChannel('RTCDataChannel' + (Math.random() * 1000 | 0), {
-                reliable: true
-            });
+            // Start timeout countdown
+            _.delay(timerCompleteHandler, TIMEOUT_WAIT_TIME);
+
+            try {
+                // Create  data-channel
+                _channel = _connection.createDataChannel('Muskepeer', null);
+            }
+            catch (e) {
+                // If an error occured here, there is a problem about the connection,
+                // so lets do a timeout and maybe retry later
+                this.isConnected = false;
+                timerCompleteHandler();
+            }
 
             // Add listeners to channel
             _channel.onclose = channelCloseHandler;
@@ -285,8 +320,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
 
             var deferred = Q.defer,
                 signal = this.getSignalChannel();
-
-            //TODO implement a timeout function
 
             //2. Alice creates an offer (an SDP session description) with the RTCPeerConnection createOffer() method.
             _connection.createOffer(function (sessionDescription) {
@@ -398,12 +431,19 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
                 logger.error('Peer', 'attempt to send, but channel is not open!');
                 return;
             }
+
             // Actually it should be possible to send a blob
             if (data instanceof Blob) {
                 _channel.send(data);
             }
             else {
-                _channel.send(JSON.stringify(data));
+                try {
+                    _channel.send(JSON.stringify(data));
+                }
+                catch (e) {
+                    // logger.log('Peer', e);
+                }
+
             }
 
 
@@ -499,7 +539,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
         };
 
         this.sendPeerList = function (list) {
-            this.send({ type: 'peer:list:push', list: list});
+            //  this.send({ type: 'peer:list:push', list: list});
         };
 
         this.getPeerByUuid = function (uuids) {
@@ -558,7 +598,17 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes'], function (_, Q,
         };
 
         this.sendResultList = function (list) {
+            var MAX_RESULTS_AT_ONCE = 2;
+
+            //SCTP !!! instead of (S)RTP
+            //buffer problem https://code.google.com/p/webrtc/issues/detail?id=2279
+            // while (list.length > 0) {
+            // _.delay(this.send, Math.random() * 10000, ({type: 'result:list:push', list: list.splice(0, MAX_RESULTS_AT_ONCE)}));
+            //      this.send({type: 'result:list:push', list: list.splice(0, MAX_RESULTS_AT_ONCE)});
+            //}
+
             this.send({type: 'result:list:push', list: list});
+
         };
 
         this.getResultByUuid = function (uuids) {

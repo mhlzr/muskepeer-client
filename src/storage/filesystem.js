@@ -224,6 +224,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
             _self = this;
             _db = db;
 
+
             return requestQuota()
                 .then(requestFileSystem)
                 .then(function (fileSystem) {
@@ -420,7 +421,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
 
         /**
-         * Add filese-entries to the storage database,
+         * Add file-entries to the storage database,
          * not to the filesystem.
          *
          * @method add

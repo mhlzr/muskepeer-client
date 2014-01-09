@@ -50,8 +50,9 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
         i18n: 'en_GB',
         uuid: uuid.generate(), //everyone will know (public)
         authToken: uuid.generate(), //will never be sent to any peer (private)
-        maxWorkers: 2,
+        maxWorkers: 1,
         maxPeers: 3,
+        stunServer: 'stun:stun.l.google.com:19302',
         fileStorageSize: 500 * 1024 * 1024 //500MB
     });
 

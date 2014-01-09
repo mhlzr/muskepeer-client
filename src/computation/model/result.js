@@ -8,5 +8,6 @@ define(['crypto/index'], function (crypto) {
         this.data = data;
         this.uuid = crypto.hash(this.data);
         this.iteration = 1;
+        this.timestamp = Date.now();
     };
 });
