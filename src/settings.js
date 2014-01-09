@@ -52,13 +52,14 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
         maxPeers: 3,
         maxWorkers: 1,
         fileStorageSize: 500 * 1024 * 1024, //500MB
+        protocol: 'srtp', //srtp || sctp
         stunServer: 'stun:stun.l.google.com:19302',
         syncInterval: 3600000, //1h
         uuid: uuid.generate() //everyone will know (public)
     });
 
 //TODO remove testing-line
-   // _settings.uuid = uuid.generate();
+    // _settings.uuid = uuid.generate();
 
     return _settings;
 

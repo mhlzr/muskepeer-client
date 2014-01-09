@@ -174,6 +174,8 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
                 uuid = e.uuid,
                 list;
 
+            logger.log('Network', e.type);
+
             if (!e.type) {
                 logger.log('Network', 'peer:message without type received');
                 return;
@@ -244,6 +246,9 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
                     });
                     break;
                 case 'result:pull':
+                    storage.db.read('results', uuid, {uuidIsHash: true}).then(function (result) {
+                        if (result) peer.sendResult(result);
+                    });
                     break;
 
                 case 'node:push':
@@ -258,6 +263,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
                     storage.db.save('jobs', e.job, {uuidIsHash: true});
                     break;
                 case 'result:push':
+                    storage.db.save('results', e.result, {uuidIsHash: true});
                     break;
 
                 case 'broadcast:job':

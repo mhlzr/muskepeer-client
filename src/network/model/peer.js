@@ -13,7 +13,8 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             ]},
         OPTIONAL_SETTINGS = {
             optional: [
-                {RtpDataChannels: true}
+                {RtpDataChannels: true},
+                {DtlsSrtpKeyAgreement: true}
             ]
         },
         MEDIA_CONSTRAINTS = {
@@ -22,10 +23,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
                 OfferToReceiveAudio: false,
                 OfferToReceiveVideo: false
             }};
-
-    //FORCE SCTP
-    // OPTIONAL_SETTINGS = null;
-    //MEDIA_CONSTRAINTS = null;
 
 
     var ee = new EventEmitter2({
@@ -90,6 +87,12 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         var _self = this,
             _connection,
             _channel;
+
+        // Protocol switch SRTP(=default) or SCTP
+        if (settings.protocol.toLowerCase() === 'sctp') {
+            OPTIONAL_SETTINGS = null;
+            MEDIA_CONSTRAINTS = null;
+        }
 
         // Event-methods
         this.emit = ee.emit;
@@ -246,6 +249,8 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         function channelMessageHandler(e) {
             var msg;
 
+            _self.isConnected = true;
+
             if (e.data instanceof Blob) {
                 msg = e.data;
             }
@@ -314,6 +319,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
                 // so lets do a timeout and maybe retry later
                 this.isConnected = false;
                 timerCompleteHandler();
+                deferred.reject();
             }
 
 
@@ -439,8 +445,15 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
          */
         this.send = function (data) {
 
+
             if (!_self.isConnected || _channel.readyState !== 'open') {
                 logger.error('Peer', 'attempt to send, but channel is not open!');
+                return;
+            }
+
+            // Buffer is full
+            if (_channel.bufferedAmount > 0) {
+                _.delay(_self.send, 500 * Math.random(), data);
                 return;
             }
 
@@ -451,13 +464,12 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             else {
                 try {
                     var message = JSON.stringify(data);
-                    console.log(_channel, message.length);
                     _channel.send(message);
 
                 }
                 catch (e) {
-
-                    logger.error('Peer', e);
+                    // Retry soon
+                    _.delay(_self.send, 500 * Math.random(), data);
                 }
 
             }
@@ -614,15 +626,11 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         };
 
         this.sendResultList = function (list) {
-            var MAX_RESULTS_AT_ONCE = 1;
+            var MAX_RESULTS_AT_ONCE = 5;
 
-            //SCTP !!! instead of (S)RTP
-            //buffer problem https://code.google.com/p/webrtc/issues/detail?id=2279
             while (list.length > 0) {
                 this.send({type: 'result:list:push', list: list.splice(0, MAX_RESULTS_AT_ONCE)});
             }
-
-
         };
 
         this.getResultByUuid = function (uuids) {
