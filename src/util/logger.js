@@ -30,22 +30,29 @@ define([], function () {
 
     function print(type, args) {
 
+
         if (args.length === 1) {
+            document.write(getPrettyTimeStamp(), ' ', args[0] + '<br/>');
             console[type](getPrettyTimeStamp(), args[0]);
         }
         else if (args.length === 2) {
-            console[type](getPrettyTimeStamp(), args[0] + ':', args[1]);
+            document.write(getPrettyTimeStamp(), ' ', args[0] + ':', args[1] + '<br/>');
+            console[type](getPrettyTimeStamp(),args[0] + ':', args[1]);
         }
         else if (args.length === 3) {
+            document.write(getPrettyTimeStamp(), ' ', args[0], args[1], ':', args[2] + '<br/>');
             console[type](getPrettyTimeStamp(), args[0], args[1], ':', args[2]);
         }
         else if (args.length === 4) {
+            document.write(getPrettyTimeStamp(), ' ', args[0], args[1], ':', args[2], args[3] + '<br/>');
             console[type](getPrettyTimeStamp(), args[0], args[1], ':', args[2], args[3]);
         }
         else {
+            document.write(getPrettyTimeStamp(), ' ', args + '<br/>');
             console[type](getPrettyTimeStamp(), args);
         }
     }
+
 
     return {
 

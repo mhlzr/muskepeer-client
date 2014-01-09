@@ -122,7 +122,7 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
         logger.log('Worker ' + message.id, 'has result', result.uuid, message.data);
 
         // Already existent?
-        storage.db.read('results', result.uuid, {uuidIsHash: true})
+        storage.db.has('results', result.uuid, {uuidIsHash: true})
             .then(function (resultInStorage) {
                 if (resultInStorage) {
                     isNew = false;

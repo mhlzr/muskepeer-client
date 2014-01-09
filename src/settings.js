@@ -47,18 +47,20 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
 
     //Defaults
     _.defaults(_settings, {
-        i18n: 'en_GB',
-        uuid: uuid.generate(), //everyone will know (public)
         authToken: uuid.generate(), //will never be sent to any peer (private)
-        maxWorkers: 1,
+        i18n: 'en_GB',
         maxPeers: 3,
+        maxWorkers: 1,
+        fileStorageSize: 500 * 1024 * 1024, //500MB
         stunServer: 'stun:stun.l.google.com:19302',
-        fileStorageSize: 500 * 1024 * 1024 //500MB
+        syncInterval: 3600000, //1h
+        uuid: uuid.generate() //everyone will know (public)
     });
 
-    //TODO remove testing-line
-    _settings.uuid = uuid.generate();
+//TODO remove testing-line
+   // _settings.uuid = uuid.generate();
 
     return _settings;
 
-});
+})
+;

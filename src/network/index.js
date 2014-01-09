@@ -264,11 +264,20 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
                     break;
                 case 'broadcast:result':
                     console.log('got a result broadcast');
-                    // Store the result
-                    storage.db.save('results', e.data, {uuidIsHash: true});
 
-                    // Rebroadcast
-                    //peers.broadcast('result', e.data);
+                    // Do i already know about this?
+                    storage.db.has('results', e.data.uuid)
+                        .then(function (exists) {
+
+                            if (!exists) {
+                                // Store the result
+                                storage.db.save('results', e.data, {uuidIsHash: true});
+
+                                // Rebroadcast
+                                peers.broadcast('result', e.data, peer.uuid);
+                            }
+                        });
+
                     break;
                 case 'broadcast:peer':
                     break;

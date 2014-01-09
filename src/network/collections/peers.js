@@ -179,40 +179,27 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
 
             /**
              * Broadcast data to peers.
-             * Will be broadcast to all connected peers if no list is passed.
+             * Will exclude originPeerUuid from receivers if passed.
              *
              * @method broadcast
              * @param type
              * @param data
-             * @param {Array} [list]
+             * @param {String} [originPeerUuid]
              */
-            broadcast: function (type, data, list) {
+            broadcast: function (type, data, originPeerUuid) {
 
-                var peers;
+                var peers = module.getConnectedPeers();
 
-                // No Rebroadcast, but origin
-                if (!list) {
-                    peers = _peers;
-                    list = _.pluck(peers, 'uuid');
-                }
-
-                // It's a rebroadcast
-                else {
-                    peers = [];
-                    _.each(list, function (peerUuid) {
-                        var peer = module.getPeerByUuid(peerUuid);
-                        if (peer) peers.push(peer);
-                    })
-                }
-
-                // Remove own uuid from list
-                list = _.reject(list, function (peerUuid) {
-                    return peerUuid === settings.uuid;
+                // Remove own uuid from list or the originPeerUuid
+                peers = _.reject(peers, function (peer) {
+                    return peer.uuid === settings.uuid || peerUuid === originPeerUuid;
                 });
 
+                console.log(peers);
+
                 // Broadcast to all connected peers
-                module.getConnectedPeers().forEach(function (peer) {
-                    peer.broadcast(type, data, list);
+                peers.forEach(function (peer) {
+                    peer.broadcast(type, data);
                 });
             },
 

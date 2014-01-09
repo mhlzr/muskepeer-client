@@ -6,7 +6,7 @@
 
 define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], function (_, Q, EventEmitter2, nodes, settings) {
 
-    var TIMEOUT_WAIT_TIME = 10000, //10s
+    var TIMEOUT_WAIT_TIME = 30000, //10s
         ICE_SERVER_SETTINGS = {
             iceServers: [
                 { url: settings.stunServer }
@@ -16,15 +16,17 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
                 {RtpDataChannels: true}
             ]
         },
-    //FORCE SCTP
-    //OPTIONAL_SETTINGS = null,
         MEDIA_CONSTRAINTS = {
             optional: [],
             mandatory: {
                 OfferToReceiveAudio: false,
                 OfferToReceiveVideo: false
-            }
-        };
+            }};
+
+    //FORCE SCTP
+    // OPTIONAL_SETTINGS = null;
+    //MEDIA_CONSTRAINTS = null;
+
 
     var ee = new EventEmitter2({
         wildcard: true,
@@ -205,10 +207,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
 
         }
 
-        function negotiationNeededHandler(e) {
-            //logger.log('Peer:negotiationNeededHandler', e);
-        }
-
         function dataChannelHandler(e) {
             logger.log('Peer', _self.uuid, 'got remote datachannel');
 
@@ -276,18 +274,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         /* Event Handler END */
 
 
-        //1.Alice creates an RTCPeerConnection object.
-        _connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, OPTIONAL_SETTINGS);
-
-        //I. Alice creates an RTCPeerConnection object with an onicecandidate handler.
-
-        //add listeners to connection
-        _connection.ondatachannel = dataChannelHandler;
-        _connection.onicecandidate = iceCandidateHandler;
-        _connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
-        _connection.onnegotiationneeded = negotiationNeededHandler;
-
-
         /**
          * Create a WebRTC-Connection
          *
@@ -296,10 +282,25 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
          */
         this.createConnection = function () {
 
+            var deferred = Q.defer,
+                signal = this.getSignalChannel();
+
             this.isSource = true;
             this.isTarget = false;
 
             logger.log('Peer', this.uuid, 'creating connection');
+
+            //1.Alice creates an RTCPeerConnection object.
+            _connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, OPTIONAL_SETTINGS);
+
+            //I. Alice creates an RTCPeerConnection object with an onicecandidate handler.
+
+            //Add listeners to connection
+            _connection.ondatachannel = dataChannelHandler;
+            _connection.onicecandidate = iceCandidateHandler;
+            _connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
+            _connection.onnegotiationneeded = negotiationNeededHandler;
+
 
             // Start timeout countdown
             _.delay(timerCompleteHandler, TIMEOUT_WAIT_TIME);
@@ -322,23 +323,25 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             _channel.onmessage = channelMessageHandler;
             _channel.onopen = channelOpenHandler;
 
-            var deferred = Q.defer,
-                signal = this.getSignalChannel();
 
-            //2. Alice creates an offer (an SDP session description) with the RTCPeerConnection createOffer() method.
-            _connection.createOffer(function (sessionDescription) {
+            function negotiationNeededHandler(e) {
 
-                    //3. Alice calls setLocalDescription() with his offer.)
-                    _connection.setLocalDescription(sessionDescription);
+                logger.log('Peer', 'negotiationNeededHandler');
+                //2. Alice creates an offer (an SDP session description) with the RTCPeerConnection createOffer() method.
+                _connection.createOffer(function (sessionDescription) {
 
-                    //4. Alice stringifies the offer and uses a signaling mechanism to send it to Eve.
-                    signal.sendPeerOffer(_self.uuid, sessionDescription);
+                        //3. Alice calls setLocalDescription() with his offer.)
+                        _connection.setLocalDescription(sessionDescription);
 
-                },
-                function (err) {
-                    logger.error(err);
-                },
-                MEDIA_CONSTRAINTS);
+                        //4. Alice stringifies the offer and uses a signaling mechanism to send it to Eve.
+                        signal.sendPeerOffer(_self.uuid, sessionDescription);
+
+                    },
+                    function (err) {
+                        logger.error(err);
+                    },
+                    MEDIA_CONSTRAINTS);
+            }
 
 
             return deferred.promise;
@@ -355,6 +358,11 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             var uuid = this.uuid,
                 deferred = Q.defer,
                 signal = this.getSignalChannel();
+
+            _connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, OPTIONAL_SETTINGS);
+            _connection.ondatachannel = dataChannelHandler;
+            _connection.onicecandidate = iceCandidateHandler;
+            _connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
 
             //5. Eve calls setRemoteDescription() with Alice's offer, so that her RTCPeerConnection knows about Alice's setup.
             _connection.setRemoteDescription(new MRTCSessionDescription(data.offer), function () {
@@ -442,10 +450,14 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             }
             else {
                 try {
-                    _channel.send(JSON.stringify(data));
+                    var message = JSON.stringify(data);
+                    console.log(_channel, message.length);
+                    _channel.send(message);
+
                 }
                 catch (e) {
-                    // logger.log('Peer', e);
+
+                    logger.error('Peer', e);
                 }
 
             }
@@ -602,16 +614,14 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         };
 
         this.sendResultList = function (list) {
-            var MAX_RESULTS_AT_ONCE = 2;
+            var MAX_RESULTS_AT_ONCE = 1;
 
             //SCTP !!! instead of (S)RTP
             //buffer problem https://code.google.com/p/webrtc/issues/detail?id=2279
-            // while (list.length > 0) {
-            // _.delay(this.send, Math.random() * 10000, ({type: 'result:list:push', list: list.splice(0, MAX_RESULTS_AT_ONCE)}));
-            //      this.send({type: 'result:list:push', list: list.splice(0, MAX_RESULTS_AT_ONCE)});
-            //}
+            while (list.length > 0) {
+                this.send({type: 'result:list:push', list: list.splice(0, MAX_RESULTS_AT_ONCE)});
+            }
 
-            this.send({type: 'result:list:push', list: list});
 
         };
 
