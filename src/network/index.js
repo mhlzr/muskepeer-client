@@ -118,9 +118,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
          */
         function peerConnectedHandler(peer) {
 
-            if (peer.isTarget) {
-                peer.synchronize();
-            }
+            peer.synchronize();
 
 
             //}
@@ -372,6 +370,8 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
              *@method publish
              */
             publish: function (type, data) {
+
+                logger.log('Network', 'publishing');
 
                 // Broadcast to peers
                 peers.broadcast(type, data);

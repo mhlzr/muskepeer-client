@@ -119,40 +119,43 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
         var isNew = true,
             result = new Result(message.data);
 
-        logger.log('Worker ' + message.id, 'has result', result.uuid, message.data);
 
         // Already existent?
         storage.db.has('results', result.uuid, {uuidIsHash: true})
             .then(function (resultInStorage) {
                 if (resultInStorage) {
                     isNew = false;
-                    result.iteration = resultInStorage.iteration + 1;
+                    //result.iteration = resultInStorage.iteration + 1;
                 }
             })
             .then(function () {
 
                 // Already did enough iterations, no need to save/update
-                if (project.computation.validationIterations > 0
-                    && result.iteration > project.computation.validationIterations) {
-                    return;
+                /*if (project.computation.validationIterations > 0
+                 && result.iteration > project.computation.validationIterations) {
+                 return;
+                 }*/
+
+                if (isNew) {
+                    logger.log('Worker ' + message.id, 'has new result', result.uuid, message.data);
+                    // Store result to local database
+                    storage.db.save('results', result, {uuidIsHash: true});
+
+                    // Inform network module which will broadcast/publish
+                    network.publish('result', result);
                 }
 
-                // Store result to local database
-                storage.db.save('results', result, {uuidIsHash: true});
-
-                // Inform network module which will broadcast/publish
-                network.publish('result', result);
 
                 // Count amount of results
-                if (project.computation.validationIterations > 0) {
-                    return storage.db.findAndReduceByObject('results', {}, {iteration: project.computation.validationIterations });
-                }
+                /* if (project.computation.validationIterations > 0) {
+                 return storage.db.findAndReduceByObject('results', {}, {iteration: project.computation.validationIterations });
+                 }*/
             })
             .then(function (results) {
                 // We already have all results?
-                if (results.length >= project.computation.expectedResults) {
+                if (results.length >= project.computation.expectedResults - 1) {
                     this.stop();
-                    logger.log('Computatiion', 'all results found');
+                    logger.log('Computation', 'all results found');
                 }
             }
         )

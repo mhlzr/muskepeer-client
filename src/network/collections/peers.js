@@ -9,7 +9,8 @@
 define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '../model/peer'], function (Q, _, settings, geolocation, MuskepeerModule, Peer) {
 
 
-        var TIMEOUT_RETRY_TIME = 60000; //60s
+        var TIMEOUT_RETRY_TIME = 60000, //60s
+            MAX_RANDOM_ASSESSMENT_DELAY_TIME = 1500;
 
         var module = new MuskepeerModule(),
             _peers = [];
@@ -178,7 +179,7 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
 
 
             /**
-             * Broadcast data to peers.
+             * Broadcast data to peers using a RAD--time.
              * Will exclude originPeerUuid from receivers if passed.
              *
              * @method broadcast
@@ -190,16 +191,25 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
 
                 var peers = module.getConnectedPeers();
 
-                // Remove own uuid from list or the originPeerUuid
+
+                // Remove own uuid from list and
+                // the peer we received the message from
                 peers = _.reject(peers, function (peer) {
-                    return peer.uuid === settings.uuid || peerUuid === originPeerUuid;
+                    return peer.uuid === settings.uuid || peer.uuid === originPeerUuid;
                 });
 
-                console.log(peers);
+                // Nobody to broadcast to
+                if (peers.length === 0) {
+                    return;
+                }
+
+                logger.log('Peers', 'broadcasting to', peers.length, 'peers');
 
                 // Broadcast to all connected peers
                 peers.forEach(function (peer) {
-                    peer.broadcast(type, data);
+                    // Get a RAD before broadcasting
+                    var rad = Math.random() * MAX_RANDOM_ASSESSMENT_DELAY_TIME;
+                    _.delay(peer.broadcast, rad, type, data);
                 });
             },
 

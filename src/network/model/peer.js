@@ -166,6 +166,16 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
 
 
         /**
+         * Indicator to debug how much messages couldn't
+         * be sent and are still in queue.
+         * @property queuedMessagesAmount
+         * @default 0
+         * @type {Number}
+         */
+        this.queuedMessagesAmount = 0;
+
+
+        /**
          * Find a signaling-channel two a given peer
          *
          * @method getSignalChannel
@@ -464,11 +474,17 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             else {
                 try {
                     var message = JSON.stringify(data);
+
+                    // Update queue indicator
+                    if (_self.queuedMessagesAmount > 0) {
+                        _self.queuedMessagesAmount--;
+                    }
                     _channel.send(message);
 
                 }
                 catch (e) {
-                    // Retry soon
+                    // Retry again
+                    _self.queuedMessagesAmount++;
                     _.delay(_self.send, 500 * Math.random(), data);
                 }
 
@@ -626,7 +642,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         };
 
         this.sendResultList = function (list) {
-            var MAX_RESULTS_AT_ONCE = 5;
+            var MAX_RESULTS_AT_ONCE = 15;
 
             while (list.length > 0) {
                 this.send({type: 'result:list:push', list: list.splice(0, MAX_RESULTS_AT_ONCE)});
