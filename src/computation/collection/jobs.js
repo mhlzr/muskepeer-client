@@ -78,11 +78,17 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
 
     module.lockJob = function (job) {
-        return storage.db.update('jobs', {uuid: job.uuid, locktime: Date.now(), isLocked: true}, {uuidIsHash: true}).then(getJobsFromStorage);
+        if (project.computation.jobs.lockJobsWhileSolving) {
+            return storage.db.update('jobs', {uuid: job.uuid, locktime: Date.now(), isLocked: true}, {uuidIsHash: true}).then(getJobsFromStorage);
+        }
+        else return null;
     };
 
     module.unlockJob = function (job) {
-        return storage.db.update('jobs', {uuid: job.uuid, locktime: null, isLocked: false}, {uuidIsHash: true}).then(getJobsFromStorage);
+        if (project.computation.jobs.lockJobsWhileSolving) {
+            return storage.db.update('jobs', {uuid: job.uuid, locktime: null, isLocked: false}, {uuidIsHash: true}).then(getJobsFromStorage);
+        }
+        else return null;
     };
 
     module.markJobAsFinished = function (job) {

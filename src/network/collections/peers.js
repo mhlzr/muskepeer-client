@@ -153,6 +153,9 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
                         return;
                     }
 
+                    // Local id for debugging
+                    data.id = _peers.length + 1;
+
                     // Save as new peer
                     peer = new Peer(data);
                     module.add(peer);

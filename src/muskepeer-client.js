@@ -112,6 +112,11 @@ define([
                 .then(storage.init)
                 .then(function () {
 
+                    // Anything to do at all?
+                    if (!project.active) {
+                        throw Error('Project is disabled');
+                    }
+
                     // Create a Uuid (which is a hash here) for each node
                     config.nodes.forEach(function (node) {
                         node.uuid = crypto.hash(node.host + node.port)
@@ -123,12 +128,18 @@ define([
                 .then(function () {
 
                     // Collection files
-                    var requiredFiles = [project.computation.workerUrl];
+                    var requiredFiles = [];
 
-                    // Do we need to include a JobFactory script?
-                    if (project.computation.useJobList) {
-                        requiredFiles.push(project.computation.jobFactoryUrl);
+                    // Add workerFile
+                    if (project.computation.solving.enabled && project.computation.solving.workerUrl) {
+                        requiredFiles.push(project.computation.solving.workerUrl);
                     }
+
+                    // Add factoryFile
+                    if (project.computation.jobs.enabled && project.computation.jobs.factoryUrl) {
+                        requiredFiles.push(project.computation.jobs.factoryUrl);
+                    }
+
                     // Store fileInfo to fileSystem
                     return storage.fs.add(_.union(project.files, requiredFiles))
                 })

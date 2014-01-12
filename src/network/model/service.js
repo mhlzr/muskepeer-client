@@ -19,6 +19,7 @@ define([], function () {
 
     return function Service(options) {
 
+        this.id = options.id;
         this.url = options.url;
         this.type = options.type;
         this.params = options.params;
@@ -58,6 +59,8 @@ define([], function () {
             });
 
             xhr.send(JSON.stringify(data));
+
+            logger.log('Service', this.id, 'sending.');
 
         };
 

@@ -45,6 +45,9 @@ define(['eventemitter2', '../model/worker', 'settings'], function (EventEmitter,
         },
 
         start: function () {
+
+            logger.log('Computation', 'Workers started');
+
             _workers.forEach(function (worker) {
                 worker.start();
             });

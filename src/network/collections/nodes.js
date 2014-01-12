@@ -26,7 +26,7 @@ define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, Musk
             connect: function () {
                 var promises = [];
 
-                logger.log('Nodes', 'connect');
+                logger.log('Nodes', 'Connecting...');
 
                 _nodes.forEach(function (node) {
                     promises.push(node.connect());
@@ -108,7 +108,7 @@ define(['q', '../model/node', '../../muskepeer-module'], function (Q, Node, Musk
             authenticate: function () {
                 var promises = [];
 
-                logger.log('Nodes', 'authenticate');
+                logger.log('Nodes', 'Authenticating...');
 
                 _nodes.forEach(function (node) {
                     var deferred = Q.defer();

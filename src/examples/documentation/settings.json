@@ -1,0 +1,112 @@
+{
+    "uuid": "0016d5da-47e2-4395-8a48-c3947907913a",
+    "title": "jobqueue",
+    "description": "Test for jobqueue",
+    "publicKey": "",
+
+    "author": "Matthieu Holzer",
+    "website": "",
+    "version": "0.0.1",
+    "active": true,
+
+    "computation": {
+
+        "offlineAllowed": true,
+
+        "solving": {
+            "enabled": true,
+            "workerUrl": "https://www.muskepeer.net/examples/jobqueue/worker.js",
+            "multipleAllowed": true,
+            "validation": {
+                "enabled": true,
+                "iterations": 3
+            },
+            "expectedAmount": 1000
+        },
+
+        "jobs": {
+            "enabled": false,
+            "factoryUrl": "https://www.muskepeer.net/examples/jobqueue/factory.js",
+            "lockJobsWhileSolving": true,
+            "maxLockTime": 3600000, //1h
+            "groupSize": 1,
+            "expectedAmount": 10000
+        }
+
+    },
+
+    "network": {
+
+        "broadcast": {
+            "results": {
+                "enabled": true,
+                "groupSize": 1
+            },
+            "jobs": {
+                "enabled": true,
+                "groupSize": 1
+            },
+            "files": {
+                "enabled": false,
+                "groupSize": 1
+            },
+            "peers": {
+                "enabled": true,
+                "groupSize": 1
+            },
+            "nodes": {
+                "enabled": true,
+                "groupSize": 1
+            }
+        },
+
+        "synchronization": {
+            "results": {
+                "enabled": true,
+                "groupSize": 15
+            },
+            "jobs": {
+                "enabled": true,
+                "groupSize": 15
+            },
+            "files": {
+                "enabled": false,
+                "groupSize": 1
+            },
+            "peers": {
+                "enabled": true,
+                "groupSize": 15
+            },
+            "nodes": {
+                "enabled": true,
+                "groupSize": 15
+            }
+        },
+
+        "useGeoLocation": true,
+
+        "services": [
+            {
+                "enabled": true,
+                "url": "https://api.parse.com/1/classes/Queens/",
+                "type": "REST",
+                "params": {},
+                "headers": [
+                    {
+                        "key": "X-Parse-Application-Id",
+                        "value": "ZzIHMKfVQmIni0K5fBdYgXxTlXyoovbm4gm0Epdq"
+                    },
+                    {
+                        "key": "X-Parse-REST-API-Key",
+                        "value": "4Izw5bddA34RFUmOuGCYrMHn4zY5dz62ETAVb2g5"
+                    }
+                ]
+            }
+        ]
+    },
+
+    "files": [
+        "https://dl.dropboxusercontent.com/u/959008/webstorm.pdf",
+        "https://dl.dropboxusercontent.com/u/959008/download.pdf"
+    ]
+}

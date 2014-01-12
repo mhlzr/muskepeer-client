@@ -13,22 +13,78 @@ define(['q', 'lodash'], function (Q, _) {
 
             "offlineAllowed": true,
 
-            "resultGroupSize": 1, //how much results to collect before broadcast
-            "validationIterations": 0, //-1 : Inifinite, 0 : None; >0 : Amount
+            "solving": {
+                "enabled": true,
+                "multipleAllowed": true,
+                "validation": {
+                    "enabled": false,
+                    "iterations": 0
+                }
+            },
 
-            "useJobList": false, //create and store jobs from worker
-            "jobGroupSize": 1 //how much jobs to create before broadcast
-
-
+            "jobs": {
+                "enabled": false,
+                "lockJobsWhileSolving": true,
+                "maxLockTime": 3600000,
+                "groupSize": 1
+            }
         },
 
         "network": {
-            "useGeoLocation": true,
-            "services": []
 
+            "broadcast": {
+                "results": {
+                    "enabled": true,
+                    "groupSize": 1
+                },
+                "jobs": {
+                    "enabled": true,
+                    "groupSize": 1
+                },
+                "files": {
+                    "enabled": false,
+                    "groupSize": 1
+                },
+                "peers": {
+                    "enabled": true,
+                    "groupSize": 1
+                },
+                "nodes": {
+                    "enabled": true,
+                    "groupSize": 1
+                }
+            },
+
+            "synchronization": {
+                "results": {
+                    "enabled": true,
+                    "groupSize": 15
+                },
+                "jobs": {
+                    "enabled": true,
+                    "groupSize": 15
+                },
+                "files": {
+                    "enabled": false,
+                    "groupSize": 1
+                },
+                "peers": {
+                    "enabled": true,
+                    "groupSize": 15
+                },
+                "nodes": {
+                    "enabled": true,
+                    "groupSize": 15
+                }
+            },
+
+            "useGeoLocation": true,
+
+            "services": []
         },
 
-        "files": []};
+        "files": []
+    };
 
 
     function isValidUrl(url) {

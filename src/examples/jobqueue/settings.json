@@ -11,18 +11,17 @@
 
     "computation": {
 
-        "offlineAllowed": true,
-        "workerUrl": "https://www.muskepeer.net/examples/jobqueue/worker.js",
-        "resultGroupSize": 1,
-        "validationIterations": 0,
+        "solving": {
+            "workerUrl": "https://www.muskepeer.net/examples/jobqueue/worker.js"
+        },
 
-        "useJobList": true,
-        "jobLocking": true,
-        "jobFactoryUrl": "https://www.muskepeer.net/examples/jobqueue/factory.js",
-        "jobGroupSize": 1,
-        "jobMaxLockTime": 3600000,
+        "jobs": {
+            "enabled": true,
+            "factoryUrl": "https://www.muskepeer.net/examples/jobqueue/factory.js"
+        },
 
-        "storages": [
+
+        "services": [
             {
                 "enabled": true,
                 "url": "https://api.parse.com/1/classes/Queens/",
@@ -40,10 +39,5 @@
                 ]
             }
         ]
-    },
-
-    "network": {
-        "broadcastResults": true,
-        "useGeoLocation": true
     }
 }

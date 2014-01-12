@@ -44,8 +44,9 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
 
             // Create external storage services
             if (project.network.services && project.network.services.length > 0) {
-                project.network.services.forEach(function (settings) {
+                project.network.services.forEach(function (settings, index) {
                     if (!settings.enabled) return;
+                    settings.id = index + 1;
                     module.services.push(new Service(settings));
                 });
 
@@ -172,7 +173,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
                 uuid = e.uuid,
                 list;
 
-            logger.log('Network', e.type);
+            logger.log('Peer', peer.id, 'Received', e.type);
 
             if (!e.type) {
                 logger.log('Network', 'peer:message without type received');
@@ -203,29 +204,29 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
                     break;
                 case 'node:list:push':
                     list = nodes.getMissingNodeUuidsAsArray(externalList);
-                    logger.log('Network', 'node:sync with ' + peer.uuid, list.length, 'differences.');
+                    logger.log('Peer', peer.id, 'Result of node:sync', list.length);
                     peer.getNodeByUuid(list);
                     break;
                 case 'peer:list:push':
                     list = peers.getMissingPeerUuidsAsArray(externalList);
-                    logger.log('Network', 'peer:sync with ' + peer.uuid, list.length, 'differences.');
+                    logger.log('Peer', peer.id, 'Result of peer:sync', list.length);
                     peer.getPeerByUuid(list);
                     break;
                 case 'file:list:push':
                     storage.getMissingFileUuidsAsArray(externalList).then(function (list) {
-                        logger.log('Network', 'file:sync with ' + peer.uuid, list.length, 'differences.');
+                        logger.log('Peer', peer.id, 'Result of file:sync', list.length);
                         peer.getFileByUuid(list);
                     });
                     break;
                 case 'job:list:push':
                     storage.getMissingJobUuidsAsArray(externalList).then(function (list) {
-                        logger.log('Network', 'job:sync with ' + peer.uuid, list.length, 'differences.');
+                        logger.log('Peer', peer.id, 'Result of job:sync', list.length);
                         peer.getJobByUuid(list);
                     });
                     break;
                 case 'result:list:push':
                     storage.getMissingResultUuidsAsArray(externalList).then(function (list) {
-                        logger.log('Network', 'result:sync with ' + peer.uuid, list.length, 'differences.');
+                        logger.log('Peer', peer.id, 'Result of result:sync', list.length);
                         peer.getResultByUuid(list);
                     });
                     break;
@@ -332,10 +333,10 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
                 registerExternalServices();
 
 
-                // Detect geoLocation if needed
+                // Detect geoLocation
                 geolocation.getGeoLocation()
                     .then(function (location) {
-                        logger.log('Geolocation', 'available');
+                        logger.log('Geolocation', 'Location available');
                         // Get nodes from database
                         return storage.db.findAndReduceByObject('nodes', {filterDuplicates: false}, {projectUuid: project.uuid})
                     })

@@ -4,10 +4,10 @@
  *
  */
 
-define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], function (_, Q, EventEmitter2, nodes, settings) {
+define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'project'], function (_, Q, EventEmitter2, nodes, settings, project) {
 
     var TIMEOUT_WAIT_TIME = 30000, //30s
-        QUEUE_RETRY_TIME = 50,
+        QUEUE_RETRY_TIME = 150,
         ICE_SERVER_SETTINGS = {
             iceServers: [
                 { url: settings.stunServer }
@@ -25,7 +25,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             }
         },
         channelConstraint = {
-            optional: []
         },
         ee = new EventEmitter2({
             wildcard: true,
@@ -86,19 +85,32 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
      */
     var Peer = function (config) {
 
-        var _self = this,
-            _connection,
-            _channel;
+        var _self = this;
+
+        this.id = config.id;
 
         // Protocol switch SRTP(=default) or SCTP
         if (settings.protocol.toLowerCase() === 'sctp') {
-            this.procotol = 'sctp';
-            logger.log('Peer', 'Using SCTP');
-            connectionConstraint = null;
-            channelConstraint = null;
+            this.protocol = 'sctp';
+            logger.log('Peer', _self.id, 'Using SCTP');
+
+            connectionConstraint = {
+                optional: [
+                    {RtpDataChannels: false},
+                    {DtlsSrtpKeyAgreement: true}
+                ],
+                mandatory: {
+                    OfferToReceiveAudio: false,
+                    OfferToReceiveVideo: false
+                }
+            };
+
+            channelConstraint = {
+                reliable: true
+            };
         } else {
-            this.procotol = 'srtp';
-            logger.log('Peer', 'Using SRTP');
+            this.protocol = 'srtp';
+            logger.log('Peer', _self.id, 'Using SRTP');
         }
 
         // Event-methods
@@ -232,7 +244,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             if (!_self.isConnected) {
                 _self.timeout = Date.now();
                 _self.emit('peer:timeout');
-                logger.log('Peer', _self.uuid, 'timed out');
+                logger.log('Peer', _self.id, 'Time-out');
 
             }
             else _self.timeout = undefined;
@@ -250,30 +262,30 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         }
 
         function dataChannelHandler(e) {
-            logger.log('Peer', _self.uuid, 'got remote datachannel');
+            logger.log('Peer', _self.id, 'Got remote dataChannel');
 
-            _channel = e.channel;
+            _self.channel = e.channel;
 
-            _self.channel = _channel;
+            _self.channel = _self.channel;
 
-            _channel.onclose = channelCloseHandler;
-            _channel.onerror = channelErrorHandler;
-            _channel.onmessage = channelMessageHandler;
-            _channel.onopen = channelOpenHandler;
+            _self.channel.onclose = channelCloseHandler;
+            _self.channel.onerror = channelErrorHandler;
+            _self.channel.onmessage = channelMessageHandler;
+            _self.channel.onopen = channelOpenHandler;
 
         }
 
         function iceConnectionStateChangeHandler(e) {
 
             // Everything is fine
-            if (_connection.iceConnectionState === 'connected' &&
-                _connection.iceGatheringState === 'complete') {
+            if (_self.connection.iceConnectionState === 'connected' &&
+                _self.connection.iceGatheringState === 'complete') {
 
-                logger.log('Peer', _self.uuid, 'connection established');
+                logger.log('Peer', _self.id, 'Connection established');
             }
             // Connection has closed
-            else if (_connection.iceConnectionState === 'disconnected') {
-                logger.log('Peer', _self.uuid, 'connection closed');
+            else if (_self.connection.iceConnectionState === 'disconnected') {
+                logger.log('Peer', _self.id, 'Connection closed');
 
                 _self.isConnected = false;
                 _self.emit('peer:disconnect', _self);
@@ -284,12 +296,12 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
 
         function negotiationNeededHandler(e) {
 
-            logger.log('Peer', 'negotiationNeededHandler');
+            logger.log('Peer', _self.id, 'Negotiation needed');
             //2. Alice creates an offer (an SDP session description) with the RTCPeerConnection createOffer() method.
-            _connection.createOffer(function (sessionDescription) {
+            _self.connection.createOffer(function (sessionDescription) {
 
                     //3. Alice calls setLocalDescription() with his offer.)
-                    _connection.setLocalDescription(sessionDescription);
+                    _self.connection.setLocalDescription(sessionDescription);
 
                     //4. Alice stringifies the offer and uses a signaling mechanism to send it to Eve.
                     _self.getSignalChannel().sendPeerOffer(_self.uuid, sessionDescription);
@@ -306,7 +318,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         }
 
         function channelErrorHandler(e) {
-            logger.log('Peer', _self.uuid, 'channel has an error', e);
+            logger.log('Peer', _self.id, 'Channel has an error', e);
         }
 
 
@@ -327,7 +339,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         }
 
         function channelOpenHandler(e) {
-            logger.log('Peer', _self.uuid, 'data-channel is open');
+            logger.log('Peer', _self.id, 'DataChannel is open');
 
             _self.isConnected = true;
             _self.emit('peer:connect', _self);
@@ -335,7 +347,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         }
 
         function channelCloseHandler(e) {
-            logger.log('Peer', _self.uuid, 'dataChannel is closed');
+            logger.log('Peer', _self.id, 'DataChannel is closed');
             _self.isConnected = false;
             _self.emit('peer:disconnect', _self);
         }
@@ -356,29 +368,29 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             this.isSource = true;
             this.isTarget = false;
 
-            logger.log('Peer', this.uuid, 'creating connection');
+            logger.log('Peer', _self.id, 'Creating connection');
 
             //1.Alice creates an RTCPeerConnection object.
-            _connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, connectionConstraint);
+            _self.connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, connectionConstraint);
 
             //I. Alice creates an RTCPeerConnection object with an onicecandidate handler.
 
             //Add listeners to connection
-            _connection.ondatachannel = dataChannelHandler;
-            _connection.onicecandidate = iceCandidateHandler;
-            _connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
-            _connection.onnegotiationneeded = negotiationNeededHandler;
-            _connection.onsignalingstatechange = signalingStateChangeHandler;
+            _self.connection.ondatachannel = dataChannelHandler;
+            _self.connection.onicecandidate = iceCandidateHandler;
+            _self.connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
+            _self.connection.onnegotiationneeded = negotiationNeededHandler;
+            _self.connection.onsignalingstatechange = signalingStateChangeHandler;
 
-            this.connection = _connection;
+            this.connection = _self.connection;
 
             // Start timeout countdown
             _.delay(timerCompleteHandler, TIMEOUT_WAIT_TIME);
 
             try {
                 // Create  data-channel
-                _channel = _connection.createDataChannel('Muskepeer', channelConstraint);
-                this.channel = _channel;
+                _self.channel = _self.connection.createDataChannel('Muskepeer', channelConstraint);
+                this.channel = _self.channel;
             }
             catch (e) {
                 // If an error occured here, there is a problem about the connection,
@@ -390,10 +402,10 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
 
 
             // Add listeners to channel
-            _channel.onclose = channelCloseHandler;
-            _channel.onerror = channelErrorHandler;
-            _channel.onmessage = channelMessageHandler;
-            _channel.onopen = channelOpenHandler;
+            _self.channel.onclose = channelCloseHandler;
+            _self.channel.onerror = channelErrorHandler;
+            _self.channel.onmessage = channelMessageHandler;
+            _self.channel.onopen = channelOpenHandler;
 
 
             return deferred.promise;
@@ -411,23 +423,23 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
                 deferred = Q.defer,
                 signal = this.getSignalChannel();
 
-            _connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, connectionConstraint);
-            _connection.ondatachannel = dataChannelHandler;
-            _connection.onicecandidate = iceCandidateHandler;
-            _connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
-            _connection.onnegotiationneeded = negotiationNeededHandler;
-            _connection.onsignalingstatechange = signalingStateChangeHandler;
+            _self.connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, connectionConstraint);
+            _self.connection.ondatachannel = dataChannelHandler;
+            _self.connection.onicecandidate = iceCandidateHandler;
+            _self.connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
+            _self.connection.onnegotiationneeded = negotiationNeededHandler;
+            _self.connection.onsignalingstatechange = signalingStateChangeHandler;
 
-            this.connection = _connection;
+            this.connection = _self.connection;
 
             //5. Eve calls setRemoteDescription() with Alice's offer, so that her RTCPeerConnection knows about Alice's setup.
-            _connection.setRemoteDescription(new MRTCSessionDescription(data.offer), function () {
+            _self.connection.setRemoteDescription(new MRTCSessionDescription(data.offer), function () {
 
                 //6. Eve calls createAnswer(), and the success callback for this is passed a local session description: Eve's answer.
-                _connection.createAnswer(function (sessionDescription) {
+                _self.connection.createAnswer(function (sessionDescription) {
 
                         //7. Eve sets her answer as the local description by calling setLocalDescription().
-                        _connection.setLocalDescription(sessionDescription);
+                        _self.connection.setLocalDescription(sessionDescription);
 
                         //8. Eve then uses the signaling mechanism to send her stringified answer back to Alice.
                         signal.sendPeerAnswer(uuid, sessionDescription);
@@ -456,7 +468,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             this.isSource = false;
 
             //9. Alice sets Eve's answer as the remote session description using setRemoteDescription().
-            _connection.setRemoteDescription(new MRTCSessionDescription(data.answer));
+            _self.connection.setRemoteDescription(new MRTCSessionDescription(data.answer));
 
         };
 
@@ -466,7 +478,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
          * @param data
          */
         this.addCandidate = function (data) {
-            _connection.addIceCandidate(new MRTCIceCandidate(data.candidate));
+            _self.connection.addIceCandidate(new MRTCIceCandidate(data.candidate));
         };
 
 
@@ -496,25 +508,19 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         this.send = function (data) {
 
 
-            if (!_self.isConnected || _channel.readyState !== 'open') {
-                logger.error('Peer', 'attempt to send, but channel is not open!');
-                return;
-            }
-
-            // Buffer is full
-            if (_channel.bufferedAmount > 0) {
-                _self.queuedMessages.push(data);
+            if (!_self.isConnected || _self.channel.readyState !== 'open') {
+                logger.error('Peer', _self.id, 'Attempt to send, but channel is not open!');
                 return;
             }
 
             // Actually it should be possible to send a blob
             if (data instanceof Blob) {
-                _channel.send(data);
+                _self.channel.send(data);
             }
             else {
                 try {
                     data = JSON.stringify(data);
-                    _channel.send(data);
+                    _self.channel.send(data);
 
                 }
                 catch (e) {
@@ -538,13 +544,13 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
          */
         this.synchronize = function () {
 
-            logger.log('Peer', this.uuid, 'synchronizing');
+            logger.log('Peer', _self.id, 'Synchronizing');
 
-            this.getNodeList();
-            this.getPeerList();
-            this.getFileList();
-            this.getJobList();
-            this.getResultList();
+            if (project.network.synchronization.nodes.enabled) this.getNodeList();
+            if (project.network.synchronization.peers.enabled) this.getPeerList();
+            if (project.network.synchronization.files.enabled) this.getFileList();
+            if (project.network.synchronization.jobs.enabled) this.getJobList();
+            if (project.network.synchronization.results.enabled) this.getResultList();
         };
 
 
@@ -583,8 +589,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
 
         };
 
-        this.fileReceiveHandler = function () {
-        };
 
         /* Node Exchange */
         this.getNodeList = function () {
@@ -592,7 +596,9 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         };
 
         this.sendNodeList = function (list) {
-            this.send({ type: 'node:list:push', list: list});
+            while (list.length > 0) {
+                this.send({type: 'node:list:push', list: list.splice(0, project.network.synchronization.nodes.groupSize)});
+            }
         };
 
         this.getNodeByUuid = function (uuids) {
@@ -623,7 +629,9 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         };
 
         this.sendPeerList = function (list) {
-            //  this.send({ type: 'peer:list:push', list: list});
+            while (list.length > 0) {
+                this.send({type: 'peer:list:push', list: list.splice(0, project.network.synchronization.peers.groupSize)});
+            }
         };
 
         this.getPeerByUuid = function (uuids) {
@@ -652,7 +660,9 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         };
 
         this.sendJobList = function (list) {
-            this.send({type: 'job:list:push', list: list});
+            while (list.length > 0) {
+                this.send({type: 'job:list:push', list: list.splice(0, project.network.synchronization.jobs.groupSize)});
+            }
         };
 
         this.getJobByUuid = function (uuids) {
@@ -682,10 +692,8 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         };
 
         this.sendResultList = function (list) {
-            var MAX_RESULTS_AT_ONCE = 15;
-
             while (list.length > 0) {
-                this.send({type: 'result:list:push', list: list.splice(0, MAX_RESULTS_AT_ONCE)});
+                this.send({type: 'result:list:push', list: list.splice(0, project.network.synchronization.results.groupSize)});
             }
         };
 
