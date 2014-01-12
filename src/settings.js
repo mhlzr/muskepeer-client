@@ -58,8 +58,6 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
         uuid: uuid.generate() //everyone will know (public)
     });
 
-//TODO remove testing-line
-    // _settings.uuid = uuid.generate();
 
     return _settings;
 

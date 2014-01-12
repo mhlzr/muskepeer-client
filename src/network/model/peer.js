@@ -6,31 +6,33 @@
 
 define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], function (_, Q, EventEmitter2, nodes, settings) {
 
-    var TIMEOUT_WAIT_TIME = 10000, //10s
+    var TIMEOUT_WAIT_TIME = 30000, //30s
+        QUEUE_RETRY_TIME = 50,
         ICE_SERVER_SETTINGS = {
             iceServers: [
                 { url: settings.stunServer }
-            ]},
-        OPTIONAL_SETTINGS = {
+            ]};
+
+    // a.k.a mediaConstraint
+    var connectionConstraint = {
             optional: [
                 {RtpDataChannels: true},
                 {DtlsSrtpKeyAgreement: true}
-            ]
-        },
-        MEDIA_CONSTRAINTS = {
-            optional: [],
+            ],
             mandatory: {
                 OfferToReceiveAudio: false,
                 OfferToReceiveVideo: false
-            }};
-
-
-    var ee = new EventEmitter2({
-        wildcard: true,
-        delimiter: ':',
-        newListener: false,
-        maxListeners: 10
-    });
+            }
+        },
+        channelConstraint = {
+            optional: []
+        },
+        ee = new EventEmitter2({
+            wildcard: true,
+            delimiter: ':',
+            newListener: false,
+            maxListeners: 10
+        });
 
     /**
      * Facade for RTCPeerConnection
@@ -90,8 +92,13 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
 
         // Protocol switch SRTP(=default) or SCTP
         if (settings.protocol.toLowerCase() === 'sctp') {
-            OPTIONAL_SETTINGS = null;
-            MEDIA_CONSTRAINTS = null;
+            this.procotol = 'sctp';
+            logger.log('Peer', 'Using SCTP');
+            connectionConstraint = null;
+            channelConstraint = null;
+        } else {
+            this.procotol = 'srtp';
+            logger.log('Peer', 'Using SRTP');
         }
 
         // Event-methods
@@ -178,13 +185,23 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
 
 
         /**
-         * Indicator to debug how much messages couldn't
-         * be sent and are still in queue.
-         * @property queuedMessagesAmount
-         * @default 0
-         * @type {Number}
+         * Queue for messages that could not be sent
+         *
+         * @property queuedMessages
+         * @type {Array}
          */
-        this.queuedMessagesAmount = 0;
+        this.queuedMessages = [];
+
+
+        /**
+         * Indicator to tell which protocol is currently used
+         * SCTP or SRTP
+         *
+         * @property protocol
+         * @default undefined
+         * @type {String}
+         */
+        this.protocol = undefined;
 
 
         /**
@@ -265,6 +282,29 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
 
         }
 
+        function negotiationNeededHandler(e) {
+
+            logger.log('Peer', 'negotiationNeededHandler');
+            //2. Alice creates an offer (an SDP session description) with the RTCPeerConnection createOffer() method.
+            _connection.createOffer(function (sessionDescription) {
+
+                    //3. Alice calls setLocalDescription() with his offer.)
+                    _connection.setLocalDescription(sessionDescription);
+
+                    //4. Alice stringifies the offer and uses a signaling mechanism to send it to Eve.
+                    _self.getSignalChannel().sendPeerOffer(_self.uuid, sessionDescription);
+
+                },
+                function (err) {
+                    logger.error(err);
+                },
+                connectionConstraint);
+        }
+
+
+        function signalingStateChangeHandler(e) {
+        }
+
         function channelErrorHandler(e) {
             logger.log('Peer', _self.uuid, 'channel has an error', e);
         }
@@ -295,7 +335,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         }
 
         function channelCloseHandler(e) {
-            logger.log('Peer', _self.uuid, 'data-channel is closed');
+            logger.log('Peer', _self.uuid, 'dataChannel is closed');
             _self.isConnected = false;
             _self.emit('peer:disconnect', _self);
         }
@@ -311,8 +351,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
          */
         this.createConnection = function () {
 
-            var deferred = Q.defer,
-                signal = this.getSignalChannel();
+            var deferred = Q.defer;
 
             this.isSource = true;
             this.isTarget = false;
@@ -320,7 +359,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             logger.log('Peer', this.uuid, 'creating connection');
 
             //1.Alice creates an RTCPeerConnection object.
-            _connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, OPTIONAL_SETTINGS);
+            _connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, connectionConstraint);
 
             //I. Alice creates an RTCPeerConnection object with an onicecandidate handler.
 
@@ -329,6 +368,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             _connection.onicecandidate = iceCandidateHandler;
             _connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
             _connection.onnegotiationneeded = negotiationNeededHandler;
+            _connection.onsignalingstatechange = signalingStateChangeHandler;
 
             this.connection = _connection;
 
@@ -337,7 +377,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
 
             try {
                 // Create  data-channel
-                _channel = _connection.createDataChannel('Muskepeer', null);
+                _channel = _connection.createDataChannel('Muskepeer', channelConstraint);
                 this.channel = _channel;
             }
             catch (e) {
@@ -356,26 +396,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             _channel.onopen = channelOpenHandler;
 
 
-            function negotiationNeededHandler(e) {
-
-                logger.log('Peer', 'negotiationNeededHandler');
-                //2. Alice creates an offer (an SDP session description) with the RTCPeerConnection createOffer() method.
-                _connection.createOffer(function (sessionDescription) {
-
-                        //3. Alice calls setLocalDescription() with his offer.)
-                        _connection.setLocalDescription(sessionDescription);
-
-                        //4. Alice stringifies the offer and uses a signaling mechanism to send it to Eve.
-                        signal.sendPeerOffer(_self.uuid, sessionDescription);
-
-                    },
-                    function (err) {
-                        logger.error(err);
-                    },
-                    MEDIA_CONSTRAINTS);
-            }
-
-
             return deferred.promise;
 
         };
@@ -391,10 +411,12 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
                 deferred = Q.defer,
                 signal = this.getSignalChannel();
 
-            _connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, OPTIONAL_SETTINGS);
+            _connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, connectionConstraint);
             _connection.ondatachannel = dataChannelHandler;
             _connection.onicecandidate = iceCandidateHandler;
             _connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
+            _connection.onnegotiationneeded = negotiationNeededHandler;
+            _connection.onsignalingstatechange = signalingStateChangeHandler;
 
             this.connection = _connection;
 
@@ -414,7 +436,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
                     function (err) {
                         logger.log(err);
                     },
-                    MEDIA_CONSTRAINTS);
+                    connectionConstraint);
 
             });
 
@@ -481,7 +503,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
 
             // Buffer is full
             if (_channel.bufferedAmount > 0) {
-                _.delay(_self.send, 10 * Math.random(), data);
+                _self.queuedMessages.push(data);
                 return;
             }
 
@@ -491,19 +513,19 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             }
             else {
                 try {
-                    var message = JSON.stringify(data);
-
-                    // Update queue indicator
-                    if (_self.queuedMessagesAmount > 0) {
-                        _self.queuedMessagesAmount--;
-                    }
-                    _channel.send(message);
+                    data = JSON.stringify(data);
+                    _channel.send(data);
 
                 }
                 catch (e) {
                     // Retry again
-                    _self.queuedMessagesAmount++;
-                    _.delay(_self.send, 10 * Math.random(), data);
+                    _self.queuedMessages.push(data);
+
+                }
+                finally {
+                    if (_self.queuedMessages.length > 0) {
+                        _.delay(_self.send, QUEUE_RETRY_TIME, _self.queuedMessages.shift());
+                    }
                 }
 
             }
