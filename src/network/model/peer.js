@@ -33,46 +33,16 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             maxListeners: 10
         });
 
-    /**
-     * Facade for RTCPeerConnection
-     *
-     * @private
-     * @class MRTCPeerConnection
-     * @for Peer
-     * @constructor
-     */
-    function MRTCPeerConnection(ice, optional) {
-        if (window.mozRTCPeerConnection) return new mozRTCPeerConnection(ice, optional);
-        else if (window.webkitRTCPeerConnection) return new webkitRTCPeerConnection(ice, optional);
-        else return new RTCPeerConnection(ice, optional);
+    // Handle vendor prefixes
+    if (webkitRTCPeerConnection) {
+        RTCPeerConnection = webkitRTCPeerConnection;
+        RTCIceCandidate = window.RTCIceCandidate;
+        RTCSessionDescription = window.RTCSessionDescription;
+    } else {
+        RTCPeerConnection = mozRTCPeerConnection;
+        RTCIceCandidate = mozRTCIceCandidate;
+        RTCSessionDescription = mozRTCSessionDescription;
     }
-
-    /**
-     * Facade for RTCIceCandidate
-     *
-     * @private
-     * @class MRTCIceCandidate
-     * @for Peer
-     * @constructor
-     */
-    function MRTCIceCandidate(candidate) {
-        if (window.mozRTCIceCandidate) return new mozRTCIceCandidate(candidate);
-        else return new RTCIceCandidate(candidate);
-    }
-
-    /**
-     * Facade for RTCSessionDescription
-     *
-     * @private
-     * @class MRTCSessionDescription
-     * @for Peer
-     * @constructor
-     */
-    function MRTCSessionDescription(sdp) {
-        if (window.mozRTCSessionDescription) return new mozRTCSessionDescription(sdp);
-        else return new RTCSessionDescription(sdp);
-    }
-
 
     /**
      * A Peer represents another Browser which is connected via
@@ -371,7 +341,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             logger.log('Peer', _self.id, 'Creating connection');
 
             //1.Alice creates an RTCPeerConnection object.
-            _self.connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, connectionConstraint);
+            _self.connection = new RTCPeerConnection(ICE_SERVER_SETTINGS, connectionConstraint);
 
             //I. Alice creates an RTCPeerConnection object with an onicecandidate handler.
 
@@ -423,7 +393,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
                 deferred = Q.defer,
                 signal = this.getSignalChannel();
 
-            _self.connection = new MRTCPeerConnection(ICE_SERVER_SETTINGS, connectionConstraint);
+            _self.connection = new RTCPeerConnection(ICE_SERVER_SETTINGS, connectionConstraint);
             _self.connection.ondatachannel = dataChannelHandler;
             _self.connection.onicecandidate = iceCandidateHandler;
             _self.connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
@@ -433,7 +403,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             this.connection = _self.connection;
 
             //5. Eve calls setRemoteDescription() with Alice's offer, so that her RTCPeerConnection knows about Alice's setup.
-            _self.connection.setRemoteDescription(new MRTCSessionDescription(data.offer), function () {
+            _self.connection.setRemoteDescription(new RTCSessionDescription(data.offer), function () {
 
                 //6. Eve calls createAnswer(), and the success callback for this is passed a local session description: Eve's answer.
                 _self.connection.createAnswer(function (sessionDescription) {
@@ -468,7 +438,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             this.isSource = false;
 
             //9. Alice sets Eve's answer as the remote session description using setRemoteDescription().
-            _self.connection.setRemoteDescription(new MRTCSessionDescription(data.answer));
+            _self.connection.setRemoteDescription(new RTCSessionDescription(data.answer));
 
         };
 
@@ -478,7 +448,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
          * @param data
          */
         this.addCandidate = function (data) {
-            _self.connection.addIceCandidate(new MRTCIceCandidate(data.candidate));
+            _self.connection.addIceCandidate(new RTCIceCandidate(data.candidate));
         };
 
 
