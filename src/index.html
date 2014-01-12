@@ -5,10 +5,15 @@
     <script data-main="main" src="lib/requirejs/require.js"></script>
     <style>
         body {
-            font-family: monospace !important;
+            font-family: Monospace;
         }
     </style>
 </head>
 <body>
+<div>
+    <button onclick="Muskepeer.computation.start()">Start Computation</button>
+    <button onclick="Muskepeer.computation.stop()">Stop Computation</button>
+    <button onclick="Muskepeer.storage.fs.clear()">Flush FileSystem</button>
+</div>
 </body>
 </html>

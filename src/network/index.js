@@ -9,7 +9,7 @@
  *
  */
 
-define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', 'computation/index', './model/service'],
+define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', './model/service'],
 
     function (Q, _, storage, project, settings, geolocation, MuskepeerModule, nodes, peers, Service) {
 
@@ -41,17 +41,15 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
          * @method registerExternalServices
          */
         function registerExternalServices() {
-
             // Create external storage services
-            if (project.network.services && project.network.services.length > 0) {
-                project.network.services.forEach(function (settings, index) {
-                    if (!settings.enabled) return;
-                    settings.id = index + 1;
-                    module.services.push(new Service(settings));
-                });
+            project.network.services.forEach(function (settings, index) {
+                if (!settings.enabled) return;
+                settings.id = index + 1;
+                module.services.push(new Service(settings));
+            });
 
-                logger.log('Network', 'ExternalServices registered');
-            }
+            logger.log('Network', 'ExternalServices registered');
+
         }
 
         /**
@@ -118,21 +116,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
          * @param {Peer} peer
          */
         function peerConnectedHandler(peer) {
-
             peer.synchronize();
-
-
-            //}
-
-            //TESTING
-            /*else {
-             //TESTING
-             storage.fs.readFileChunkAsDataUrl({uuid: '8e6bcaccef241392cd7d3b127438ce4f41a8d31450f105c34438805dee7f6d1a'})
-             .then(function (base64) {
-             peer.sendFile('some uuid', base64, 0);
-             });
-             }
-             */
         }
 
         /**
@@ -268,6 +252,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
                 case 'broadcast:job':
                     break;
                 case 'broadcast:result':
+
                     console.log('got a result broadcast');
 
                     // Do i already know about this?

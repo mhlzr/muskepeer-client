@@ -31,7 +31,7 @@ define(['eventemitter2'], function (EventEmitter) {
 
         function workerMessageHandler(e) {
             // Convert worker-message to event
-            _self.emit(e.data.type.toLowerCase(), {id: _self.id, data: e.data.data });
+            _self.emit(e.data.type.toLowerCase(), {id: _self.id, data: e.data });
 
         }
 

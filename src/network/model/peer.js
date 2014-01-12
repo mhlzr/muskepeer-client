@@ -167,12 +167,13 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
 
 
         /**
-         * Queue for messages that could not be sent
+         * Amount of queuedmessages that could not be sent
          *
-         * @property queuedMessages
-         * @type {Array}
+         * @property queuedMessageAmount
+         * @default 0
+         * @type {Number}
          */
-        this.queuedMessages = [];
+        this.queuedMessageAmount = 0;
 
 
         /**
@@ -232,7 +233,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
         }
 
         function dataChannelHandler(e) {
-            logger.log('Peer', _self.id, 'Got remote dataChannel');
+            logger.log('Peer', _self.id, 'Got remote DataChannel');
 
             _self.channel = e.channel;
 
@@ -298,13 +299,14 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             _self.isConnected = true;
 
             if (e.data instanceof Blob) {
-                msg = e.data;
+                msg = {blob: e.data};
             }
             else {
                 msg = JSON.parse(e.data);
             }
 
             _self.emit('peer:message', _.extend(msg, {target: _self}));
+
 
         }
 
@@ -483,29 +485,33 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
                 return;
             }
 
+
             // Actually it should be possible to send a blob
             if (data instanceof Blob) {
                 _self.channel.send(data);
             }
             else {
+                // Currently JSON & Channel.send error produce a SyntaxError
+                // https://code.google.com/p/webrtc/issues/detail?id=2434
                 try {
                     data = JSON.stringify(data);
-                    _self.channel.send(data);
-
                 }
                 catch (e) {
-                    // Retry again
-                    _self.queuedMessages.push(data);
-
+                    // We won't retry as this always will fail
                 }
-                finally {
-                    if (_self.queuedMessages.length > 0) {
-                        _.delay(_self.send, QUEUE_RETRY_TIME, _self.queuedMessages.shift());
+                try {
+                    _self.channel.send(data);
+
+                    if (_self.queuedMessageAmount > 0) {
+                        _self.queuedMessageAmount--;
                     }
                 }
-
+                catch (e) {
+                    // We will be back after the break! :)
+                    _self.queuedMessageAmount++;
+                    _.delay(_self.send, QUEUE_RETRY_TIME, data);
+                }
             }
-
 
         };
 
@@ -688,6 +694,10 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
         };
 
 
+        /**
+         * @method serialize
+         * @return {Object}
+         */
         this.serialize = function () {
             return{
                 uuid: this.uuid,
@@ -706,6 +716,5 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
 
 
     };
-
     return Peer;
 });

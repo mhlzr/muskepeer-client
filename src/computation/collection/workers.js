@@ -23,7 +23,7 @@ define(['eventemitter2', '../model/worker', 'settings'], function (EventEmitter,
         onAny: _ee.onAny,
         offAny: _ee.offAny,
 
-        size: _workers.length || 0,
+        size: 0,
 
         create: function (url) {
 
@@ -51,6 +51,8 @@ define(['eventemitter2', '../model/worker', 'settings'], function (EventEmitter,
             _workers.forEach(function (worker) {
                 worker.start();
             });
+
+            this.size = _workers.length;
         },
 
         stop: function () {
@@ -61,6 +63,8 @@ define(['eventemitter2', '../model/worker', 'settings'], function (EventEmitter,
 
             // Destroying
             _workers = [];
+
+            this.size = 0;
         },
 
         pause: function () {

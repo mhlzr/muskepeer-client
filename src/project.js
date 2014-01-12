@@ -2,7 +2,7 @@
  * @class Project
  */
 
-define(['q', 'lodash'], function (Q, _) {
+define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
 
     // Defaults
     var defaults = {
@@ -78,12 +78,11 @@ define(['q', 'lodash'], function (Q, _) {
                 }
             },
 
-            "useGeoLocation": true,
+            "services": [],
 
-            "services": []
-        },
+            "useGeoLocation": true
 
-        "files": []
+        }
     };
 
 
@@ -130,7 +129,10 @@ define(['q', 'lodash'], function (Q, _) {
      * @returns {Object}
      */
     function combineWithDefaults(project) {
-        return _.defaults(project, defaults);
+        return mixing(project, defaults, {
+            overwrite: false,
+            recursive: true
+        });
     }
 
     return {

@@ -5,7 +5,7 @@
  * @extends MuskepeerModule
  */
 
-define(['muskepeer-module', '../storage/index', '../network/index', '../project', './collection/workers', 'crypto/index', './collection/jobs', './model/job', './model/result'], function (MuskepeerModule, storage, network, project, workers, crypto, jobs, Job, Result) {
+define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../project', './collection/workers', 'crypto/index', './collection/jobs', './model/job', './model/result'], function (Q, MuskepeerModule, storage, network, project, workers, crypto, jobs, Job, Result) {
 
     var module = new MuskepeerModule();
 
@@ -22,21 +22,27 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
         // No need for Workers
         if (!project.computation.solving.enabled) {
             logger.log('Computation', 'Not using Workers!');
-            return null;
+            return Q();
+        }
+        // Already initiated?
+        else if (workers.size !== 0) {
+            return Q();
         }
 
-        // Already initiated?
-        if (workers.size !== 0) return null;
+        // Instantiate workers
+        else {
+            logger.log('Computation', 'Creating Workers');
+            // Get the cached worker-script from local fileSystem
+            return storage.fs.getFileInfoByUri(project.computation.solving.workerUrl)
+                .then(function (fileInfos) {
+                    return storage.fs.readFileAsLocalUrl(fileInfos[0]);
+                })
+                .then(function (localUrl) {
+                    workers.create(localUrl);
+                    addWorkerEventListeners();
+                });
+        }
 
-        // Get the cached worker-script from local fileSystem
-        return storage.fs.getFileInfoByUri(project.computation.solving.workerUrl)
-            .then(function (fileInfos) {
-                return storage.fs.readFileAsLocalUrl(fileInfos[0]);
-            })
-            .then(function (localUrl) {
-                workers.create(localUrl);
-                addWorkerEventListeners();
-            });
     }
 
 
@@ -52,8 +58,10 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
         // No need for a JobFactory
         if (!project.computation.jobs.enabled) {
             logger.log('Computation', 'Not using JobFactory');
-            return null;
+            return Q();
         }
+
+        logger.log('Computation', 'Creating JobFactory');
 
         // Instantiate JobFactory
         return storage.fs.getFileInfoByUri(project.computation.jobs.factoryUrl)
@@ -95,7 +103,6 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
         workers.off('file:required', workerResultRequiredHandler);
         workers.off('job:found', jobFactoryMessageHandler);
         workers.off('file:found', workerFileFoundHandler)
-
     }
 
     /**
@@ -242,10 +249,11 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
                  }*/
 
                 if (isNew) {
-                    logger.log('Worker ' + message.id, 'has new result', result.uuid, message.data);
+
+                    logger.log('Worker', message.id, 'has new result', message.data);
 
                     // Inform network module which will broadcast/publish
-                    network.publish('result:found', result);
+                    network.publish('result:push', result);
 
                     // Store result to local database
                     return storage.db.save('results', result, {uuidIsHash: true});
@@ -309,10 +317,11 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
          */
         start: function () {
 
+            logger.log('Computation', 'starting');
+
             createJobFactory()
                 .then(createWorkers)
                 .then(function () {
-
                     // Start the jobFactory
                     if (module.jobFactory) {
                         module.jobFactory.postMessage({cmd: 'start'});
@@ -331,6 +340,7 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
          * @method pause
          */
         pause: function () {
+            logger.log('Computation', 'pause');
             workers.pause();
             this.isPaused = true;
         },
@@ -338,6 +348,7 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
          * @method resume
          */
         resume: function () {
+            logger.log('Computation', 'resume');
             workers.resume();
             this.isPaused = false;
         },
@@ -345,6 +356,8 @@ define(['muskepeer-module', '../storage/index', '../network/index', '../project'
          * @method stop
          */
         stop: function () {
+
+            logger.log('Computation', 'stopping');
 
             if (this.jobFactory) {
                 removeJobFactoryListeners();

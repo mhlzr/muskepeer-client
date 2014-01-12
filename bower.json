@@ -16,15 +16,16 @@
   ],
   "dependencies": {
     "requirejs": "~2.1.9",
-    "q": "~0.9.7",
+    "q": "~1.0.0",
     "eventemitter2": "~0.4.13",
-    "lodash": "~2.2.1",
+    "lodash": "~2.4.1",
     "sjcl": "*",
-    "modernizr": "~2.6.2",
+    "modernizr": "~2.7.1",
     "idbwrapper": "~1.4.0",
     "node-uuid": "~1.4.1",
     "requirejs-domready": "~2.0.1",
     "sockjs": "~0.3.4",
-    "observe-js": "~0.1.1"
+    "observe-js": "~0.1.1",
+    "mixing": "*"
   }
 }

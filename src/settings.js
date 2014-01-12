@@ -8,19 +8,8 @@
 
 define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
 
-    /**
-     *
-     * @type {String}
-     * @private
-     * @default 'settings'
-     */
     var _storeName = 'settings',
-        /**
-         *
-         * @type {*}
-         * @private
-         */
-            _settings = readSettingsFromLocalStorage();
+        _settings = readSettingsFromLocalStorage();
 
 
     /**
