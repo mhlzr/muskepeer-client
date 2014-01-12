@@ -16,6 +16,9 @@ self.addEventListener('message', function (e) {
         case 'start':
             start();
             break;
+        case 'stop' :
+            self.close();
+            break;
     }
 });
 
@@ -102,7 +105,7 @@ function start() {
     while (true) {
         if (test(solution = createPossibleSolution())) {
             // Inform the listener
-            self.postMessage({type: 'result:found', data: solution});
+            self.postMessage({type: 'result:found', result: solution});
 
         }
     }

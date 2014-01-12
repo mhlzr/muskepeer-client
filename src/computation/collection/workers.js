@@ -6,30 +6,35 @@
 define(['eventemitter2', '../model/worker', 'settings'], function (EventEmitter, Worker, settings) {
 
 
-    var _workers = [],
+    var _self,
+        _workers = [],
         _ee = new EventEmitter({delimiter: ':'});
+
+
+    function workerEventHandler(e) {
+        _self.emit(this.event, e);
+    }
 
     return {
 
         emit: _ee.emit,
         on: _ee.on,
         off: _ee.off,
-        any: _ee.any,
+        onAny: _ee.onAny,
+        offAny: _ee.offAny,
 
         size: _workers.length || 0,
 
         create: function (url) {
-            var self = this;
+
+            _self = this;
 
             for (var i = 0; i < settings.maxWorkers; i++) {
                 var worker = new Worker(url);
                 worker.id = i + 1;
 
                 // Pass-through events
-                worker.onAny(function (e) {
-                    self.emit(this.event, e);
-                });
-
+                worker.onAny(workerEventHandler);
                 _workers.push(worker);
 
             }
@@ -48,7 +53,11 @@ define(['eventemitter2', '../model/worker', 'settings'], function (EventEmitter,
         stop: function () {
             _workers.forEach(function (worker) {
                 worker.stop();
+                worker.offAny(workerEventHandler);
             });
+
+            // Destroying
+            _workers = [];
         },
 
         pause: function () {

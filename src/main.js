@@ -25,7 +25,7 @@ require(['muskepeer-client', 'util/logger', 'domready'], function (Muskepeer, Lo
     window.logger = Logger;
 
     Muskepeer.start({
-        project: 'https://www.muskepeer.net/examples/n-queens/settings.json',
+        project: 'https://www.muskepeer.net/examples/jobqueue/settings.json',
         nodes: [
             {
                 host: 'node01-muskepeer.rhcloud.com',

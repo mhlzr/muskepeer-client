@@ -224,11 +224,14 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
             _self = this;
             _db = db;
 
-
             return requestQuota()
                 .then(requestFileSystem)
                 .then(function (fileSystem) {
                     _fs = fileSystem;
+                    if (!project.uuid) {
+                        logger.error('Filesystem', 'No project uuid set, can not create dir!');
+                        throw Error('Filesystem', 'No project uuid set');
+                    }
                     return createSubDirectory(project.uuid);
                 })
                 .then(function () {

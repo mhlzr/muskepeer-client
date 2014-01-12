@@ -91,10 +91,11 @@ define(['q', 'lodash'], function (Q, _) {
 
                 logger.log('Project', 'Downloading settings');
 
-                downloadJSON(config).then(function (config) {
-                    _.extend(self, combineWithDefaults(config));
-                    deferred.resolve();
-                })
+                downloadJSON(config)
+                    .then(function (config) {
+                        _.extend(self, combineWithDefaults(config));
+                        deferred.resolve();
+                    })
             }
             else {
                 logger.error('Project', 'Configuration neither object nor valid url');

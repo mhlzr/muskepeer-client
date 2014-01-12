@@ -3,10 +3,18 @@
  * @class Result
  */
 
-define(['crypto/index'], function (crypto) {
+define(['crypto/index', 'settings'], function (crypto, settings) {
     return function Result(data) {
-        this.data = data;
-        this.uuid = crypto.hash(this.data);
+
+        this.data = data.result;
+        this.uuid = crypto.hash(data);
+
+        this.peerUuid = settings.uuid;
+
+        if (data.job) {
+            this.jobUuid = data.job.uuid;
+        }
+
         this.iteration = 1;
         this.timestamp = Date.now();
     };

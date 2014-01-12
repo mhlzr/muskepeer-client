@@ -91,20 +91,26 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
             /**
              * Clear all data from stores
              * @method clear
+             * @param {Array} [storeNames]
              * @return {Promise}
              */
-            clear: function () {
-                var promises = [];
+            clear: function (storeNames) {
+                var promises = [],
+                    stores = _stores;
 
-                var deferred;
-                _stores.forEach(function (store) {
-                    deferred = Q.defer();
-
-                    store.clear(function success() {
-                        deferred.resolve();
+                if (storeNames) {
+                    stores = [];
+                    _stores.forEach(function (storeName) {
+                        stores.push(getStoreByName(storeName));
                     });
+                }
 
+                stores.forEach(function (store) {
+                    var deferred = Q.defer();
                     promises.push(deferred.promise);
+
+                    store.clear(deferred.resolve);
+
                 });
 
                 return Q.all(promises);
@@ -439,4 +445,5 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
 
         }
     }
-);
+)
+;

@@ -1,7 +1,7 @@
 {
-    "uuid": "d34ebd37-927a-426a-b762-87fb73c04159",
-    "title": "n-Queens solver",
-    "description": "Will find distinct solutions for the n-queens problem.",
+    "uuid": "0016d5da-47e2-4395-8a48-c3947907913a",
+    "title": "jobqueue",
+    "description": "Test for jobqueue",
     "publicKey": "",
 
     "author": "Matthieu Holzer",
@@ -12,13 +12,15 @@
     "computation": {
 
         "offlineAllowed": true,
-        "workerUrl": "https://www.muskepeer.net/examples/n-queens/worker.js",
+        "workerUrl": "https://www.muskepeer.net/examples/jobqueue/worker.js",
         "resultGroupSize": 1,
         "validationIterations": 0,
 
-        "expectedResults": 860,
-
-        "useJobList": false,
+        "useJobList": true,
+        "jobLocking": true,
+        "jobFactoryUrl": "https://www.muskepeer.net/examples/jobqueue/factory.js",
+        "jobGroupSize": 1,
+        "jobMaxLockTime": 3600000,
 
         "storages": [
             {
@@ -41,6 +43,7 @@
     },
 
     "network": {
+        "broadcastResults": true,
         "useGeoLocation": true
     }
 }

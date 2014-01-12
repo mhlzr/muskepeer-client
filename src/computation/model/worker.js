@@ -19,6 +19,7 @@ define(['eventemitter2'], function (EventEmitter) {
         this.on = _ee.on;
         this.off = _ee.off;
         this.onAny = _ee.onAny;
+        this.offAny = _ee.onAny;
 
         this.isRunning = false;
         this.isPaused = false;
@@ -49,6 +50,8 @@ define(['eventemitter2'], function (EventEmitter) {
 
         this.stop = function () {
             _webworker.postMessage({cmd: 'stop'});
+            _webworker.removeEventListener('message', workerMessageHandler);
+            _webworker.removeEventListener('error', workerErrorHandler);
             _webworker.terminate();
             _webworker = null;
             this.isRunning = false;
@@ -68,6 +71,7 @@ define(['eventemitter2'], function (EventEmitter) {
         };
 
         this.pushJob = function (job) {
+            console.log('pushing', job);
             _webworker.postMessage({cmd: 'job', job: job});
         };
 

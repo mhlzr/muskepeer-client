@@ -6,7 +6,7 @@
 
 define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], function (_, Q, EventEmitter2, nodes, settings) {
 
-    var TIMEOUT_WAIT_TIME = 30000, //10s
+    var TIMEOUT_WAIT_TIME = 10000, //10s
         ICE_SERVER_SETTINGS = {
             iceServers: [
                 { url: settings.stunServer }
@@ -99,6 +99,18 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
         this.on = ee.on;
         this.off = ee.off;
         this.onAny = ee.onAny;
+
+        /**
+         * @property connection
+         * @type {RTCPeerCpnnection}
+         */
+        this.connection = undefined;
+
+        /**
+         * @property channel
+         * @type {RTCDataChannel}
+         */
+        this.channel = undefined;
 
         /**
          * Indicates if there is a stable conenction to this peer
@@ -225,6 +237,8 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
 
             _channel = e.channel;
 
+            _self.channel = _channel;
+
             _channel.onclose = channelCloseHandler;
             _channel.onerror = channelErrorHandler;
             _channel.onmessage = channelMessageHandler;
@@ -316,6 +330,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             _connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
             _connection.onnegotiationneeded = negotiationNeededHandler;
 
+            this.connection = _connection;
 
             // Start timeout countdown
             _.delay(timerCompleteHandler, TIMEOUT_WAIT_TIME);
@@ -323,6 +338,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             try {
                 // Create  data-channel
                 _channel = _connection.createDataChannel('Muskepeer', null);
+                this.channel = _channel;
             }
             catch (e) {
                 // If an error occured here, there is a problem about the connection,
@@ -379,6 +395,8 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
             _connection.ondatachannel = dataChannelHandler;
             _connection.onicecandidate = iceCandidateHandler;
             _connection.oniceconnectionstatechange = iceConnectionStateChangeHandler;
+
+            this.connection = _connection;
 
             //5. Eve calls setRemoteDescription() with Alice's offer, so that her RTCPeerConnection knows about Alice's setup.
             _connection.setRemoteDescription(new MRTCSessionDescription(data.offer), function () {
@@ -463,7 +481,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
 
             // Buffer is full
             if (_channel.bufferedAmount > 0) {
-                _.delay(_self.send, 500 * Math.random(), data);
+                _.delay(_self.send, 10 * Math.random(), data);
                 return;
             }
 
@@ -485,7 +503,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings'], fun
                 catch (e) {
                     // Retry again
                     _self.queuedMessagesAmount++;
-                    _.delay(_self.send, 500 * Math.random(), data);
+                    _.delay(_self.send, 10 * Math.random(), data);
                 }
 
             }
