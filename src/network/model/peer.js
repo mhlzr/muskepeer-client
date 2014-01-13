@@ -44,18 +44,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
         RTCSessionDescription = mozRTCSessionDescription;
     }
 
-    /**
-     * @private
-     * @method isValidJSON
-     * @see https://github.com/douglascrockford/JSON-js/blob/master/json2.js
-     * @param jsonString
-     * @return {Boolean}
-     */
-    function isValidJSON(jsonString) {
-        return (/^[\],:{}\s]*$/.test(jsonString.replace(/\\["\\\/bfnrtu]/g, '@').
-            replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
-            replace(/(?:^|:|,)(?:\s*\[)+/g, '')));
-    }
 
     /**
      * A Peer represents another Browser which is connected via
@@ -72,29 +60,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
 
         this.id = config.id;
 
-        // Protocol switch SRTP(=default) or SCTP
-        if (settings.protocol.toLowerCase() === 'sctp') {
-            this.protocol = 'sctp';
-            logger.log('Peer', _self.id, 'Using SCTP');
-
-            connectionConstraint = {
-                optional: [
-                    {RtpDataChannels: false},
-                    {DtlsSrtpKeyAgreement: true}
-                ],
-                mandatory: {
-                    OfferToReceiveAudio: false,
-                    OfferToReceiveVideo: false
-                }
-            };
-
-            channelConstraint = {
-                reliable: true
-            };
-        } else {
-            this.protocol = 'srtp';
-            logger.log('Peer', _self.id, 'Using SRTP');
-        }
 
         // Event-methods
         this.emit = ee.emit;
@@ -178,6 +143,12 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
          */
         this.timeout = undefined;
 
+        /**
+         * List of timers for synchronization
+         * @type {Array}
+         */
+        this.syncTimers = [];
+
 
         /**
          * Amount of queuedmessages that could not be sent
@@ -198,6 +169,31 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
          * @type {String}
          */
         this.protocol = undefined;
+
+
+        // Protocol switch SRTP(=default) or SCTP
+        if (settings.protocol.toLowerCase() === 'sctp') {
+            this.protocol = 'sctp';
+            logger.log('Peer', _self.id, 'Using SCTP');
+
+            connectionConstraint = {
+                optional: [
+                    {RtpDataChannels: false},
+                    {DtlsSrtpKeyAgreement: true}
+                ],
+                mandatory: {
+                    OfferToReceiveAudio: false,
+                    OfferToReceiveVideo: false
+                }
+            };
+
+            channelConstraint = {
+                reliable: true
+            };
+        } else {
+            this.protocol = 'srtp';
+            logger.log('Peer', _self.id, 'Using SRTP');
+        }
 
 
         /**
@@ -537,11 +533,28 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
 
             logger.log('Peer', _self.id, 'Synchronizing');
 
-            if (project.network.synchronization.nodes.enabled) this.getNodeList();
-            if (project.network.synchronization.peers.enabled) this.getPeerList();
-            if (project.network.synchronization.files.enabled) this.getFileList();
-            if (project.network.synchronization.jobs.enabled) this.getJobList();
-            if (project.network.synchronization.results.enabled) this.getResultList();
+            if (project.network.synchronization.nodes.enabled) {
+                this.syncTimers.push(setInterval(project.network.synchronization.nodes.interval, this.getNodeList));
+                this.getNodeList();
+            }
+            if (project.network.synchronization.peers.enabled) {
+                this.syncTimers.push(setInterval(project.network.synchronization.peers.interval, this.getPeerList))
+                this.getPeerList();
+            }
+            if (project.network.synchronization.files.enabled) {
+                this.syncTimers.push(setInterval(project.network.synchronization.files.interval, this.getPeerList))
+                this.getFileList();
+            }
+            if (project.network.synchronization.jobs.enabled) {
+                this.syncTimers.push(setInterval(project.network.synchronization.jobs.interval, this.getPeerList))
+                this.getJobList();
+            }
+            if (project.network.synchronization.results.enabled) {
+                this.syncTimers.push(setInterval(project.network.synchronization.results.interval, this.getPeerList))
+                this.getResultList();
+            }
+
+
         };
 
 
@@ -583,7 +596,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
 
         /* Node Exchange */
         this.getNodeList = function () {
-            this.send({ type: 'node:list:pull'});
+            _self.send({ type: 'node:list:pull'});
         };
 
         this.sendNodeList = function (list) {
@@ -727,6 +740,16 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
          */
         this.broadcast = function (type, data) {
             _self.send({type: 'broadcast:' + type, data: data});
+        };
+
+
+        /**
+         * @method disconnect
+         */
+        this.disconnect = function () {
+            _self.isConnected = false;
+            _self.channel.close();
+            _self.connection.close();
         }
 
 

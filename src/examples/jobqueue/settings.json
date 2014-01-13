@@ -18,26 +18,7 @@
         "jobs": {
             "enabled": true,
             "factoryUrl": "https://www.muskepeer.net/examples/jobqueue/factory.js"
-        },
+        }
 
-
-        "services": [
-            {
-                "enabled": true,
-                "url": "https://api.parse.com/1/classes/Queens/",
-                "type": "REST",
-                "params": {},
-                "headers": [
-                    {
-                        "key": "X-Parse-Application-Id",
-                        "value": "ZzIHMKfVQmIni0K5fBdYgXxTlXyoovbm4gm0Epdq"
-                    },
-                    {
-                        "key": "X-Parse-REST-API-Key",
-                        "value": "4Izw5bddA34RFUmOuGCYrMHn4zY5dz62ETAVb2g5"
-                    }
-                ]
-            }
-        ]
     }
 }

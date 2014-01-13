@@ -65,6 +65,39 @@ define([
     }
 
 
+    /**
+     * @private
+     * @method coupleModules
+     */
+    function coupleModules() {
+
+        //network.on('result:push', function () {});
+
+        network.on('broadcast:computation:start', computation.start);
+        network.on('broadcast:computation:stop', computation.stop);
+
+        computation.on('job:lock', function (e) {
+            network.publish('job:lock', e);
+        });
+        computation.on('job:finished', function (e) {
+            network.publish('job:finished', e);
+        });
+        computation.on('result:push', function (e) {
+            network.publish('result:push', e);
+        });
+
+    }
+
+    /**
+     * @private
+     * @method decoupleModules
+     */
+    function decoupleModules() {
+        network.removeAllListeners();
+        computation.removeAllListeners();
+    }
+
+
     return {
 
         computation: computation,
@@ -94,23 +127,6 @@ define([
             catch (e) {
                 window.alert('Your browser is not supported.');
             }
-
-
-            // Coupling
-            //network.on('result:push', function () {});
-
-            network.on('broadcast:computation:start', computation.start);
-            network.on('broadcast:computation:stop', computation.stop);
-
-            computation.on('job:lock', function (e) {
-                network.publish('job:lock', e);
-            });
-            computation.on('job:finished', function (e) {
-                network.publish('job:finished', e);
-            });
-            computation.on('result:push', function (e) {
-                network.publish('result:push', e);
-            });
 
 
             return this;
@@ -166,7 +182,10 @@ define([
                     return storage.fs.downloadIncompleteFiles();
                 })
                 .done(function () {
+
                     // Finallly initialize the network and computation module
+                    coupleModules();
+
                     network.start();
                     // computation.start();
                 });
@@ -180,8 +199,12 @@ define([
          * @chainable
          */
         stop: function () {
+
+            decoupleModules();
+
             this.computation.stop();
             this.network.stop();
+
             return this;
 
         }

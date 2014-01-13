@@ -23,6 +23,7 @@ define(['lodash', 'eventemitter2'], function (_, EventEmitter2) {
         this.off = ee.off;
         this.onAny = ee.onAny;
         this.offAny = ee.offAny;
+        this.removeAllListeners = ee.removeAllListeners;
     }
 
 
