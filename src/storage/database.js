@@ -30,7 +30,7 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
          * @return {Promise}
          */
         function createStores() {
-            var storeNames = ['results', 'jobs', 'files', 'nodes'],
+            var storeNames = ['results', 'jobs', 'files', 'nodes', 'messages'],
                 promises = [];
 
             var deferred;
@@ -274,6 +274,9 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
              * @return {Promise}
              */
             save: function (storeName, data, options) {
+
+                options = options || {};
+
                 var deferred = Q.defer(),
                     store;
 

@@ -19,7 +19,8 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
                 "validation": {
                     "enabled": false,
                     "iterations": 0
-                }
+                },
+                "resultCountTimeInterval": 10000
             },
 
             "jobs": {

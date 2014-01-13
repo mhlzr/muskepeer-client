@@ -88,6 +88,7 @@ define([
                 if (!device.isCompatible) {
                     var msg = 'The following features are required but not supported by your browser: ' + device.missingRequirements.join('\n');
                     window.alert(msg);
+                    return;
                 }
             }
             catch (e) {
@@ -96,15 +97,10 @@ define([
 
 
             // Coupling
-            network.on('result:push', function () {
-                computation.isComplete()
-                    .then(function (isComplete) {
-                        if (isComplete) computation.stop();
-                    })
-            });
+            //network.on('result:push', function () {});
 
-            network.on('computation:start', computation.start);
-            network.on('computation:stop', computation.stop);
+            network.on('broadcast:computation:start', computation.start);
+            network.on('broadcast:computation:stop', computation.stop);
 
             computation.on('job:lock', function (e) {
                 network.publish('job:lock', e);

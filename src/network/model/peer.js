@@ -34,11 +34,11 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
         });
 
     // Handle vendor prefixes
-    if (webkitRTCPeerConnection) {
+    if (window.webkitRTCPeerConnection) {
         RTCPeerConnection = webkitRTCPeerConnection;
         RTCIceCandidate = window.RTCIceCandidate;
         RTCSessionDescription = window.RTCSessionDescription;
-    } else {
+    } else if (window.mozRTCPeerConnection) {
         RTCPeerConnection = mozRTCPeerConnection;
         RTCIceCandidate = mozRTCIceCandidate;
         RTCSessionDescription = mozRTCSessionDescription;

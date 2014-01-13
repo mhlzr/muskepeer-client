@@ -21,7 +21,8 @@
                 "enabled": true,
                 "iterations": 3
             },
-            "expectedAmount": 1000
+            "expectedAmount": 1000,
+            "resultCountTimeInterval": 30000
         },
 
         "jobs": {

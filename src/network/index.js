@@ -9,10 +9,10 @@
  *
  */
 
-define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', './geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', './model/service'],
+define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', './geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', 'uuid', './model/service'],
 
 
-    function (Q, _, crypto, storage, project, settings, geolocation, MuskepeerModule, nodes, peers, Service) {
+    function (Q, _, crypto, storage, project, settings, geolocation, MuskepeerModule, nodes, peers, uuid, Service) {
 
 
         var MASTER_BROADCAST_MESSAGE_TTL = 1000 * 60, //1m
@@ -53,6 +53,34 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
             });
 
             logger.log('Network', 'ExternalServices registered');
+        }
+
+
+        /**
+         * @private
+         * @method masterMessageHandler
+         */
+        function masterMessageHandler(e) {
+            if (isValidMasterMessage(e.data.message, e.data.signature)) {
+
+                storage.db.has('messages', e.data.message.uuid)
+                    .then(function (exists) {
+
+                        if (!exists) {
+
+                            // Inform
+                            module.emit(e.type, e.data.message);
+
+                            // Save
+                            storage.db.save('messages', e.data.message)
+                                .then(function () {
+                                    // Broadcast
+                                    peers.broadcast(e.type, e.data, e.target.uuid);
+                                });
+
+                        }
+                    })
+            }
         }
 
 
@@ -310,15 +338,10 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
                 case 'broadcast:file':
                     break;
                 case 'broadcast:computation:start':
-                    //Verify that message is valid
-                    if (isValidMasterMessage(e.data.message, e.data.signature)) {
-                        module.emit('computation:start');
-                    }
+                    masterMessageHandler(e);
                     break;
                 case 'broadcast:computation:stop':
-                    if (isValidMasterMessage(e.data.message, e.data.signature)) {
-                        module.emit('computation:stop');
-                    }
+                    masterMessageHandler(e);
                     break;
             }
         }
@@ -395,7 +418,7 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
              * @method stop
              */
             stop: function () {
-                //TODO deconstruct, remove listeners
+                //TODO deconstruct, remove listeners, close all connections
             },
 
 
@@ -424,6 +447,7 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
                 data = data || {};
 
                 var msg = _.extend(data, {
+                        uuid: uuid.generate(),
                         type: type,
                         timestamp: Date.now()
                     }),
