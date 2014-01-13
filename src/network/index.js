@@ -251,7 +251,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
 
                 case 'broadcast:job':
                     break;
-                case 'broadcast:result':
+                case 'broadcast:result:push':
 
                     console.log('got a result broadcast');
 
@@ -357,7 +357,7 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
              */
             publish: function (type, data) {
 
-                logger.log('Network', 'publishing');
+                //logger.log('Network', 'publishing', data.uuid);
 
                 // Broadcast to peers
                 peers.broadcast(type, data);

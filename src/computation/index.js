@@ -215,8 +215,7 @@ define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../pro
      */
     function workerResultFoundHandler(message) {
 
-        var isNew = true,
-            result = new Result(message.data);
+        var result = new Result(message.data);
 
 
         if (result.jobUuid) {
@@ -235,12 +234,18 @@ define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../pro
         // Already existent?
         storage.db.has('results', result.uuid, {uuidIsHash: true})
             .then(function (resultInStorage) {
+                var deferred = Q.defer();
+
                 if (resultInStorage) {
-                    isNew = false;
+                    deferred.resolve(false);
                     //result.iteration = resultInStorage.iteration + 1;
                 }
+                else {
+                    deferred.resolve(true);
+                }
+                return deferred.promise;
             })
-            .then(function () {
+            .then(function (isNew) {
 
                 // Already did enough iterations, no need to save/update
                 /*if (project.computation.validationIterations > 0
@@ -250,17 +255,15 @@ define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../pro
 
                 if (isNew) {
 
-                    logger.log('Worker', message.id, 'has new result', message.data);
-
                     // Inform network module which will broadcast/publish
                     network.publish('result:push', result);
 
                     // Store result to local database
                     return storage.db.save('results', result, {uuidIsHash: true});
 
-
                 }
-                else return null;
+
+                else throw Error('Already know');
 
 
                 // Count amount of results
@@ -379,6 +382,9 @@ define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../pro
             return storage.db.findAndReduceByObject('results', {}, {})
                 .then(function (results) {
                     var deferred = Q.defer();
+
+                    logger.log('Computation', 'has', results.length, 'results');
+
 
                     // We don't know how much to expect, so we can't say
                     if (!project.computation.jobs.expectedAmount || !_.isFinite(project.computation.jobs.expectedAmount)) {

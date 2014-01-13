@@ -113,6 +113,8 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
 
                 });
 
+                logger.log('Database', 'cleared');
+
                 return Q.all(promises);
             },
 

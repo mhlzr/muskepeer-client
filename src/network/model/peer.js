@@ -45,6 +45,19 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
     }
 
     /**
+     * @private
+     * @method isValidJSON
+     * @see https://github.com/douglascrockford/JSON-js/blob/master/json2.js
+     * @param jsonString
+     * @return {Boolean}
+     */
+    function isValidJSON(jsonString) {
+        return (/^[\],:{}\s]*$/.test(jsonString.replace(/\\["\\\/bfnrtu]/g, '@').
+            replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+            replace(/(?:^|:|,)(?:\s*\[)+/g, '')));
+    }
+
+    /**
      * A Peer represents another Browser which is connected via
      * WebRTCs DataChannel
      *
@@ -479,6 +492,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
          */
         this.send = function (data) {
 
+            var jsonString;
 
             if (!_self.isConnected || _self.channel.readyState !== 'open') {
                 logger.error('Peer', _self.id, 'Attempt to send, but channel is not open!');
@@ -494,13 +508,13 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
                 // Currently JSON & Channel.send error produce a SyntaxError
                 // https://code.google.com/p/webrtc/issues/detail?id=2434
                 try {
-                    data = JSON.stringify(data);
+                    jsonString = JSON.stringify(data);
                 }
                 catch (e) {
                     // We won't retry as this always will fail
                 }
                 try {
-                    _self.channel.send(data);
+                    _self.channel.send(jsonString);
 
                     if (_self.queuedMessageAmount > 0) {
                         _self.queuedMessageAmount--;

@@ -24,22 +24,19 @@ define(['eventemitter2'], function (EventEmitter) {
         this.isRunning = false;
         this.isPaused = false;
 
+        function workerMessageHandler(e) {
+            _self.emit(e.data.type.toLowerCase(), {id: self.id, data: e.data });
+        }
 
         function workerErrorHandler(e) {
             logger.log('Worker', 'error occured', e);
         }
 
-        function workerMessageHandler(e) {
-            // Convert worker-message to event
-            _self.emit(e.data.type.toLowerCase(), {id: _self.id, data: e.data });
-
-        }
-
         this.start = function () {
 
             _webworker = new WebWorker(url);
-            _webworker.addEventListener('message', workerMessageHandler);
-            _webworker.addEventListener('error', workerErrorHandler);
+            _webworker.addEventListener('message', workerMessageHandler, false);
+            _webworker.addEventListener('error', workerErrorHandler, false);
 
             this.isRunning = true;
             this.isPaused = false;
@@ -71,7 +68,6 @@ define(['eventemitter2'], function (EventEmitter) {
         };
 
         this.pushJob = function (job) {
-            console.log('pushing', job);
             _webworker.postMessage({cmd: 'job', job: job});
         };
 

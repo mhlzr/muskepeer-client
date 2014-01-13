@@ -14,15 +14,14 @@
         "offlineAllowed": true,
 
         "solving": {
-            "workerUrl": "https://www.muskepeer.net/examples/n-queens/worker.js",
-            "expectedAmount": 2680
+            "workerUrl": "https://www.muskepeer.net/examples/n-queens/worker.js"
         }
     },
 
     "network": {
         "services": [
             {
-                "enabled": true,
+                "enabled": false,
                 "url": "https://api.parse.com/1/classes/Queens/",
                 "type": "REST",
                 "params": {},

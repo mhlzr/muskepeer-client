@@ -7,6 +7,11 @@
 
 define([], function () {
 
+    var MAX_MESSAGES = 50;
+
+    var output = document.getElementsByTagName('output')[0],
+        msgAmount = 0;
+
     /**
      * Create a timestamp ( format : HH::MM:SS )
      *
@@ -31,27 +36,37 @@ define([], function () {
 
     function print(type, args) {
 
+        if (msgAmount >= MAX_MESSAGES) {
+            output.innerHTML = '';
+            console.clear();
+            msgAmount = 0;
+        }
+
 
         if (args.length === 1) {
-            document.body.innerHTML += getPrettyTimeStamp() + ' ' + args[0] + '<br/>';
+            output.innerHTML += getPrettyTimeStamp() + ' ' + args[0] + '<br/>';
             console[type](getPrettyTimeStamp(), args[0]);
         }
         else if (args.length === 2) {
-            document.body.innerHTML += getPrettyTimeStamp() + ' ' + args[0] + ':' + args[1] + '<br/>';
+            output.innerHTML += getPrettyTimeStamp() + ' ' + args[0] + ': ' + args[1] + '<br/>';
             console[type](getPrettyTimeStamp(), args[0] + ':', args[1]);
         }
         else if (args.length === 3) {
-            document.body.innerHTML += getPrettyTimeStamp() + ' ' + args[0] + args[1] + ':' + args[2] + '<br/>';
-            console[type](getPrettyTimeStamp(), args[0], args[1], ':', args[2]);
+            output.innerHTML += getPrettyTimeStamp() + ' ' + args[0] + args[1] + ': ' + args[2] + '<br/>';
+            console[type](getPrettyTimeStamp(), args[0], args[1], ': ', args[2]);
         }
         else if (args.length === 4) {
-            document.body.innerHTML += getPrettyTimeStamp() + ' ' + args[0] + args[1] + ':' + args[2] + args[3] + '<br/>';
-            console[type](getPrettyTimeStamp(), args[0] + args[1] + ':', args[2], args[3]);
+            output.innerHTML += getPrettyTimeStamp() + ' ' + args[0] + args[1] + ': ' + args[2] + ' ' + args[3] + '<br/>';
+            console[type](getPrettyTimeStamp(), args[0] + args[1] + ': ', args[2], args[3]);
         }
         else {
-            document.body.innerHTML += getPrettyTimeStamp() + ' ' + args + '<br/>';
+            output.innerHTML += getPrettyTimeStamp() + ' ' + args + '<br/>';
             console[type](getPrettyTimeStamp(), args);
         }
+
+        msgAmount++;
+
+
     }
 
 
