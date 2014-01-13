@@ -63,22 +63,27 @@
         "synchronization": {
             "results": {
                 "enabled": true,
+                "interval": 3600000,
                 "groupSize": 15
             },
             "jobs": {
                 "enabled": true,
+                "interval": 3600000,
                 "groupSize": 15
             },
             "files": {
                 "enabled": false,
+                "interval": 3600000,
                 "groupSize": 1
             },
             "peers": {
                 "enabled": true,
+                "interval": 3600000,
                 "groupSize": 15
             },
             "nodes": {
                 "enabled": true,
+                "interval": 3600000,
                 "groupSize": 15
             }
         },

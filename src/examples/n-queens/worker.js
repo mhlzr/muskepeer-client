@@ -23,7 +23,7 @@ self.addEventListener('message', function (e) {
 });
 
 
-var BOARDSIZE = 10;
+var BOARDSIZE = 12;
 
 function test(positions) {
 

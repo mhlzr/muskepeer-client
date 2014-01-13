@@ -5,7 +5,7 @@
  * @extends MuskepeerModule
  */
 
-define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../project', './collection/workers', 'crypto/index', './collection/jobs', './model/job', './model/result'], function (Q, MuskepeerModule, storage, network, project, workers, crypto, jobs, Job, Result) {
+define(['q', 'muskepeer-module', '../storage/index', '../project', './collection/workers', 'crypto/index', './collection/jobs', './model/job', './model/result'], function (Q, MuskepeerModule, storage, project, workers, crypto, jobs, Job, Result) {
 
     var module = new MuskepeerModule();
 
@@ -387,13 +387,12 @@ define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../pro
 
 
                     // We don't know how much to expect, so we can't say
-                    if (!project.computation.jobs.expectedAmount || !_.isFinite(project.computation.jobs.expectedAmount)) {
+                    if (!project.computation.solving.expectedAmount || !_.isFinite(project.computation.solving.expectedAmount)) {
                         deferred.resolve(false);
                     }
 
                     // We already have all results?
-                    if (amount >= project.computation.jobs.expectedAmount) {
-                        console.log('DONNNNNNNNNNEEE!!');
+                    if (amount >= project.computation.solving.expectedAmount) {
                         deferred.resolve(true);
                     }
                     return deferred.promise;
