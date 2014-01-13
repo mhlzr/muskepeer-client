@@ -95,6 +95,25 @@ define([
             }
 
 
+            // Coupling
+            network.on('result:push', function () {
+                computation.isComplete()
+                    .then(function (isComplete) {
+                        if (isComplete) computation.stop();
+                    })
+            });
+
+            computation.on('job:lock', function (e) {
+                network.publish('job:lock', e);
+            });
+            computation.on('job:finished', function (e) {
+                network.publish('job:finished', e);
+            });
+            computation.on('result:push', function (e) {
+                network.publish('result:push', e);
+            });
+
+
             return this;
         },
         /**

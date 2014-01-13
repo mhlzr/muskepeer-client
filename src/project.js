@@ -58,11 +58,11 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
             "synchronization": {
                 "results": {
                     "enabled": true,
-                    "groupSize": 15
+                    "groupSize": 500
                 },
                 "jobs": {
                     "enabled": true,
-                    "groupSize": 15
+                    "groupSize": 500
                 },
                 "files": {
                     "enabled": false,
@@ -70,11 +70,11 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
                 },
                 "peers": {
                     "enabled": true,
-                    "groupSize": 15
+                    "groupSize": 500
                 },
                 "nodes": {
                     "enabled": true,
-                    "groupSize": 15
+                    "groupSize": 100
                 }
             },
 

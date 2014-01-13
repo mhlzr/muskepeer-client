@@ -500,7 +500,8 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             }
 
 
-            // Actually it should be possible to send a blob
+            // Actually it should be possible to send a blob, but it isn't
+            // https://code.google.com/p/webrtc/issues/detail?id=2276
             if (data instanceof Blob) {
                 _self.channel.send(data);
             }

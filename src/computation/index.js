@@ -196,7 +196,7 @@ define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../pro
 
                             // Need to publish lock?
                             if (project.computation.jobs.lockJobsWhileSolving) {
-                                network.publish('job:lock', {uuid: job.uuid});
+                                module.emit('job:lock', {uuid: job.uuid})
                             }
 
                             // Send to worker
@@ -223,7 +223,7 @@ define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../pro
             jobs.unlockJob({uuid: result.jobUuid}).then(function () {
                 //TODO check iterations
                 // Inform network
-                network.publish('job:finished', {uuid: result.jobUuid});
+                module.emit('job:finished', {uuid: result.jobUuid});
 
                 return jobs.markJobAsFinished({uuid: result.jobUuid});
             });
@@ -256,7 +256,7 @@ define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../pro
                 if (isNew) {
 
                     // Inform network module which will broadcast/publish
-                    network.publish('result:push', result);
+                    module.emit('result:push', result);
 
                     // Store result to local database
                     return storage.db.save('results', result, {uuidIsHash: true});
@@ -379,11 +379,11 @@ define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../pro
          * @return {Promise}
          */
         isComplete: function () {
-            return storage.db.findAndReduceByObject('results', {}, {})
-                .then(function (results) {
+            return storage.db.count('results')
+                .then(function (amount) {
                     var deferred = Q.defer();
 
-                    logger.log('Computation', 'has', results.length, 'results');
+                    logger.log('Computation', 'has', amount, 'results');
 
 
                     // We don't know how much to expect, so we can't say
@@ -392,7 +392,8 @@ define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../pro
                     }
 
                     // We already have all results?
-                    if (results.length >= project.computation.jobs.expectedAmount) {
+                    if (amount >= project.computation.jobs.expectedAmount) {
+                        console.log('DONNNNNNNNNNEEE!!');
                         deferred.resolve(true);
                     }
                     return deferred.promise;
@@ -402,5 +403,4 @@ define(['q', 'muskepeer-module', '../storage/index', '../network/index', '../pro
 
     });
 
-})
-;
+});

@@ -31,8 +31,10 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
 
 
     //Chrome is currently the only one supporting native O_o
-    //which would be Object.observe(_settings, storeSettingsToLocalStorage);
-    var observer = new ObjectObserver(_settings, storeSettingsToLocalStorage);
+    //which would be
+    //Object.observe(_settings, storeSettingsToLocalStorage);
+    var observer = new ObjectObserver(_settings);
+    observer.open(storeSettingsToLocalStorage);
 
     //Defaults
     _.defaults(_settings, {
@@ -41,12 +43,13 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
         maxPeers: 3,
         maxWorkers: 1,
         fileStorageSize: 500 * 1024 * 1024, //500MB
-        protocol: 'srtp', //srtp || sctp
+        protocol: 'sctp', //srtp || sctp
         stunServer: 'stun:stun.l.google.com:19302',
         syncInterval: 3600000, //1h
         uuid: uuid.generate() //everyone will know (public)
     });
 
+    //storeSettingsToLocalStorage();
 
     return _settings;
 

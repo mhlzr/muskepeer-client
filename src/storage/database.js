@@ -119,6 +119,25 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
             },
 
             /**
+             * Counts all entries in a store.
+             *
+             * @method count
+             * @param storeName
+             * @return promise
+             */
+            count: function (storeName) {
+                var deferred = Q.defer(),
+                    store = getStoreByName(storeName);
+
+                store.count(function (amount) {
+                    deferred.resolve(amount);
+
+                }, {});
+
+                return deferred.promise;
+            },
+
+            /**
              * Read data by key from indexedDB
              * @method read
              * @param {String} storeName
