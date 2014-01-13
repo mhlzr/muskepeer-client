@@ -26,6 +26,7 @@
     "requirejs-domready": "~2.0.1",
     "sockjs": "~0.3.4",
     "observe-js": "~0.1.2",
-    "mixing": "*"
+    "mixing": "*",
+    "jsrsasign": "https://github.com/kjur/jsrsasign.git#~4.2.1"
   }
 }

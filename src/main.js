@@ -4,6 +4,7 @@ require.config({
         'lodash': 'lib/lodash/dist/lodash',
         'eventemitter2': 'lib/eventemitter2/lib/eventemitter2',
         'idbwrapper': 'lib/idbwrapper/idbstore',
+        'jsrsasign': 'lib/jsrsasign/jsrsasign-latest-all-min',
         'mixing': 'lib/mixing/dist/mixing',
         'node-uuid': 'lib/node-uuid/uuid',
         'observe-js': 'lib/observe-js/src/observe',
@@ -12,6 +13,9 @@ require.config({
         'sockjs': 'lib/sockjs/sockjs'
     },
     shim: {
+        'jsrsasign': {
+            exports: 'KJUR'
+        },
         'sjcl': {
             exports: 'sjcl'
         }
