@@ -9,9 +9,14 @@
  *
  */
 
-define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', './model/service'],
+define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', './geolocation', 'muskepeer-module', './collections/nodes', './collections/peers', './model/service'],
 
-    function (Q, _, storage, project, settings, geolocation, MuskepeerModule, nodes, peers, Service) {
+
+    function (Q, _, crypto, storage, project, settings, geolocation, MuskepeerModule, nodes, peers, Service) {
+
+
+        var MASTER_BROADCAST_MESSAGE_TTL = 1000 * 60, //1m
+            MASTER_BROADCAST_PEER_MAX_TIME_DRIFTING = 1000 * 60 * 2; //2m
 
         var module = new MuskepeerModule();
 
@@ -35,7 +40,6 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
             }
         }
 
-
         /**
          * @private
          * @method registerExternalServices
@@ -49,7 +53,34 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
             });
 
             logger.log('Network', 'ExternalServices registered');
+        }
 
+
+        /**
+         * @private
+         * @method isValidMasterMessage
+         */
+        function isValidMasterMessage(message, signature) {
+            var now = Date.now();
+
+            if (!message || !signature) return;
+
+            // Signature is okay?
+            if (!crypto.verify(JSON.stringify(message), signature)) {
+                return false;
+            }
+
+            // We allow, some drifting, as time between clients might not be in sync
+            if (!message.timestamp || message.timestamp > now + MASTER_BROADCAST_PEER_MAX_TIME_DRIFTING) {
+                return false;
+            }
+
+            // TTL reached?
+            if (now > message.timestamp + MASTER_BROADCAST_MESSAGE_TTL) {
+                return false;
+            }
+
+            return true;
         }
 
         /**
@@ -278,6 +309,17 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
                     break;
                 case 'broadcast:file':
                     break;
+                case 'broadcast:computation:start':
+                    //Verify that message is valid
+                    if (isValidMasterMessage(e.data.message, e.data.signature)) {
+                        module.emit('computation:start');
+                    }
+                    break;
+                case 'broadcast:computation:stop':
+                    if (isValidMasterMessage(e.data.message, e.data.signature)) {
+                        module.emit('computation:stop');
+                    }
+                    break;
             }
         }
 
@@ -362,8 +404,6 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
              */
             publish: function (type, data) {
 
-                //logger.log('Network', 'publishing', data.uuid);
-
                 // Broadcast to peers
                 peers.broadcast(type, data);
 
@@ -371,7 +411,32 @@ define(['q', 'lodash', 'storage/index', 'project', 'settings', './geolocation', 
                 module.services.forEach(function (service) {
                     service.save(data);
                 });
-            }
+            },
 
+
+            /**
+             * @method broadcastMasterMessage
+             * @param type
+             * @param data
+             */
+            broadcastMasterMessage: function (type, data) {
+
+                data = data || {};
+
+                var msg = _.extend(data, {
+                        type: type,
+                        timestamp: Date.now()
+                    }),
+                    signature = crypto.sign(JSON.stringify(msg));
+
+                peers.broadcast(type, {
+                        'message': msg,
+                        'signature': signature
+                    }
+                );
+
+            }
         });
-    });
+    }
+);
+

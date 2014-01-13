@@ -14,6 +14,10 @@
 <div>
     <button onclick="Muskepeer.computation.start()">Start Computation</button>
     <button onclick="Muskepeer.computation.stop()">Stop Computation</button>
+
+    <button onclick="Muskepeer.network.broadcastMasterMessage('computation:start')">Start Grid-Computation</button>
+    <button onclick="Muskepeer.network.broadcastMasterMessage('computation:stop')">Stop Grid-Computation</button>
+
     <button onclick="Muskepeer.storage.fs.clear()">Clear FileSystem</button>
     <button onclick="Muskepeer.storage.db.clear()">Clear Database</button>
     <input type="text" value="chrome://webrtc-internals" disabled/>

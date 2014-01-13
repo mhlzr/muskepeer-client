@@ -103,6 +103,9 @@ define([
                     })
             });
 
+            network.on('computation:start', computation.start);
+            network.on('computation:stop', computation.stop);
+
             computation.on('job:lock', function (e) {
                 network.publish('job:lock', e);
             });
