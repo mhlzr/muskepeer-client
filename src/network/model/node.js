@@ -58,23 +58,23 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', '../geolocation']
                 //add listeners
                 this.socket.addEventListener('message', this.messageHandler);
                 this.socket.addEventListener('open', function () {
-                    logger.log('Node', self.id + ' ' + self.url, 'connected');
+                    logger.log('Node ' + self.id, self.url, 'connected');
                     self.isConnected = true;
                     deferred.resolve();
                 });
 
                 this.socket.addEventListener('error', function (e) {
                     self.disconnect();
-                    logger.log('Node' + self.id + ' ' + self.url, 'error');
+                    logger.log('Node ' + self.id, self.url, 'error');
                 });
 
                 this.socket.addEventListener('close', function (e) {
                     self.disconnect();
-                    logger.log('Node', self.id + ' ' + self.url, 'disconnected', e.code + ' : ' + e.reason);
+                    logger.log('Node ' + self.id, self.url, 'disconnected', e.code + ' : ' + e.reason);
 
                     switch (e.code) {
                         case 1011 :
-                            logger.log('Node', self.id + ' ' + self.url, 'is idle! Please restart it.');
+                            logger.log('Node ' + self.id, self.url, 'is idle! Please restart it.');
                             break;
                     }
                 });
@@ -181,7 +181,7 @@ define(['lodash', 'q', 'eventemitter2', 'settings', 'project', '../geolocation']
             var data = JSON.parse(e.data),
                 cmd = data.cmd;
 
-            logger.log('Node', self.id, 'Received', data);
+            logger.log('Node ' + self.id, 'Received', data);
 
             switch (cmd.toLowerCase()) {
                 case 'peer:offer' :

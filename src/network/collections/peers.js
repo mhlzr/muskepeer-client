@@ -206,7 +206,13 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
                     return;
                 }
 
-                logger.log('Peers', 'broadcasting to', peers.length, 'peers');
+                if (!originPeerUuid) {
+                    logger.log('Peers', 'Broadcasting', type, 'to', peers.length, 'peer(s)');
+                }
+                else {
+                    logger.log('Peers', 'Rebroadcasting', type, 'to', peers.length, 'peer(s)');
+                }
+
 
                 // Broadcast to all connected peers
                 peers.forEach(function (peer) {

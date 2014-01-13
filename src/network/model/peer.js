@@ -9,11 +9,10 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
     var TIMEOUT_WAIT_TIME = 30000, //30s
         QUEUE_RETRY_TIME = 150,
         ICE_SERVER_SETTINGS = {
-            iceServers: [
-                { url: settings.stunServer }
-            ]};
+            iceServers: settings.iceServers
+        };
 
-    // a.k.a mediaConstraint
+// a.k.a mediaConstraint
     var connectionConstraint = {
             optional: [
                 {RtpDataChannels: true},
@@ -33,7 +32,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             maxListeners: 10
         });
 
-    // Handle vendor prefixes
+// Handle vendor prefixes
     if (window.webkitRTCPeerConnection) {
         RTCPeerConnection = webkitRTCPeerConnection;
         RTCIceCandidate = window.RTCIceCandidate;
@@ -174,7 +173,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
         // Protocol switch SRTP(=default) or SCTP
         if (settings.protocol.toLowerCase() === 'sctp') {
             this.protocol = 'sctp';
-            logger.log('Peer', _self.id, 'Using SCTP');
+            logger.log('Peer ' + _self.id, 'Using SCTP');
 
             connectionConstraint = {
                 optional: [
@@ -192,7 +191,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             };
         } else {
             this.protocol = 'srtp';
-            logger.log('Peer', _self.id, 'Using SRTP');
+            logger.log('Peer ' + _self.id, 'Using SRTP');
         }
 
 
@@ -224,7 +223,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             if (!_self.isConnected) {
                 _self.timeout = Date.now();
                 _self.emit('peer:timeout');
-                logger.log('Peer', _self.id, 'Time-out');
+                logger.log('Peer ' + _self.id, 'Time-out');
 
             }
             else _self.timeout = undefined;
@@ -242,7 +241,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
         }
 
         function dataChannelHandler(e) {
-            logger.log('Peer', _self.id, 'Got remote DataChannel');
+            logger.log('Peer ' + _self.id, 'Received remote DataChannel');
 
             _self.channel = e.channel;
 
@@ -261,11 +260,11 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             if (_self.connection.iceConnectionState === 'connected' &&
                 _self.connection.iceGatheringState === 'complete') {
 
-                logger.log('Peer', _self.id, 'Connection established');
+                logger.log('Peer ' + _self.id, 'Connection established');
             }
             // Connection has closed
             else if (_self.connection.iceConnectionState === 'disconnected') {
-                logger.log('Peer', _self.id, 'Connection closed');
+                logger.log('Peer ' + _self.id, 'Connection closed');
 
                 _self.isConnected = false;
                 _self.emit('peer:disconnect', _self);
@@ -276,7 +275,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
 
         function negotiationNeededHandler(e) {
 
-            logger.log('Peer', _self.id, 'Negotiation needed');
+            logger.log('Peer ' + _self.id, 'Negotiation needed');
             //2. Alice creates an offer (an SDP session description) with the RTCPeerConnection createOffer() method.
             _self.connection.createOffer(function (sessionDescription) {
 
@@ -298,7 +297,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
         }
 
         function channelErrorHandler(e) {
-            logger.log('Peer', _self.id, 'Channel has an error', e);
+            logger.log('Peer ' + _self.id, 'Channel has an error', e);
         }
 
 
@@ -320,7 +319,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
         }
 
         function channelOpenHandler(e) {
-            logger.log('Peer', _self.id, 'DataChannel is open');
+            logger.log('Peer ' + _self.id, 'DataChannel is open');
 
             _self.isConnected = true;
             _self.emit('peer:connect', _self);
@@ -328,7 +327,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
         }
 
         function channelCloseHandler(e) {
-            logger.log('Peer', _self.id, 'DataChannel is closed');
+            logger.log('Peer ' + _self.id, 'DataChannel is closed', e);
             _self.isConnected = false;
             _self.emit('peer:disconnect', _self);
         }
@@ -344,12 +343,11 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
          */
         this.createConnection = function () {
 
-            var deferred = Q.defer;
 
             this.isSource = true;
             this.isTarget = false;
 
-            logger.log('Peer', _self.id, 'Creating connection');
+            logger.log('Peer ' + _self.id, 'Creating connection');
 
             //1.Alice creates an RTCPeerConnection object.
             _self.connection = new RTCPeerConnection(ICE_SERVER_SETTINGS, connectionConstraint);
@@ -363,7 +361,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             _self.connection.onnegotiationneeded = negotiationNeededHandler;
             _self.connection.onsignalingstatechange = signalingStateChangeHandler;
 
-            this.connection = _self.connection;
 
             // Start timeout countdown
             _.delay(timerCompleteHandler, TIMEOUT_WAIT_TIME);
@@ -371,7 +368,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             try {
                 // Create  data-channel
                 _self.channel = _self.connection.createDataChannel('Muskepeer', channelConstraint);
-                this.channel = _self.channel;
             }
             catch (e) {
                 // If an error occured here, there is a problem about the connection,
@@ -388,8 +384,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             _self.channel.onmessage = channelMessageHandler;
             _self.channel.onopen = channelOpenHandler;
 
-
-            return deferred.promise;
 
         };
 
@@ -491,7 +485,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             var jsonString;
 
             if (!_self.isConnected || _self.channel.readyState !== 'open') {
-                logger.error('Peer', _self.id, 'Attempt to send, but channel is not open!');
+                logger.error('Peer ' + _self.id, 'Attempt to send, but channel is not open!');
                 return;
             }
 
@@ -531,7 +525,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
          */
         this.synchronize = function () {
 
-            logger.log('Peer', _self.id, 'Synchronizing');
+            logger.log('Peer ' + _self.id, 'Synchronizing');
 
             if (project.network.synchronization.nodes.enabled) {
                 this.syncTimers.push(setInterval(project.network.synchronization.nodes.interval, this.getNodeList));
@@ -755,4 +749,5 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
 
     };
     return Peer;
-});
+})
+;

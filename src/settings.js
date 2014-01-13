@@ -44,7 +44,14 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
         maxWorkers: 1,
         fileStorageSize: 500 * 1024 * 1024, //500MB
         protocol: 'sctp', //srtp || sctp
-        stunServer: 'stun:stun.l.google.com:19302',
+        iceServers: [
+            {
+                'url': 'stun:stun.l.google.com:19302'
+            },
+            {
+                'url': 'stun:stun.turnservers.com:3478'
+            }
+        ],
         syncInterval: 3600000, //1h
         uuid: uuid.generate() //everyone will know (public)
     });

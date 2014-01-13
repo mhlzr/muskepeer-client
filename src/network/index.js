@@ -216,7 +216,7 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
                 uuid = e.uuid,
                 list;
 
-            logger.log('Peer', peer.id, 'Received', e.type);
+            logger.log('Peer ' + peer.id, 'Received', e.type);
 
             if (!e.type) {
                 logger.log('Network', 'peer:message without type received');
@@ -247,29 +247,29 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
                     break;
                 case 'node:list:push':
                     list = nodes.getMissingNodeUuidsAsArray(externalList);
-                    logger.log('Peer', peer.id, 'Result of node:sync', list.length);
+                    logger.log('Peer ' + peer.id, 'Result of node:sync', list.length);
                     peer.getNodeByUuid(list);
                     break;
                 case 'peer:list:push':
                     list = peers.getMissingPeerUuidsAsArray(externalList);
-                    logger.log('Peer', peer.id, 'Result of peer:sync', list.length);
+                    logger.log('Peer ' + peer.id, 'Result of peer:sync', list.length);
                     peer.getPeerByUuid(list);
                     break;
                 case 'file:list:push':
                     storage.getMissingFileUuidsAsArray(externalList).then(function (list) {
-                        logger.log('Peer', peer.id, 'Result of file:sync', list.length);
+                        logger.log('Peer ' + peer.id, 'Result of file:sync', list.length);
                         peer.getFileByUuid(list);
                     });
                     break;
                 case 'job:list:push':
                     storage.getMissingJobUuidsAsArray(externalList).then(function (list) {
-                        logger.log('Peer', peer.id, 'Result of job:sync', list.length);
+                        logger.log('Peer ' + peer.id, 'Result of job:sync', list.length);
                         peer.getJobByUuid(list);
                     });
                     break;
                 case 'result:list:push':
                     storage.getMissingResultUuidsAsArray(externalList).then(function (list) {
-                        logger.log('Peer', peer.id, 'Result of result:sync', list.length);
+                        logger.log('Peer ' + peer.id, 'Result of result:sync', list.length);
                         peer.getResultByUuid(list);
                     });
                     break;

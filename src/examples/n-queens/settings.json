@@ -15,7 +15,7 @@
 
         "solving": {
             "workerUrl": "https://www.muskepeer.net/examples/n-queens/worker.js",
-            "expectedAmount": 14200
+            "expectedAmount": 92
         }
     },
 

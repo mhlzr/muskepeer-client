@@ -286,13 +286,11 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
 
             return module.isComplete()
                 .then(function (isComplete) {
-
                     if (isComplete) {
+                        logger.log('Computation', 'All results found, stopping computation.');
                         // We're done here!
                         module.stop();
-                        logger.log('Computation', 'all results found, stopping computation.');
                     }
-
                 });
         }
 

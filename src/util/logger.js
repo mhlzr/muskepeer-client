@@ -5,11 +5,12 @@
  * @class Logger
  */
 
-define([], function () {
+define(['lodash'], function (_) {
 
     var MAX_MESSAGES = 50;
 
     var output = document.getElementsByTagName('output')[0],
+        htmlLogging = true,
         msgAmount = 0;
 
     /**
@@ -42,26 +43,24 @@ define([], function () {
             msgAmount = 0;
         }
 
+        var origin = args[0],
+            data = Array.prototype.slice.call(args, 1),
+            dataAsString = _.clone(data);
 
-        if (args.length === 1) {
-            output.innerHTML += getPrettyTimeStamp() + ' ' + args[0] + '<br/>';
-            console[type](getPrettyTimeStamp(), args[0]);
-        }
-        else if (args.length === 2) {
-            output.innerHTML += getPrettyTimeStamp() + ' ' + args[0] + ': ' + args[1] + '<br/>';
-            console[type](getPrettyTimeStamp(), args[0] + ':', args[1]);
-        }
-        else if (args.length === 3) {
-            output.innerHTML += getPrettyTimeStamp() + ' ' + args[0] + args[1] + ': ' + args[2] + '<br/>';
-            console[type](getPrettyTimeStamp(), args[0], args[1], ': ', args[2]);
-        }
-        else if (args.length === 4) {
-            output.innerHTML += getPrettyTimeStamp() + ' ' + args[0] + args[1] + ': ' + args[2] + ' ' + args[3] + '<br/>';
-            console[type](getPrettyTimeStamp(), args[0] + args[1] + ': ', args[2], args[3]);
-        }
-        else {
-            output.innerHTML += getPrettyTimeStamp() + ' ' + args + '<br/>';
-            console[type](getPrettyTimeStamp(), args);
+        //Console
+        console[type].apply(console, [getPrettyTimeStamp(), origin, ':'].concat(data));
+
+        //DOM
+        if (htmlLogging) {
+
+            dataAsString.forEach(function (el, id) {
+                if (_.isObject(el)) {
+                    dataAsString[id] = '<em style="color:blue">' + JSON.stringify(el) + '</em>';
+                }
+            });
+
+            output.innerHTML += getPrettyTimeStamp() + ' ' + '<strong style="color:red">' + origin + '</strong> : ' + dataAsString.join(' ') + '<br/>';
+
         }
 
         msgAmount++;
@@ -71,6 +70,23 @@ define([], function () {
 
 
     return {
+
+        /**
+         * @method disableHTMLLog
+         * @default true
+         */
+        disableHTMLLog: function () {
+            htmlLogging = false;
+        },
+
+
+        /**
+         * @method enableHTMLLog
+         * @default true
+         */
+        enableHTMLLog: function () {
+            htmlLogging = true;
+        },
 
         /**
          * Log some information
