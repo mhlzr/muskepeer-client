@@ -1,6 +1,6 @@
 /**
- * @author Matthieu Holzer
- * @date 17.10.13
+ * Module to generate and test UUIDs
+ *
  * @module Uuid
  * @class Uuid
  */
@@ -12,6 +12,7 @@ define(['node-uuid'], function (uuid) {
     return {
         /**
          * Generates an universally unique identifier
+         *
          * @method generate
          * @return {String} An Universally unique identifier v4
          * @see http://en.wikipedia.org/wiki/Universally_unique_identifier
@@ -22,6 +23,7 @@ define(['node-uuid'], function (uuid) {
 
         /**
          * Test if a uuid is valid
+         *
          * @method isValid
          * @param uuid
          * @returns {boolean}

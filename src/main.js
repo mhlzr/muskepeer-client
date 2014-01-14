@@ -24,9 +24,9 @@ require.config({
 
 require(['muskepeer-client', 'util/logger', 'domready'], function (Muskepeer, Logger) {
 
-    window.Muskepeer = Muskepeer.init();
-
     window.logger = Logger;
+
+    window.Muskepeer = Muskepeer.init();
 
     Muskepeer.start({
         project: 'https://www.muskepeer.net/examples/n-queens/settings.json',
@@ -42,7 +42,7 @@ require(['muskepeer-client', 'util/logger', 'domready'], function (Muskepeer, Lo
                 port: 8443
             }/*,
              {
-             host: '192.168.178.26',
+             host: '127.0.0.1',
              isSecure: false,
              port: 8080
              }*/
@@ -50,6 +50,6 @@ require(['muskepeer-client', 'util/logger', 'domready'], function (Muskepeer, Lo
         ]
     });
 
-    logger.log('Uuid', Muskepeer.settings.uuid);
+
 });
 

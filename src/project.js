@@ -1,10 +1,20 @@
 /**
+ * Represents the current project
+ *
+ * @module Project
  * @class Project
  */
 
 define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
 
-    // Defaults
+    /**
+     * Defaults project-settings
+     *
+     * @private
+     * @property defaults
+     * @type {Object}
+     *
+     * */
     var defaults = {
 
         "active": true,
@@ -87,12 +97,24 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
     };
 
 
+    /**
+     * @private
+     * @method isValidUrl
+     * @param url
+     * @returns {Boolean}
+     */
     function isValidUrl(url) {
-        // I think that's sufficient
+        // I think that's sufficient currently
         return new RegExp(/http(s)?/gi).test(url);
     }
 
 
+    /**
+     * @private
+     * @method downloadJSON
+     * @param url {String}
+     * @return {Promise}
+     */
     function downloadJSON(url) {
         var deferred = Q.defer();
 
@@ -127,7 +149,7 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
      * @private
      * @method combineWithDefaults
      * @param {Object} project
-     * @returns {Object}
+     * @return {Object}
      */
     function combineWithDefaults(project) {
         return mixing(project, defaults, {
@@ -137,6 +159,14 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
     }
 
     return {
+
+        /**
+         * Create project from object or url
+         *
+         * @method create
+         * @param {Object|String} config Object or url of json-file
+         * @return {Promise}
+         */
         create: function (config) {
 
             var self = this,

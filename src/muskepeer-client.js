@@ -115,6 +115,9 @@ define([
          * @return {Object}
          */
         init: function () {
+
+            logger.log('Uuid', this.settings.uuid);
+
             try {
                 var device = getDeviceCapabilities();
 

@@ -56,8 +56,6 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
         uuid: uuid.generate() //everyone will know (public)
     });
 
-    //storeSettingsToLocalStorage();
-
     return _settings;
 
 })

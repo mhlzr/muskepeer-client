@@ -1,8 +1,6 @@
 /**
- * Created by Matthieu Holzer on 15.10.13.
- * @module MuskepeerModule
- * @class MuskepeerModule
- * @constructor
+ *
+ *
  */
 define(['lodash', 'eventemitter2'], function (_, EventEmitter2) {
 
@@ -13,6 +11,10 @@ define(['lodash', 'eventemitter2'], function (_, EventEmitter2) {
         maxListeners: 10 // the max number of listeners that can be assigned to an event, defaults to 10.
     });
 
+    /**
+     * @class MuskepeerModule
+     * @constructor
+     */
     function Module() {
         var self = this;
         this.extend = function (obj) {
