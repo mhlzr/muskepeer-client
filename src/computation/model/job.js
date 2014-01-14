@@ -1,8 +1,11 @@
-/**
- * @class Job
- */
 define(['crypto/index', 'settings'], function (crypto, settings) {
 
+
+    /**
+     * @class Job
+     * @constructor
+     * @param {Object} parameters
+     */
     return function Job(parameters) {
 
         this.isLocked = false;

@@ -1,4 +1,5 @@
 /**
+ * @class Crypto
  * @module Crypto
  * @see  http://kjur.github.io/jsrsasign/sample-ecdsa.html
  */
@@ -11,6 +12,8 @@ define(['sjcl', 'jsrsasign', 'settings', 'project'], function (sjcl, jsrsasign, 
     return {
 
         /**
+         * Generate a hash from an Object using SHA256
+         *
          * @method hash
          * @param data
          * @return {String}
@@ -40,6 +43,8 @@ define(['sjcl', 'jsrsasign', 'settings', 'project'], function (sjcl, jsrsasign, 
         },
 
         /**
+         * Sign a message using Elliptic Curve DSA
+         *
          * @method sign
          * @param message
          * @return {String} signature
@@ -69,6 +74,8 @@ define(['sjcl', 'jsrsasign', 'settings', 'project'], function (sjcl, jsrsasign, 
         },
 
         /**
+         * Verify that a message and signature haven't been manipulated
+         *
          * @method verify
          * @param message
          * @param signature

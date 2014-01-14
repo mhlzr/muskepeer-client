@@ -1,6 +1,5 @@
 /**
  * @class Worker
- *
  */
 
 define(['eventemitter2'], function (EventEmitter) {

@@ -1,4 +1,6 @@
 # Ignore those
 .idea
 node_modules
+dist
 src/lib
+dist

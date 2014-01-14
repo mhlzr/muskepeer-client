@@ -1,15 +1,6 @@
 module.exports = function (grunt) {
 
 
-    /* Global Browser Paths for karma */
-    process.env['CHROME_BIN'] = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
-    process.env['FIREFOX_BIN'] = 'C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe';
-    process.env['OPERA_BIN'] = 'C:\\Program Files (x86)\\Opera\\launcher.exe';
-
-    process.env['BROWSER_STACK_USERNAME'] = 'MatthieuHolzer';
-    process.env['BROWSER_STACK_ACCESS_KEY'] = '2hdKPMJ1aRLkNAgoABJc';
-
-
     grunt.initConfig({
 
             pkg: grunt.file.readJSON('package.json'),
@@ -66,21 +57,6 @@ module.exports = function (grunt) {
                 }
             },
 
-            karma: {
-                'local-unit-once': {
-                    configFile: 'test/karma.local.unit.js'
-                },
-                'local-unit-watch': {
-                    autoWatch: true,
-                    configFile: 'test/karma.local.unit.js',
-                    singleRun: false
-                },
-                'remote-unit-once': {
-                    configFile: 'test/karma.remote.unit.js'
-                }
-
-            },
-
             requirejs: {
                 compile: {
                     options: {
@@ -131,7 +107,6 @@ module.exports = function (grunt) {
 // Load NPM Tasks
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-yuidoc');
@@ -139,11 +114,7 @@ module.exports = function (grunt) {
 
 // Default Task
     grunt.registerTask('default', ['watch']);
-    grunt.registerTask('test', ['karma:local-unit-watch']);
 
-// Testing Task
-    grunt.registerTask('test:local', ['karma:local-unit-once']);
-    grunt.registerTask('test:remote', ['karma:remote-unit-once']);
 
 // Documentation Task
     grunt.registerTask('doc', ['yuidoc']);

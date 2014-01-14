@@ -1,5 +1,6 @@
-musketeer-client
+muskepeer-client
 ================
 
-Connects to a musketeer-node via WebSocket, then creates connections to other musketeer-clients via WebRTC.
+Client for a browser-based grid computing network using WebRTC.
+
 

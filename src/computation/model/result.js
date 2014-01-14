@@ -1,9 +1,10 @@
-/**
- *
- * @class Result
- */
-
 define(['crypto/index', 'settings'], function (crypto, settings) {
+
+    /**
+     * @class Result
+     * @constructor
+     * @param {Object} data
+     */
     return function Result(data) {
 
         this.data = data.result;
