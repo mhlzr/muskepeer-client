@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src\storage\filesystem.js - muskepeer-client</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="muskepeer-client"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.0.1</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/Computation.html">Computation</a></li>
+            
+                <li><a href="../classes/Crypto.html">Crypto</a></li>
+            
+                <li><a href="../classes/Database.html">Database</a></li>
+            
+                <li><a href="../classes/FileSystem.html">FileSystem</a></li>
+            
+                <li><a href="../classes/GeoLocation.html">GeoLocation</a></li>
+            
+                <li><a href="../classes/Job.html">Job</a></li>
+            
+                <li><a href="../classes/Jobs.html">Jobs</a></li>
+            
+                <li><a href="../classes/Logger.html">Logger</a></li>
+            
+                <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
+            
+                <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
+            
+                <li><a href="../classes/Network.html">Network</a></li>
+            
+                <li><a href="../classes/Node.html">Node</a></li>
+            
+                <li><a href="../classes/Nodes.html">Nodes</a></li>
+            
+                <li><a href="../classes/Peer.html">Peer</a></li>
+            
+                <li><a href="../classes/Peers.html">Peers</a></li>
+            
+                <li><a href="../classes/Project.html">Project</a></li>
+            
+                <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Service.html">Service</a></li>
+            
+                <li><a href="../classes/Settings.html">Settings</a></li>
+            
+                <li><a href="../classes/Storage.html">Storage</a></li>
+            
+                <li><a href="../classes/Uuid.html">Uuid</a></li>
+            
+                <li><a href="../classes/Worker.html">Worker</a></li>
+            
+                <li><a href="../classes/Workers.html">Workers</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/Computation.html">Computation</a></li>
+            
+                <li><a href="../modules/Crypto.html">Crypto</a></li>
+            
+                <li><a href="../modules/Database.html">Database</a></li>
+            
+                <li><a href="../modules/FileSystem.html">FileSystem</a></li>
+            
+                <li><a href="../modules/GeoLocation.html">GeoLocation</a></li>
+            
+                <li><a href="../modules/Jobs.html">Jobs</a></li>
+            
+                <li><a href="../modules/Logger.html">Logger</a></li>
+            
+                <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
+            
+                <li><a href="../modules/Network.html">Network</a></li>
+            
+                <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Settings.html">Settings</a></li>
+            
+                <li><a href="../modules/Storage.html">Storage</a></li>
+            
+                <li><a href="../modules/Uuid.html">Uuid</a></li>
+            
+                <li><a href="../modules/Workers.html">Workers</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: src\storage\filesystem.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/**
+ * FileSystem
+ *
+ * @module FileSystem
+ * @class FileSystem
+ *
+ * @see http://www.html5rocks.com/de/tutorials/file/filesystem/
+ * @see https://gist.github.com/robnyman/1894032
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/URL.createObjectURL
+ * @see http://www.html5rocks.com/en/tutorials/file/filesystem/#toc-filesystemurls
+ *
+ */
+
+define([&#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;q&#x27;, &#x27;project&#x27;, &#x27;settings&#x27;], function (_, crypto, Q, project, settings) {
+
+    /**
+     * @final
+     * @property CHUNK_SIZE
+     * @type {Number}
+     */
+    var CHUNK_SIZE = 512;
+
+    var _self,
+        _db,
+        _fs;
+
+    /**
+     * Request access to the local fileSystem,
+     * will cause a user prompt at first attempt
+     *
+     * @private
+     * @method requestFileSystem
+     * @return {Promise}
+     */
+    function requestFileSystem() {
+        var deferred = Q.defer();
+
+        window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+
+        window.requestFileSystem(window.PERSISTENT, settings.fileStorageSize, deferred.resolve, function (error) {
+            deferred.reject(error);
+        });
+
+        return deferred.promise;
+    }
+
+    /**
+     * Request a specific stoage-quota
+     * will cause a user prompt at first attempt
+     *
+     * @private
+     * @method requestQuota
+     * @return {Promise}
+     */
+    function requestQuota() {
+        var deferred = Q.defer();
+
+        navigator.webkitPersistentStorage = navigator.webkitPersistentStorage || window.webkitStorageInfo;
+        navigator.webkitPersistentStorage.requestQuota(settings.fileStorageSize || 50 * 1024 * 1024, deferred.resolve, deferred.reject);
+
+        return deferred.promise;
+    }
+
+    /**
+     * Parse a fileName from an uri
+     *
+     * @private
+     * @method getFileNameFromUri
+     * @param {String} uri
+     * @return {String}
+     */
+    function getFileNameFromUri(uri) {
+        var regex = new RegExp(/[^\\/]+$/);
+        return uri.match(regex)[0];
+    }
+
+    /**
+     * Create a directory in filesystem
+     *
+     * @private
+     * @method createSubDirectory
+     * @param {String} dir
+     * @return {Promise}
+     */
+    function createSubDirectory(dir) {
+        var deferred = Q.defer();
+
+        _fs.root.getDirectory(dir, {create: true}, deferred.resolve, deferred.reject);
+
+        return deferred.promise;
+    }
+
+    /**
+     * Gets a file via XHR and returns a promise,
+     * resolve will contain a Blob
+     *
+     * @private
+     * @method download
+     *
+     * @param {Object} file
+     * @return {Promise}
+     *
+     */
+    function downloadViaXHR(file) {
+        var deferred = Q.defer(),
+            xhr = new XMLHttpRequest(),
+            data;
+
+        xhr.open(&#x27;GET&#x27;, file.uri, true);
+        xhr.responseType = &#x27;blob&#x27;;
+
+        xhr.addEventListener(&#x27;progress&#x27;, function (e) {
+
+            // Maybe somehow there will already be some chunks in here
+            if (e.target.response instanceof Blob) {
+                data = {
+                    blob: e.target.response,
+                    position: e.position,
+                    totalSize: e.totalSize
+                };
+            }
+            else {
+                // If not at least we can store these info
+                data = {totalSize: e.totalSize}
+            }
+
+            deferred.notify(data);
+        });
+
+        xhr.addEventListener(&#x27;load&#x27;, function (e) {
+
+            if (xhr.status === 200) {
+                data = {
+                    blob: e.target.response,
+                    position: e.position,
+                    totalSize: e.target.response.size
+                };
+                deferred.resolve(data);
+            } else {
+                deferred.reject(&#x27;Error downloading file&#x27;);
+            }
+
+        }, false);
+
+        xhr.send();
+
+        return deferred.promise;
+    }
+
+
+    /**
+     * Updates the list by getting the newest info from db
+     *
+     * @private
+     * @method updateFileList
+     * @return {Promise}
+     */
+    function updateFileList() {
+        return _self.getFileList()
+            .then(function (files) {
+                _self.list = files;
+            });
+    }
+
+
+    /**
+     * Converts a base64 String to a Blob
+     *
+     * @private
+     * @method base64toBlob
+     * @see http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
+     *
+     * @param {String} base64
+     * @param {String} [contentType]
+     *
+     * @return {Blob}
+     */
+    function base64oBlob(base64, contentType) {
+        contentType = contentType || &#x27;&#x27;;
+
+        var byteCharacters = atob(base64);
+        var byteArrays = [];
+
+        for (var offset = 0; offset &lt; byteCharacters.length; offset += CHUNK_SIZE) {
+            var slice = byteCharacters.slice(offset, offset + CHUNK_SIZE);
+
+            var byteNumbers = new Array(slice.length);
+            for (var i = 0; i &lt; slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            var byteArray = new Uint8Array(byteNumbers);
+
+            byteArrays.push(byteArray);
+        }
+
+        return new Blob(byteArrays, {type: contentType});
+
+    }
+
+
+    return {
+
+        /**
+         * List of related files in db,
+         * will always be updated automatically
+         *
+         * @property list
+         * @type {Array}
+         */
+        list: null,
+
+        /**
+         * Initialize fileStorage
+         *
+         * @chainable
+         * @method init
+         *
+         * @param db Instance of database submodule
+         * @return {Object}
+         */
+        init: function (db) {
+
+            _self = this;
+            _db = db;
+
+            return requestQuota()
+                .then(requestFileSystem)
+                .then(function (fileSystem) {
+                    _fs = fileSystem;
+                    if (!project.uuid) {
+                        logger.error(&#x27;Filesystem&#x27;, &#x27;No project uuid set, can not create dir!&#x27;);
+                        throw Error(&#x27;Filesystem&#x27;, &#x27;No project uuid set&#x27;);
+                    }
+                    return createSubDirectory(project.uuid);
+                })
+                .then(function () {
+                    return updateFileList();
+                });
+        },
+
+        /**
+         * Write a file/blob to the local filesystem
+         *
+         * @method write
+         *
+         * @param {Object} file
+         * @param {Blob|String} blob or base64-String
+         * @param {Number} [pos]
+         *
+         * @return {Promise}
+         */
+        write: function (file, blob, pos) {
+            var deferred = Q.defer(),
+                writtenBytes = 0,
+                isNewFile = true;
+
+            // Test if we need to convert from base64
+            if (!blob instanceof Blob) {
+                blob = base64oBlob(blob);
+            }
+
+            // Does the file exist in database?
+            _db.read(&#x27;files&#x27;, file.uuid, {uuidIsHash: true})
+                .then(function (fileInfo) {
+                    // Just to make sure, we have data that is up to date
+                    file = fileInfo;
+                    //Is it marked as complete?)
+                    if (!file || file.isComplete) {
+                        deferred.reject(&#x27;File does not exist, or is already complete&#x27;);
+                    }
+
+                    writtenBytes = file.position;
+                    isNewFile = writtenBytes === 0;
+
+                    // We won&#x27;t overwrite fileDate
+                    if (pos &lt; writtenBytes) {
+                        deferred.reject(&#x27;Position is lower than already written bytes!&#x27;);
+                    }
+                })
+                .then(function () {
+                    // Append bytes
+                    _fs.root.getFile(project.uuid + &#x27;/&#x27; + file.uuid, {create: isNewFile }, function (fileEntry) {
+
+                        fileEntry.createWriter(function (writer) {
+
+                            // Start at given position or EOF
+                            pos = pos || writer.length;
+                            writer.seek(pos);
+                            writer.write(blob);
+
+
+                        }, deferred.reject);
+
+                    }, deferred.reject);
+                })
+                .then(function () {
+                    // Update fileInfo in database
+                    var currentPosition = file.position + blob.size;
+                    return _db.update(&#x27;files&#x27;, {uuid: file.uuid, isComplete: currentPosition &gt;= file.size, position: currentPosition}, {uuidIsHash: true});
+                })
+                .then(updateFileList);
+
+
+            return deferred.promise;
+        },
+
+        /**
+         * Get a local url to a file in fileSystem
+         *
+         * @method readFileAsLocalUrl
+         * @param {Object} file
+         * @return {Promise}
+         */
+        readFileAsLocalUrl: function (file) {
+            var deferred = Q.defer();
+
+            _fs.root.getFile(project.uuid + &#x27;/&#x27; + file.uuid, {}, function (fileEntry) {
+                deferred.resolve(fileEntry.toURL());
+            }, deferred.reject);
+
+            return deferred.promise;
+        },
+
+
+        /**
+         * Read some chunks from the file, which will resul in a Blob-Instance.
+         * Chunk size is defined globally by CHUNK_SIZE.
+         *
+         * @param file
+         * @param offset
+         *
+         * @return {Promise}
+         */
+        readFileChunkAsBlob: function (file, offset) {
+            var deferred = Q.defer();
+
+            _fs.root.getFile(project.uuid + &#x27;/&#x27; + file.uuid, {}, function (fileEntry) {
+
+                fileEntry.file(function (file) {
+
+                    var start = offset || 0,
+                        end = start + CHUNK_SIZE,
+                        blob;
+
+                    // Every file has an end
+                    if (start + CHUNK_SIZE &gt; file.size) {
+                        end = file.size;
+                    }
+
+                    // Slice that file
+                    blob = file.slice(start, end);
+
+                    deferred.resolve(blob);
+
+
+                }, deferred.reject);
+
+
+            }, deferred.reject);
+
+            return deferred.promise;
+        },
+
+        /**
+         * Read some chunks from the file, which will be base64 encodded.
+         * Chunk size is defined globally by CHUNK_SIZE.
+         *
+         * @param {Object} file
+         * @param {Number} offset
+         * @return {Promise}
+         */
+        readFileChunkAsDataUrl: function (file, offset) {
+            var deferred = Q.defer();
+
+            _fs.root.getFile(project.uuid + &#x27;/&#x27; + file.uuid, {}, function (fileEntry) {
+
+                // Get a File object representing the file,
+                // then use FileReader to read its contents.
+                fileEntry.file(function (file) {
+
+                    var reader = new FileReader(),
+                        start = offset || 0,
+                        end = start + CHUNK_SIZE,
+                        blob, chunk;
+
+                    // Every file has an end
+                    if (start + CHUNK_SIZE &gt; file.size) {
+                        end = file.size;
+                    }
+
+                    // Slice that file
+                    blob = file.slice(start, end);
+
+                    reader.onloadend = function (e) {
+
+                        if (e.target.readyState === FileReader.DONE) {
+
+                            // Remove data attribute prefix
+                            chunk = reader.result.match(/,(.*)$/);
+
+                            if (chunk) {
+                                deferred.resolve(chunk[1]);
+                                reader = null;
+                            } else {
+                                deferred.reject();
+                            }
+
+                        } else {
+                            deferred.reject();
+                        }
+
+                    };
+
+                    reader.readAsDataURL(blob);
+
+                }, deferred.reject);
+
+
+            }, deferred.reject);
+
+            return deferred.promise;
+        },
+
+
+        /**
+         * Add file-entries to the storage database,
+         * not to the filesystem.
+         *
+         * @method add
+         * @param {Array|String} uris
+         * @return {Promise}
+         */
+        add: function (uris) {
+
+            var promises = [];
+
+            //just a single uri?
+            if (!_.isArray(uris)) {
+                uris = [uris];
+            }
+
+            uris.forEach(function (uri) {
+
+                var file = {
+                    name: getFileNameFromUri(uri),
+                    uri: uri,
+                    size: 0,
+                    position: 0,
+                    isComplete: false,
+                    uuid: crypto.hash(uri)
+                };
+
+                var promise = _db.read(&#x27;files&#x27;, file.uuid, {uuidIsHash: true})
+                    .then(function (result) {
+                        if (!result) {
+                            return _db.save(&#x27;files&#x27;, file, {allowDuplicates: false, uuidIsHash: true});
+                        }
+
+                    });
+
+                promises.push(promise);
+
+            });
+
+            return Q.all(promises).then(updateFileList);
+        },
+
+        /**
+         * Get an array of incomplete files from storage-database
+         *
+         * @method getListOfIncompleteFiles
+         * @return {Promise}
+         */
+        getIncompleteFileList: function () {
+            return _db.findAndReduceByObject(&#x27;files&#x27;, {filterDuplicates: false}, {projectUuid: project.uuid, isComplete: false});
+        },
+
+        /**
+         * Get an array of all files from storage-database
+         *
+         * @method getFileList
+         * @return {Promise}
+         */
+        getFileList: function () {
+            return _db.findAndReduceByObject(&#x27;files&#x27;, {filterDuplicates: false}, {projectUuid: project.uuid});
+        },
+
+
+        /**
+         * This will download all incomplete files from their urls.
+         * Should be used if you know, that there are no other peers in you pool,
+         * that can deliver the files you need.
+         *
+         * @method downloadIncompleteFiles
+         * @return [Promise}
+         */
+        downloadIncompleteFiles: function () {
+
+            // Get incomplete files from database
+            return this.getIncompleteFileList()
+                .then(function (files) {
+
+                    var promises = [];
+
+                    files.forEach(function (file) {
+
+                        var deferred = Q.defer();
+                        promises.push(deferred.promise);
+
+                        downloadViaXHR(file)
+                            .progress(function (data) {
+
+                                // We gort some chunks
+                                if (data.blob &amp;&amp; data.position) {
+                                    _db.update(&#x27;files&#x27;, {uuid: file.uuid, size: data.totalSize, position: data.position}, {uuidIsHash: true})
+                                        .then(function () {
+                                            _self.write(file, data.blob, data.position);
+                                        });
+                                }
+
+                                // We only got some info
+                                else {
+                                    _db.update(&#x27;files&#x27;, {uuid: file.uuid, size: data.totalSize}, {uuidIsHash: true})
+                                }
+
+                            })
+                            .catch(function (err) {
+                                logger.error(&#x27;FileSystem&#x27;, file.uri, &#x27;error during download!&#x27;);
+                            })
+                            .done(function (data) {
+
+                                logger.log(&#x27;FileSystem&#x27;, file.uri, &#x27;download complete!&#x27;);
+
+                                _db.update(&#x27;files&#x27;, {uuid: file.uuid, isComplete: true, position: data.blob.size, size: data.blob.size}, {uuidIsHash: true});
+
+                                _self.write(file, data.blob).then(updateFileList);
+
+                                deferred.resolve();
+
+                            });
+
+                    });
+
+                    return Q.all(promises);
+
+                });
+
+
+        },
+
+        /**
+         * Retrieve a filInfo object from storage (db) by uuid (hash).
+         *
+         * @method getFileInfoByUuid
+         *
+         * @param uuid
+         * @return {Object}
+         */
+        getFileInfoByUuid: function (uuid) {
+            return _db.read(&#x27;files&#x27;, uuid, {uuidIsHash: true});
+        },
+
+
+        /**
+         * Retrieve a fileInfo object from storage by url.
+         *
+         * @method getFileInfoByUri
+         *
+         * @param uri
+         * @return {Array} can be multiple files
+         */
+        getFileInfoByUri: function (uri) {
+            return _db.findAndReduceByObject(&#x27;files&#x27;, {}, {uri: uri});
+        },
+
+
+        /**
+         * Will delete all files/folders inside the project-dir recursively
+         * as well as the references (fileInfo) in database
+         *
+         * @method clear
+         * @return {Promise}
+         */
+        clear: function () {
+            var deferred = Q.defer();
+
+            // Delete form filesystem
+            _fs.root.getDirectory(project.uuid, {}, function (dirEntry) {
+
+                dirEntry.removeRecursively(function () {
+
+                    deferred.resolve();
+                }, deferred.reject);
+
+            }, deferred.reject);
+
+
+            return deferred.promise
+                .then(_self.getFileList)
+                .then(function (files) {
+                    var promises = [];
+
+                    //Delete from database
+                    files.forEach(function (file) {
+                        promises.push(_db.remove(&#x27;files&#x27;, file.uuid, {uuidIsHash: true}));
+                    });
+
+                    return Q.all(promises);
+                }).then(function () {
+                    logger.log(&#x27;FileStorage&#x27;, &#x27;removed all files/folders from file-system!&#x27;);
+                    return updateFileList();
+                });
+        }
+
+
+    };
+})
+;
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

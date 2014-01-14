@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src\network\collections\peers.js - muskepeer-client</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="muskepeer-client"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.0.1</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/Computation.html">Computation</a></li>
+            
+                <li><a href="../classes/Crypto.html">Crypto</a></li>
+            
+                <li><a href="../classes/Database.html">Database</a></li>
+            
+                <li><a href="../classes/FileSystem.html">FileSystem</a></li>
+            
+                <li><a href="../classes/GeoLocation.html">GeoLocation</a></li>
+            
+                <li><a href="../classes/Job.html">Job</a></li>
+            
+                <li><a href="../classes/Jobs.html">Jobs</a></li>
+            
+                <li><a href="../classes/Logger.html">Logger</a></li>
+            
+                <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
+            
+                <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
+            
+                <li><a href="../classes/Network.html">Network</a></li>
+            
+                <li><a href="../classes/Node.html">Node</a></li>
+            
+                <li><a href="../classes/Nodes.html">Nodes</a></li>
+            
+                <li><a href="../classes/Peer.html">Peer</a></li>
+            
+                <li><a href="../classes/Peers.html">Peers</a></li>
+            
+                <li><a href="../classes/Project.html">Project</a></li>
+            
+                <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Service.html">Service</a></li>
+            
+                <li><a href="../classes/Settings.html">Settings</a></li>
+            
+                <li><a href="../classes/Storage.html">Storage</a></li>
+            
+                <li><a href="../classes/Uuid.html">Uuid</a></li>
+            
+                <li><a href="../classes/Worker.html">Worker</a></li>
+            
+                <li><a href="../classes/Workers.html">Workers</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/Computation.html">Computation</a></li>
+            
+                <li><a href="../modules/Crypto.html">Crypto</a></li>
+            
+                <li><a href="../modules/Database.html">Database</a></li>
+            
+                <li><a href="../modules/FileSystem.html">FileSystem</a></li>
+            
+                <li><a href="../modules/GeoLocation.html">GeoLocation</a></li>
+            
+                <li><a href="../modules/Jobs.html">Jobs</a></li>
+            
+                <li><a href="../modules/Logger.html">Logger</a></li>
+            
+                <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
+            
+                <li><a href="../modules/Network.html">Network</a></li>
+            
+                <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Settings.html">Settings</a></li>
+            
+                <li><a href="../modules/Storage.html">Storage</a></li>
+            
+                <li><a href="../modules/Uuid.html">Uuid</a></li>
+            
+                <li><a href="../modules/Workers.html">Workers</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: src\network\collections\peers.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/**
+ * Collection for Peer-Instances
+ *
+ * @module Network
+ * @class Peers
+ *
+ */
+
+define([&#x27;q&#x27;, &#x27;lodash&#x27;, &#x27;settings&#x27;, &#x27;../geolocation&#x27;, &#x27;../../muskepeer-module&#x27;, &#x27;../model/peer&#x27;], function (Q, _, settings, geolocation, MuskepeerModule, Peer) {
+
+
+        var TIMEOUT_RETRY_TIME = 60000, //60s
+            MAX_RANDOM_ASSESSMENT_DELAY_TIME = 1500;
+
+        var module = new MuskepeerModule(),
+            _peers = [];
+
+
+        return module.extend({
+
+            /**
+             * @property list
+             * @type {Array}
+             */
+            list: _peers,
+
+            /**
+             * @method add
+             * @param peer
+             */
+            add: function (peer) {
+                if (!module.getPeerByUuid(peer.uuid)) {
+                    _peers.push(peer);
+                }
+            },
+
+            /**
+             * @method connect
+             * @param {Array} [peers]
+             * @return {Promise}
+             */
+            connect: function (peers) {
+
+                //pass peers, otherwise will take all
+                peers = peers || _peers;
+
+                var promises = [];
+
+                _.each(peers, function (peer) {
+
+                    // Never connect to null or self
+                    if (!peer || peer.uuid === settings.uuid) return;
+
+                    // No need to connect if already connected
+                    if (!peer.isConnected) {
+                        promises.push(peer.createConnection());
+                    }
+
+                });
+
+                return Q.all(promises);
+            },
+
+            /**
+             * @method connectToNeighbourPeers
+             * @return {Promise}
+             */
+            connectToNeighbourPeers: function () {
+                return module.connect(module.getNeighbourPeers());
+            },
+
+
+            /**
+             * @method getPeerByUuid
+             * @param {String} uuid
+             * @returns {Peer}
+             */
+            getPeerByUuid: function (uuid) {
+                return _.find(_peers, function (peer) {
+                    return peer.uuid === uuid;
+                });
+            },
+
+            /**
+             * @method getNeighbourPeers
+             * @return {Array}
+             */
+            getNeighbourPeers: function () {
+                // Assuming they are already sorted in a specific way
+                // e.g. geolocation-distance
+
+                // Remove all peers that had a timeout shortly
+                var peers = _peers.filter(function (peer) {
+                    // Timeout at all? &amp;&amp; Timeout was long ago
+                    return !peer.timeout || peer.timeout + TIMEOUT_RETRY_TIME &lt; Date.now();
+                });
+
+                return peers.slice(0, settings.maxPeers || 2);
+            },
+
+
+            /**
+             * Get all known Peers Uuids as an array
+             *
+             * @method getPeerUuidsAsArray
+             * @return {Array}
+             */
+            getPeerUuidsAsArray: function () {
+                return _.map(_peers, function (peer) {
+                    return peer.uuid;
+                })
+            },
+
+            /**
+             * Compare a list of given peers to the local one,
+             * return the ones that are missing locally.
+             *
+             * @method getPeerUugetMissingPeerUuidsAsArrayidsAsArray
+             * @param {Array} externalList
+             * @return {Array}
+             */
+
+            getMissingPeerUuidsAsArray: function (externalList) {
+                var internalList = module.getPeerUuidsAsArray();
+                // The external list will always include the uuid of this peer,
+                // so we add it herejust for the comparison
+                internalList.push(settings.uuid);
+                return _.difference(externalList, internalList);
+            },
+
+
+            /**
+             * @method update
+             * @param {Object} peerData
+             */
+            update: function (peerData) {
+
+                // Multidimensional array form multiple nodes needs to be flattened
+                peerData = _.flatten(peerData);
+
+                peerData.forEach(function (data) {
+
+                    //make sure it&#x27;s not self
+                    if (data.uuid === settings.uuid) return;
+
+                    //already got this one?
+                    var peer = module.getPeerByUuid(data.uuid);
+
+                    //already got this peer?
+                    if (peer) {
+                        //only add the node uuid
+                        peer.addNodes(data.nodes);
+                        return;
+                    }
+
+                    // Local id for debugging
+                    data.id = _peers.length + 1;
+
+                    // Save as new peer
+                    peer = new Peer(data);
+                    module.add(peer);
+
+                    // Pass-through events
+                    peer.onAny(function (e) {
+                        module.emit(this.event, e);
+                    });
+
+                    // Calculate geolocation distance
+                    peer.distance = geolocation.getDistanceBetweenTwoLocations(peer.location);
+
+                });
+
+
+                // Sort peers by their geolocation-distance
+                _peers = _.sortBy(_peers, function (peer) {
+                    return peer.distance;
+                });
+
+                // Update public list
+                this.list = _peers;
+            },
+
+
+            /**
+             * Broadcast data to peers using a RAD--time.
+             * Will exclude originPeerUuid from receivers if passed.
+             *
+             * @method broadcast
+             * @param type
+             * @param data
+             * @param {String} [originPeerUuid]
+             */
+            broadcast: function (type, data, originPeerUuid) {
+
+                var peers = module.getConnectedPeers();
+
+
+                // Remove own uuid from list and
+                // the peer we received the message from
+                peers = _.reject(peers, function (peer) {
+                    return peer.uuid === settings.uuid || peer.uuid === originPeerUuid;
+                });
+
+                // Nobody to broadcast to
+                if (peers.length === 0) {
+                    return;
+                }
+
+                if (!originPeerUuid) {
+                    logger.log(&#x27;Peers&#x27;, &#x27;Broadcasting&#x27;, type, &#x27;to&#x27;, peers.length, &#x27;peer(s)&#x27;);
+                }
+                else {
+                    logger.log(&#x27;Peers&#x27;, &#x27;Rebroadcasting&#x27;, type, &#x27;to&#x27;, peers.length, &#x27;peer(s)&#x27;);
+                }
+
+
+                // Broadcast to all connected peers
+                peers.forEach(function (peer) {
+                    // Get a RAD before broadcasting
+                    var rad = Math.random() * MAX_RANDOM_ASSESSMENT_DELAY_TIME;
+                    _.delay(peer.broadcast, rad, type, data);
+                });
+            },
+
+            /**
+             * Get a list of all peers to which there is an active connection.
+             *
+             * @method getConnectedPeers
+             *
+             * @return {Array}
+             */
+            getConnectedPeers: function () {
+                return _.where(_peers, {isConnected: true});
+            }
+
+        });
+    }
+);
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

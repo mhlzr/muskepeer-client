@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src\network\geolocation.js - muskepeer-client</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="muskepeer-client"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.0.1</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/Computation.html">Computation</a></li>
+            
+                <li><a href="../classes/Crypto.html">Crypto</a></li>
+            
+                <li><a href="../classes/Database.html">Database</a></li>
+            
+                <li><a href="../classes/FileSystem.html">FileSystem</a></li>
+            
+                <li><a href="../classes/GeoLocation.html">GeoLocation</a></li>
+            
+                <li><a href="../classes/Job.html">Job</a></li>
+            
+                <li><a href="../classes/Jobs.html">Jobs</a></li>
+            
+                <li><a href="../classes/Logger.html">Logger</a></li>
+            
+                <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
+            
+                <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
+            
+                <li><a href="../classes/Network.html">Network</a></li>
+            
+                <li><a href="../classes/Node.html">Node</a></li>
+            
+                <li><a href="../classes/Nodes.html">Nodes</a></li>
+            
+                <li><a href="../classes/Peer.html">Peer</a></li>
+            
+                <li><a href="../classes/Peers.html">Peers</a></li>
+            
+                <li><a href="../classes/Project.html">Project</a></li>
+            
+                <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Service.html">Service</a></li>
+            
+                <li><a href="../classes/Settings.html">Settings</a></li>
+            
+                <li><a href="../classes/Storage.html">Storage</a></li>
+            
+                <li><a href="../classes/Uuid.html">Uuid</a></li>
+            
+                <li><a href="../classes/Worker.html">Worker</a></li>
+            
+                <li><a href="../classes/Workers.html">Workers</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/Computation.html">Computation</a></li>
+            
+                <li><a href="../modules/Crypto.html">Crypto</a></li>
+            
+                <li><a href="../modules/Database.html">Database</a></li>
+            
+                <li><a href="../modules/FileSystem.html">FileSystem</a></li>
+            
+                <li><a href="../modules/GeoLocation.html">GeoLocation</a></li>
+            
+                <li><a href="../modules/Jobs.html">Jobs</a></li>
+            
+                <li><a href="../modules/Logger.html">Logger</a></li>
+            
+                <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
+            
+                <li><a href="../modules/Network.html">Network</a></li>
+            
+                <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Settings.html">Settings</a></li>
+            
+                <li><a href="../modules/Storage.html">Storage</a></li>
+            
+                <li><a href="../modules/Uuid.html">Uuid</a></li>
+            
+                <li><a href="../modules/Workers.html">Workers</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: src\network\geolocation.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/**
+ *
+ * @module GeoLocation
+ * @class GeoLocation
+ * @requires q, project
+ *
+ */
+
+define([&#x27;q&#x27;, &#x27;project&#x27;], function (Q, project) {
+
+    /**
+     * Earth-radius in kilometers
+     *
+     * @private
+     * @property EARH_RADIUS
+     * @type {Number}
+     * @readOnly
+     * @static
+     * @final
+     */
+    var EARTH_RADIUS = 6371;
+
+    /**
+     * Internal caching for the location object
+     * @private
+     * @property location
+     * @type Object
+     * @default null
+     */
+    var _location = null;
+
+    /**
+     * Convert angular-value to radian
+     * @method deg2grad
+     * @private
+     * @param deg {Number} Degrees
+     * @return {Number}
+     */
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+    }
+
+    return {
+
+        /**
+         * Asynchronously get the latitude/longitude of the device using the W3C-API
+         * @method getGeoLocation
+         * @return {Promise}
+         */
+        getGeoLocation: function () {
+
+            var deferred = Q.defer();
+
+            //don&#x27;t return the actual location
+            if (!project.network.useGeoLocation) {
+                deferred.resolve(null);
+            }
+
+            //already cached?
+            else if (project.network.useGeoLocation &amp;&amp; _location) {
+                deferred.resolve(_location);
+            }
+
+            //ask for it
+            else {
+                navigator.geolocation.getCurrentPosition(
+                    function success(position) {
+                        //caching
+                        _location = {
+                            lat: position.coords.latitude,
+                            long: position.coords.longitude
+                        };
+                        deferred.resolve(_location);
+                    },
+                    function error() {
+                        deferred.resolve(_location ? _location : null);
+                    },
+                    { enableHighAccuracy: true }
+                );
+            }
+
+            return deferred.promise;
+        },
+
+        /**
+         * Uses the Haversine formula to calculate the distance between two geoLocations
+         *
+         * @method getDistanceBetweenTwoLocations
+         * @see http://en.wikipedia.org/wiki/Haversine_formula
+         *
+         * @param {Object} position1
+         * @param {Number} position1.lat
+         * @param {Number} position1.long
+         * @param {Object} [position2]
+         * @param {Number} position2.lat
+         * @param {Number} position2.long
+         *
+         * @return [Number] distance in kilometers
+         */
+        getDistanceBetweenTwoLocations: function (position1, position2) {
+
+            position2 = position2 || _location;
+
+            var dLat = deg2rad(position2.lat - position2.lat),
+                dLon = deg2rad(position2.long - position1.long),
+
+                a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                    + Math.cos(deg2rad(position2.lat)) * Math.cos(deg2rad(position2.lat))
+                    * Math.sin(dLon / 2) * Math.sin(dLon / 2),
+
+                c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return EARTH_RADIUS * c;
+        }
+    };
+});
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

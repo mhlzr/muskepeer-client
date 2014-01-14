@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src\computation\index.js - muskepeer-client</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="muskepeer-client"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.0.1</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/Computation.html">Computation</a></li>
+            
+                <li><a href="../classes/Crypto.html">Crypto</a></li>
+            
+                <li><a href="../classes/Database.html">Database</a></li>
+            
+                <li><a href="../classes/FileSystem.html">FileSystem</a></li>
+            
+                <li><a href="../classes/GeoLocation.html">GeoLocation</a></li>
+            
+                <li><a href="../classes/Job.html">Job</a></li>
+            
+                <li><a href="../classes/Jobs.html">Jobs</a></li>
+            
+                <li><a href="../classes/Logger.html">Logger</a></li>
+            
+                <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
+            
+                <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
+            
+                <li><a href="../classes/Network.html">Network</a></li>
+            
+                <li><a href="../classes/Node.html">Node</a></li>
+            
+                <li><a href="../classes/Nodes.html">Nodes</a></li>
+            
+                <li><a href="../classes/Peer.html">Peer</a></li>
+            
+                <li><a href="../classes/Peers.html">Peers</a></li>
+            
+                <li><a href="../classes/Project.html">Project</a></li>
+            
+                <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Service.html">Service</a></li>
+            
+                <li><a href="../classes/Settings.html">Settings</a></li>
+            
+                <li><a href="../classes/Storage.html">Storage</a></li>
+            
+                <li><a href="../classes/Uuid.html">Uuid</a></li>
+            
+                <li><a href="../classes/Worker.html">Worker</a></li>
+            
+                <li><a href="../classes/Workers.html">Workers</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/Computation.html">Computation</a></li>
+            
+                <li><a href="../modules/Crypto.html">Crypto</a></li>
+            
+                <li><a href="../modules/Database.html">Database</a></li>
+            
+                <li><a href="../modules/FileSystem.html">FileSystem</a></li>
+            
+                <li><a href="../modules/GeoLocation.html">GeoLocation</a></li>
+            
+                <li><a href="../modules/Jobs.html">Jobs</a></li>
+            
+                <li><a href="../modules/Logger.html">Logger</a></li>
+            
+                <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
+            
+                <li><a href="../modules/Network.html">Network</a></li>
+            
+                <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Settings.html">Settings</a></li>
+            
+                <li><a href="../modules/Storage.html">Storage</a></li>
+            
+                <li><a href="../modules/Uuid.html">Uuid</a></li>
+            
+                <li><a href="../modules/Workers.html">Workers</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: src\computation\index.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/**
+ *
+ * @module Computation
+ * @class Computation
+ * @extends MuskepeerModule
+ */
+
+define([&#x27;q&#x27;, &#x27;muskepeer-module&#x27;, &#x27;../storage/index&#x27;, &#x27;../project&#x27;, &#x27;./collection/workers&#x27;, &#x27;crypto/index&#x27;, &#x27;./collection/jobs&#x27;, &#x27;./model/job&#x27;, &#x27;./model/result&#x27;], function (Q, MuskepeerModule, storage, project, workers, crypto, jobs, Job, Result) {
+
+        var module = new MuskepeerModule(),
+            resultCountInterval;
+
+
+        /**
+         * Create worker instances
+         *
+         * @private
+         * @method createWorkers
+         * @return {Promise}
+         */
+        function createWorkers() {
+
+            // No need for Workers
+            if (!project.computation.solving.enabled) {
+                logger.log(&#x27;Computation&#x27;, &#x27;Not using Workers!&#x27;);
+                return Q();
+            }
+            // Already initiated?
+            else if (workers.size !== 0) {
+                return Q();
+            }
+
+            // Instantiate workers
+            else {
+                logger.log(&#x27;Computation&#x27;, &#x27;Creating Workers&#x27;);
+                // Get the cached worker-script from local fileSystem
+                return storage.fs.getFileInfoByUri(project.computation.solving.workerUrl)
+                    .then(function (fileInfos) {
+                        return storage.fs.readFileAsLocalUrl(fileInfos[0]);
+                    })
+                    .then(function (localUrl) {
+                        workers.create(localUrl);
+                        addWorkerEventListeners();
+                    });
+            }
+
+        }
+
+
+        /**
+         * Create jobFactory
+         *
+         * @private
+         * @method createJobFactory
+         * @return {Promise}
+         */
+        function createJobFactory() {
+
+            // No need for a JobFactory
+            if (!project.computation.jobs.enabled) {
+                logger.log(&#x27;Computation&#x27;, &#x27;Not using JobFactory&#x27;);
+                return Q();
+            }
+
+            logger.log(&#x27;Computation&#x27;, &#x27;Creating JobFactory&#x27;);
+
+            // Instantiate JobFactory
+            return storage.fs.getFileInfoByUri(project.computation.jobs.factoryUrl)
+                .then(function (fileInfos) {
+                    return storage.fs.readFileAsLocalUrl(fileInfos[0]);
+                })
+                .then(function (localUrl) {
+                    module.jobFactory = new Worker(localUrl);
+                    addJobFactoryListeners();
+                    logger.log(&#x27;Computation&#x27;, &#x27;JobFactory started&#x27;);
+                });
+        }
+
+
+        /**
+         * @private
+         * @method addWorkerEventListeners
+         */
+        function addWorkerEventListeners() {
+            workers.on(&#x27;job:required&#x27;, workerJobRequiredHandler);
+            workers.on(&#x27;result:found&#x27;, workerResultFoundHandler);
+            workers.on(&#x27;result:required&#x27;, workerResultRequiredHandler);
+            workers.on(&#x27;file:required&#x27;, workerResultRequiredHandler);
+
+            // It&#x27;s possible, that during computing a Worker finds an (unsolved) job
+            workers.on(&#x27;job:found&#x27;, jobFactoryMessageHandler);
+            // Or even found a new file (created one)
+            workers.on(&#x27;file:found&#x27;, workerFileFoundHandler)
+        }
+
+        /**
+         * @private
+         * @method removeWorkerEventListeners
+         */
+        function removeWorkerEventListeners() {
+            workers.off(&#x27;job:required&#x27;, workerJobRequiredHandler);
+            workers.off(&#x27;result:found&#x27;, workerResultFoundHandler);
+            workers.off(&#x27;result:required&#x27;, workerResultRequiredHandler);
+            workers.off(&#x27;file:required&#x27;, workerResultRequiredHandler);
+            workers.off(&#x27;job:found&#x27;, jobFactoryMessageHandler);
+            workers.off(&#x27;file:found&#x27;, workerFileFoundHandler)
+        }
+
+        /**
+         * @private
+         * @method addJobFactoryListeners
+         */
+        function addJobFactoryListeners() {
+            module.jobFactory.addEventListener(&#x27;message&#x27;, jobFactoryMessageHandler);
+            module.jobFactory.addEventListener(&#x27;error&#x27;, jobFactoryErrorHandler);
+        }
+
+        /**
+         * @private
+         * @method removeJobFactoryListeners
+         */
+        function removeJobFactoryListeners() {
+            module.jobFactory.removeEventListener(&#x27;message&#x27;, jobFactoryMessageHandler);
+            module.jobFactory.removeEventListener(&#x27;error&#x27;, jobFactoryErrorHandler);
+        }
+
+
+        /**
+         * @private
+         * @method jobFactoryMessageHandler
+         */
+        function jobFactoryMessageHandler(message) {
+            var job = new Job(message.data);
+            // Add job to queue (if redundant it will be ignored)
+            jobs.add(job);
+        }
+
+        /**
+         * @private
+         * @method jobFactoryErrorHandler
+         */
+        function jobFactoryErrorHandler(error) {
+            logger.error(&#x27;JobFactory&#x27;, &#x27;an error occurred&#x27;);
+        }
+
+        /**
+         * @private
+         * @method workerResultRequiredHandler
+         */
+        function workerResultRequiredHandler(message) {
+
+            if (!message.data.uuid) return;
+
+            logger.log(&#x27;Worker &#x27; + message.id, &#x27;needs result &#x27; + message.data.uuid);
+
+            // Get result from storage
+            storage.db.read(&#x27;results&#x27;, message.data.uuid)
+                .then(function (result) {
+                    // Push to worker
+                    workers.getWorkerById(message.id).pushResult(result);
+                });
+
+        }
+
+        /**
+         * @private
+         * @method workerJobRequiredHandler
+         */
+        function workerJobRequiredHandler(message) {
+
+            // Specific job?
+            if (message.data &amp;&amp; message.data.uuid) {
+
+                logger.log(&#x27;Worker &#x27; + message.id, &#x27;needs specific job &#x27; + message.data.uuid);
+
+                jobs.getJobByUuid(message.data.uuid).then(function (job) {
+                    if (job) {
+                        // Push to worker
+                        workers.getWorkerById(message.id).pushJob(job);
+                    }
+                });
+            }
+            // Use next job in queue
+            else {
+                logger.log(&#x27;Worker &#x27; + message.id, &#x27;needs job&#x27;);
+
+                jobs.getNextAvailableJob().then(function (job) {
+
+                        if (!job) {
+                            logger.log(&#x27;Computation&#x27;, &#x27;No more jobs left!&#x27;);
+                            return;
+                        }
+
+                        //Lock job
+                        jobs.lockJob(job)
+                            .then(function () {
+
+                                // Need to publish lock?
+                                if (project.computation.jobs.lockJobsWhileSolving) {
+                                    module.emit(&#x27;job:lock&#x27;, {uuid: job.uuid})
+                                }
+
+                                // Send to worker
+                                workers.getWorkerById(message.id).pushJob(job);
+                            });
+
+                    }
+                );
+            }
+        }
+
+
+        /**
+         * @private
+         * @method workerResultFoundHandler
+         */
+        function workerResultFoundHandler(message) {
+
+            var result = new Result(message.data);
+
+
+            if (result.jobUuid) {
+                // Unlock the job
+                jobs.unlockJob({uuid: result.jobUuid}).then(function () {
+                    //TODO check iterations
+                    // Inform network
+                    module.emit(&#x27;job:finished&#x27;, {uuid: result.jobUuid});
+
+                    return jobs.markJobAsFinished({uuid: result.jobUuid});
+                });
+
+            }
+
+
+            // Already existent?
+            return storage.db.has(&#x27;results&#x27;, result.uuid, {uuidIsHash: true})
+                .then(function (resultInStorage) {
+                    var deferred = Q.defer();
+
+                    if (resultInStorage) {
+                        deferred.resolve(false);
+                        //result.iteration = resultInStorage.iteration + 1;
+                    }
+                    else {
+                        deferred.resolve(true);
+                    }
+                    return deferred.promise;
+                })
+                .then(function (isNew) {
+
+
+                    if (isNew) {
+
+                        // Inform network module which will broadcast/publish
+                        module.emit(&#x27;result:push&#x27;, result);
+
+                        // Store result to local database
+                        return storage.db.save(&#x27;results&#x27;, result, {uuidIsHash: true});
+
+                    }
+
+                    // Already did enough iterations, no need to save/update
+                    /*if (project.computation.validationIterations &gt; 0
+                     &amp;&amp; result.iteration &gt; project.computation.validationIterations) {
+                     return;
+                     }*/
+                });
+
+        }
+
+        /**
+         * @private
+         * @method workerFileFoundHandler
+         */
+        function workerFileFoundHandler(message) {
+            logger.log(&#x27;Worker &#x27; + message.id, &#x27;found a file&#x27;);
+        }
+
+
+        /**
+         * @private
+         * @method resultCountIntervalCompleteHandler
+         * @param e
+         */
+        function resultCountIntervalCompleteHandler(e) {
+
+            return module.isComplete()
+                .then(function (isComplete) {
+                    if (isComplete) {
+                        logger.log(&#x27;Computation&#x27;, &#x27;All results found, stopping computation.&#x27;);
+                        // We&#x27;re done here!
+                        module.stop();
+                    }
+                });
+        }
+
+
+        return module.extend({
+
+            /**
+             * @property {Boolean} isRunning
+             * @default false
+             */
+            isRunning: false,
+            /**
+             * @property {Boolean} isPaused
+             * @default false
+             */
+            isPaused: false,
+
+            /**
+             * @property {Object} jobs
+             */
+            jobs: jobs,
+
+            /**
+             * @property {Worker} jobFactory
+             */
+            jobFactory: null,
+
+            /**
+             * @method start
+             */
+            start: function () {
+
+                if (this.isRunning) return;
+
+                logger.log(&#x27;Computation&#x27;, &#x27;starting&#x27;);
+
+                createJobFactory()
+                    .then(createWorkers)
+                    .then(function () {
+                        // Start the jobFactory
+                        if (module.jobFactory) {
+                            module.jobFactory.postMessage({cmd: &#x27;start&#x27;});
+                        }
+
+                        // Start the workers
+                        workers.start();
+
+                        resultCountInterval = setInterval(resultCountIntervalCompleteHandler, project.computation.solving.resultCountTimeInterval);
+
+                    });
+
+                this.isRunning = true;
+                this.isPaused = false;
+
+            },
+            /**
+             * @method pause
+             */
+            pause: function () {
+                logger.log(&#x27;Computation&#x27;, &#x27;pause&#x27;);
+                workers.pause();
+                this.isPaused = true;
+            },
+            /**
+             * @method resume
+             */
+            resume: function () {
+                logger.log(&#x27;Computation&#x27;, &#x27;resume&#x27;);
+                workers.resume();
+                this.isPaused = false;
+            },
+            /**
+             * @method stop
+             */
+            stop: function () {
+
+                if (!this.isRunning) return;
+
+                logger.log(&#x27;Computation&#x27;, &#x27;stopping&#x27;);
+
+                if (this.jobFactory) {
+                    removeJobFactoryListeners();
+                    this.jobFactory.terminate();
+                    this.jobFactory = null;
+                }
+
+                clearInterval(resultCountInterval);
+                resultCountTimeInterval = null;
+
+                removeWorkerEventListeners();
+                workers.stop();
+
+                this.isRunning = false;
+            },
+
+            /**
+             * @method isComplete
+             * @return {Promise}
+             */
+            isComplete: function () {
+                return storage.db.count(&#x27;results&#x27;)
+                    .then(function (amount) {
+                        var deferred = Q.defer();
+
+                        logger.log(&#x27;Computation&#x27;, amount, &#x27;results&#x27;);
+
+                        // We don&#x27;t know how much to expect, so we can&#x27;t say
+                        if (!project.computation.solving.expectedAmount || !_.isFinite(project.computation.solving.expectedAmount)) {
+                            deferred.resolve(false);
+                        }
+
+                        // We already have all results?
+                        if (amount &gt;= project.computation.solving.expectedAmount) {
+                            deferred.resolve(true);
+                        }
+                        return deferred.promise;
+                    });
+
+            }
+
+        });
+
+    }
+
+)
+;
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

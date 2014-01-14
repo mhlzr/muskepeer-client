@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src\storage\database.js - muskepeer-client</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="muskepeer-client"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.0.1</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/Computation.html">Computation</a></li>
+            
+                <li><a href="../classes/Crypto.html">Crypto</a></li>
+            
+                <li><a href="../classes/Database.html">Database</a></li>
+            
+                <li><a href="../classes/FileSystem.html">FileSystem</a></li>
+            
+                <li><a href="../classes/GeoLocation.html">GeoLocation</a></li>
+            
+                <li><a href="../classes/Job.html">Job</a></li>
+            
+                <li><a href="../classes/Jobs.html">Jobs</a></li>
+            
+                <li><a href="../classes/Logger.html">Logger</a></li>
+            
+                <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
+            
+                <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
+            
+                <li><a href="../classes/Network.html">Network</a></li>
+            
+                <li><a href="../classes/Node.html">Node</a></li>
+            
+                <li><a href="../classes/Nodes.html">Nodes</a></li>
+            
+                <li><a href="../classes/Peer.html">Peer</a></li>
+            
+                <li><a href="../classes/Peers.html">Peers</a></li>
+            
+                <li><a href="../classes/Project.html">Project</a></li>
+            
+                <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Service.html">Service</a></li>
+            
+                <li><a href="../classes/Settings.html">Settings</a></li>
+            
+                <li><a href="../classes/Storage.html">Storage</a></li>
+            
+                <li><a href="../classes/Uuid.html">Uuid</a></li>
+            
+                <li><a href="../classes/Worker.html">Worker</a></li>
+            
+                <li><a href="../classes/Workers.html">Workers</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/Computation.html">Computation</a></li>
+            
+                <li><a href="../modules/Crypto.html">Crypto</a></li>
+            
+                <li><a href="../modules/Database.html">Database</a></li>
+            
+                <li><a href="../modules/FileSystem.html">FileSystem</a></li>
+            
+                <li><a href="../modules/GeoLocation.html">GeoLocation</a></li>
+            
+                <li><a href="../modules/Jobs.html">Jobs</a></li>
+            
+                <li><a href="../modules/Logger.html">Logger</a></li>
+            
+                <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
+            
+                <li><a href="../modules/Network.html">Network</a></li>
+            
+                <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Settings.html">Settings</a></li>
+            
+                <li><a href="../modules/Storage.html">Storage</a></li>
+            
+                <li><a href="../modules/Uuid.html">Uuid</a></li>
+            
+                <li><a href="../modules/Workers.html">Workers</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: src\storage\database.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/**
+ * Database
+ *
+ * @module Database
+ * @class Database
+ *
+ * @see https://github.com/jensarps/IDBWrapper
+ */
+
+define([&#x27;lodash&#x27;, &#x27;q&#x27;, &#x27;uuid&#x27;, &#x27;project&#x27;, &#x27;idbwrapper&#x27;], function (_, Q, uuid, project, IDBStore) {
+
+        var STORE_PREFIX = &#x27;Muskepeer-&#x27;,
+
+            ERRORS = {
+                DATA_MISSING: &#x27;Data is missing!&#x27;,
+                DATA_EMPTY: &#x27;Data is empty!&#x27;,
+                DATA_NOT_OBJECT: &#x27;Data is not an object!&#x27;,
+                UUID_MISSING: &#x27;Data uuid is missing!&#x27;,
+                UUID_INVALID: &#x27;Data uuid is invalid!&#x27;,
+                STORE_NOT_FOUND: &#x27;Store not found!&#x27;
+            };
+
+        var _self,
+            _stores = [];
+
+        /**
+         * Create needed indexedDB-Stores
+         * @private
+         * @method createStores
+         * @return {Promise}
+         */
+        function createStores() {
+            var storeNames = [&#x27;results&#x27;, &#x27;jobs&#x27;, &#x27;files&#x27;, &#x27;nodes&#x27;, &#x27;messages&#x27;],
+                promises = [];
+
+            var deferred;
+            storeNames.forEach(function (storeName) {
+                    deferred = Q.defer();
+
+                    //create store
+                    _stores.push(
+                        new IDBStore({
+                            autoIncrement: false,
+                            keyPath: &#x27;uuid&#x27;,
+                            storeName: storeName,
+                            storePrefix: STORE_PREFIX,
+                            indexes: [
+                                {
+                                    name: &#x27;project&#x27;,
+                                    keyPath: &#x27;projectUuid&#x27;,
+                                    unique: false,
+                                    multiEntry: true
+                                }
+                            ],
+                            onStoreReady: deferred.resolve,
+                            onError: deferred.reject
+
+                        })
+                    );
+
+                    //add promise
+                    promises.push(deferred.promise);
+                }
+
+            )
+            ;
+
+            return Q.all(promises);
+
+        }
+
+        /**
+         * @private
+         * @method getStoreByBame
+         * @param {String} name
+         * @return {Object}
+         */
+        function getStoreByName(name) {
+            return _.find(_stores, function (store) {
+                return store.storeName === name;
+            });
+        }
+
+        return {
+
+            init: function () {
+                _self = this;
+                return createStores();
+            },
+
+            /**
+             * Clear all data from stores
+             * @method clear
+             * @param {Array} [storeNames]
+             * @return {Promise}
+             */
+            clear: function (storeNames) {
+                var promises = [],
+                    stores = _stores;
+
+                if (storeNames) {
+                    stores = [];
+                    _stores.forEach(function (storeName) {
+                        stores.push(getStoreByName(storeName));
+                    });
+                }
+
+                stores.forEach(function (store) {
+                    var deferred = Q.defer();
+                    promises.push(deferred.promise);
+
+                    store.clear(deferred.resolve);
+
+                });
+
+                logger.log(&#x27;Database&#x27;, &#x27;cleared&#x27;);
+
+                return Q.all(promises);
+            },
+
+            /**
+             * Counts all entries in a store.
+             *
+             * @method count
+             * @param storeName
+             * @return promise
+             */
+            count: function (storeName) {
+                var deferred = Q.defer(),
+                    store = getStoreByName(storeName);
+
+                store.count(function (amount) {
+                    deferred.resolve(amount);
+
+                }, {});
+
+                return deferred.promise;
+            },
+
+            /**
+             * Read data by key from indexedDB
+             * @method read
+             * @param {String} storeName
+             * @param {String} key
+             * @param {Object} [options]
+             * @return {Promise}
+             */
+            read: function (storeName, key, options) {
+                var deferred = Q.defer(),
+                    store = getStoreByName(storeName);
+
+                options = options || {};
+
+                if (!store) {
+                    deferred.reject(ERRORS.STORE_NOT_FOUND);
+                    return deferred.promise;
+                }
+                else if (!options.uuidIsHash &amp;&amp; !uuid.isValid(key)) {
+                    deferred.reject(ERRORS.UUID_INVALID);
+                    return deferred.promise;
+                }
+
+                store.get(key, deferred.resolve, deferred.reject);
+
+                return deferred.promise;
+            },
+
+            /**
+             * List all items from a store
+             * @method list
+             *
+             * @param {String} storeName
+             * @param {Object} [options]
+             * @param {Object} [keyRangeOptions]
+             * @param {Object} [filterObject]
+             *
+             * @return {Promise}
+             */
+            list: function (storeName, options, keyRangeOptions, filterObject) {
+                var deferred = Q.defer(),
+                    store = getStoreByName(storeName),
+                    results = [],
+                    defaultOptions = {
+                        index: &#x27;project&#x27;,
+                        order: &#x27;ASC&#x27;,
+                        filterDuplicates: false,
+                        writeAccess: false,
+                        onEnd: function () {
+                            deferred.resolve(results)
+                        },
+                        onError: function (error) {
+                            deferred.reject(error);
+                        }
+                    };
+
+
+                //if nothing was passed
+                options = options || {};
+
+                //disallow overwriting callbacks from the outside
+                if (options &amp;&amp; options.onEnd) options.onEnd = undefined;
+                if (options &amp;&amp; options.onError) options.onError = undefined;
+
+                //merge with defaults
+                options = _.defaults(options, defaultOptions);
+
+                //add keyRange if passed
+                if (keyRangeOptions) {
+                    options.keyRange = store.makeKeyRange(keyRangeOptions);
+                }
+
+
+                store.iterate(function onItem(item) {
+
+                    //test/reduce the found objects
+                    if (filterObject) {
+                        for (var key in filterObject) {
+                            //does the property exist?
+                            if (!item.hasOwnProperty(key)) {
+                                return;
+                            }
+                            else {
+                                //do the values match?
+                                if (item[key] !== filterObject[key]) {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    deferred.notify(item);
+                    results.push(item);
+
+                }, options);
+
+                return deferred.promise;
+            },
+
+            /**
+             * Uses list() and reduces matches by indexedDB.keyranges
+             *
+             * @method findAndReduceByKeyRange
+             *
+             * @param {String} storeName
+             * @param {Object} options
+             * @param {Object} keyRangeOptions
+             * @return {Promise}
+             */
+            findAndReduceByKeyRange: function (storeName, options, keyRangeOptions) {
+                return this.list(storeName, options, keyRangeOptions);
+            },
+
+            /**
+             * Uses list() and reduces matches by a filterObject
+             *
+             * @method findAndReduceByObject
+             *
+             * @param {String} storeName
+             * @param {Object} options
+             * @param {Object} filterObject
+             * @return {Promise}
+             */
+            findAndReduceByObject: function (storeName, options, filterObject) {
+                return this.list(storeName, options, null, filterObject);
+            },
+
+            /**
+             * Save data to indexedDb, if not uuid is set it will be added automatically
+             *
+             * @method save
+             *
+             * @param {String} storeName
+             * @param {Object} data
+             * @param {Object} options
+             * @return {Promise}
+             */
+            save: function (storeName, data, options) {
+
+                options = options || {};
+
+                var deferred = Q.defer(),
+                    store;
+
+                //data is object?
+                if (!_.isObject(data)) {
+                    deferred.reject(ERRORS.DATA_NOT_OBJECT);
+                    return deferred.promise;
+                }
+
+                //data is not empty?
+                if (_.isEmpty(data)) {
+                    deferred.reject(ERRORS.DATA_EMPTY);
+                    return deferred.promise;
+                }
+
+                //data has uuid?
+                if (!options.uuidIsHash &amp;&amp; (!data.uuid || !uuid.isValid(data.uuid))) {
+                    data.uuid = uuid.generate();
+                }
+
+                //add project uuid
+                data.projectUuid = project.uuid;
+
+                store = getStoreByName(storeName);
+
+                //store found?
+                if (!store) {
+                    deferred.reject(ERRORS.STORE_NOT_FOUND);
+                    return deferred.promise;
+                }
+
+                //search if data is already existent
+                if (!options.allowDuplicates) {
+                    var clone = {};
+
+                    //can&#x27;t just Object.create/clone here, because you
+                    //can&#x27;t delete the uuid
+                    for (var key in data) {
+                        if (key !== &#x27;uuid&#x27; &amp;&amp; data.hasOwnProperty(key)) {
+                            clone[key] = data[key];
+                        }
+                    }
+                    _self.findAndReduceByObject(storeName, null, clone).then(function (results) {
+                        //not found in db
+                        if (_.isEmpty(results)) {
+                            //save
+                            store.put(data, deferred.resolve, function onError(e) {
+                                deferred.reject(e);
+                            })
+                        }
+                        //already got such an entry
+                        else {
+                            //nothing saved, but still not an error
+                            deferred.resolve();
+                        }
+                    });
+                }
+                else {
+                    //save without check
+                    store.put(data, deferred.resolve, deferred.reject);
+                }
+
+
+                return deferred.promise;
+
+            },
+
+            /**
+             * Save Mutiple objects to a shared store
+             *
+             * @method saveMultiple
+             *
+             * @param {String} storeName
+             * @param {Array} datasets
+             * @param {Object} options
+             * @return {Promise}
+             */
+            saveMultiple: function (storeName, datasets, options) {
+                var promises = [];
+                datasets.forEach(function (dataset) {
+                    promises.push(_self.save(storeName, dataset, options));
+                });
+
+                return Q.all(promises);
+            },
+
+            /**
+             * Remove an existing dataset
+             *
+             * @method remove
+             *
+             * @param {String} storeName
+             * @param {String} key
+             * @return {Promise}
+             */
+            remove: function (storeName, key) {
+                var deferred = Q.defer(),
+                    store = getStoreByName(storeName);
+
+                //store found?
+                if (!store) {
+                    deferred.reject(ERRORS.STORE_NOT_FOUND);
+                }
+                //remove
+                store.remove(key, deferred.resolve, deferred.reject);
+
+                return deferred.promise;
+            },
+
+            /**
+             * Update an existing dataset
+             *
+             * @method update
+             *
+             * @param storeName
+             * @param data
+             * @param options
+             * @returns {Promise}
+             */
+            update: function (storeName, data, options) {
+                var store = getStoreByName(storeName),
+                    deferred = Q.defer();
+
+                options = options || {};
+
+                //store found?
+                if (!store) {
+                    deferred.reject(ERRORS.STORE_NOT_FOUND);
+                    return deferred.promise;
+                }
+                //data is not empty?
+                else if (_.isEmpty(data)) {
+                    deferred.reject(ERRORS.DATA_EMPTY);
+                    return deferred.promise;
+                }
+                //check uuid
+                else if (!data.uuid) {
+                    deferred.reject(ERRORS.UUID_MISSING);
+                    return deferred.promise;
+                }
+                else if (!options.uuidIsHash &amp;&amp; !uuid.isValid(data.uuid)) {
+                    deferred.reject(ERRORS.UUID_INVALID);
+                    return deferred.promise;
+                }
+
+
+                //get data from store
+                this.read(storeName, data.uuid, options)
+                    //merge
+                    .then(function (existingData) {
+                        data = _.extend(existingData, data);
+                        store.put(data);
+                    })
+                    //save
+                    .then(function () {
+                        _self.save(storeName, data, options)
+                    })
+                    .done(function () {
+                        deferred.resolve(data);
+                    });
+
+
+                return deferred.promise;
+            },
+
+
+            /**
+             * Find out if a store has s specific dataset
+             *
+             * @method has
+             * @param {String} storeName
+             * @param {String} key
+             */
+            has: function (storeName, key) {
+                var deferred = Q.defer(),
+                    store = getStoreByName(storeName);
+
+                if (!store) {
+                    deferred.reject(ERRORS.STORE_NOT_FOUND);
+                    return deferred.promise;
+                }
+
+                store.get(key, function (result) {
+                    if (result) deferred.resolve(true);
+                    else  deferred.resolve(false);
+                }, deferred.reject);
+
+                return deferred.promise;
+            }
+
+        }
+    }
+)
+;
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

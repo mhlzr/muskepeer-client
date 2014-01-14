@@ -1,0 +1,3711 @@
+{
+    "project": {
+        "name": "muskepeer-client",
+        "description": "",
+        "version": "0.0.1"
+    },
+    "files": {
+        "src\\computation\\collection\\jobs.js": {
+            "name": "src\\computation\\collection\\jobs.js",
+            "modules": {
+                "Jobs": 1
+            },
+            "classes": {
+                "Jobs": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\computation\\collection\\workers.js": {
+            "name": "src\\computation\\collection\\workers.js",
+            "modules": {
+                "Workers": 1
+            },
+            "classes": {
+                "Workers": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\computation\\model\\job.js": {
+            "name": "src\\computation\\model\\job.js",
+            "modules": {},
+            "classes": {
+                "Job": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\computation\\model\\result.js": {
+            "name": "src\\computation\\model\\result.js",
+            "modules": {},
+            "classes": {
+                "Result": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\computation\\model\\worker.js": {
+            "name": "src\\computation\\model\\worker.js",
+            "modules": {},
+            "classes": {
+                "Worker": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\computation\\index.js": {
+            "name": "src\\computation\\index.js",
+            "modules": {
+                "Computation": 1
+            },
+            "classes": {
+                "Computation": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\crypto\\index.js": {
+            "name": "src\\crypto\\index.js",
+            "modules": {
+                "Crypto": 1
+            },
+            "classes": {
+                "Crypto": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\examples\\n-queens\\worker.js": {
+            "name": "src\\examples\\n-queens\\worker.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\network\\collections\\nodes.js": {
+            "name": "src\\network\\collections\\nodes.js",
+            "modules": {},
+            "classes": {
+                "Nodes": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\network\\collections\\peers.js": {
+            "name": "src\\network\\collections\\peers.js",
+            "modules": {},
+            "classes": {
+                "Peers": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\network\\model\\node.js": {
+            "name": "src\\network\\model\\node.js",
+            "modules": {},
+            "classes": {
+                "Node": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\network\\model\\peer.js": {
+            "name": "src\\network\\model\\peer.js",
+            "modules": {},
+            "classes": {
+                "Peer": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\network\\model\\service.js": {
+            "name": "src\\network\\model\\service.js",
+            "modules": {},
+            "classes": {
+                "Service": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\network\\geolocation.js": {
+            "name": "src\\network\\geolocation.js",
+            "modules": {
+                "GeoLocation": 1
+            },
+            "classes": {
+                "GeoLocation": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\network\\index.js": {
+            "name": "src\\network\\index.js",
+            "modules": {
+                "Network": 1
+            },
+            "classes": {
+                "Network": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\storage\\database.js": {
+            "name": "src\\storage\\database.js",
+            "modules": {
+                "Database": 1
+            },
+            "classes": {
+                "Database": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\storage\\filesystem.js": {
+            "name": "src\\storage\\filesystem.js",
+            "modules": {
+                "FileSystem": 1
+            },
+            "classes": {
+                "FileSystem": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\storage\\index.js": {
+            "name": "src\\storage\\index.js",
+            "modules": {
+                "Storage": 1
+            },
+            "classes": {
+                "Storage": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\util\\logger.js": {
+            "name": "src\\util\\logger.js",
+            "modules": {
+                "Logger": 1
+            },
+            "classes": {
+                "Logger": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\muskepeer-client.js": {
+            "name": "src\\muskepeer-client.js",
+            "modules": {
+                "MuskepeerClient": 1
+            },
+            "classes": {
+                "MuskepeerClient": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\muskepeer-module.js": {
+            "name": "src\\muskepeer-module.js",
+            "modules": {},
+            "classes": {
+                "MuskepeerModule": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\project.js": {
+            "name": "src\\project.js",
+            "modules": {
+                "Project": 1
+            },
+            "classes": {
+                "Project": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\settings.js": {
+            "name": "src\\settings.js",
+            "modules": {
+                "Settings": 1
+            },
+            "classes": {
+                "Settings": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\uuid.js": {
+            "name": "src\\uuid.js",
+            "modules": {
+                "Uuid": 1
+            },
+            "classes": {
+                "Uuid": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "Jobs": {
+            "name": "Jobs",
+            "submodules": {},
+            "classes": {
+                "Jobs": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\computation\\collection\\jobs.js",
+            "line": 1
+        },
+        "Workers": {
+            "name": "Workers",
+            "submodules": {},
+            "classes": {
+                "Workers": 1,
+                "Job": 1,
+                "Result": 1,
+                "Worker": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\computation\\model\\worker.js",
+            "line": 1
+        },
+        "Computation": {
+            "name": "Computation",
+            "submodules": {},
+            "classes": {
+                "Computation": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\computation\\index.js",
+            "line": 1,
+            "extends": "MuskepeerModule"
+        },
+        "Crypto": {
+            "name": "Crypto",
+            "submodules": {},
+            "classes": {
+                "Crypto": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\crypto\\index.js",
+            "line": 1
+        },
+        "Network": {
+            "name": "Network",
+            "submodules": {},
+            "classes": {
+                "Nodes": 1,
+                "Peers": 1,
+                "Node": 1,
+                "Peer": 1,
+                "Service": 1,
+                "Network": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\network\\index.js",
+            "line": 1,
+            "extends": "MuskepeerModule",
+            "uses": [
+                "window"
+            ],
+            "see": [
+                "http://www.html5rocks.com/en/mobile/workingoffthegrid/"
+            ]
+        },
+        "GeoLocation": {
+            "name": "GeoLocation",
+            "submodules": {},
+            "classes": {
+                "GeoLocation": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\network\\geolocation.js",
+            "line": 1,
+            "requires": [
+                "q",
+                "project"
+            ]
+        },
+        "Database": {
+            "name": "Database",
+            "submodules": {},
+            "classes": {
+                "Database": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\storage\\database.js",
+            "line": 1,
+            "description": "Database",
+            "see": [
+                "https://github.com/jensarps/IDBWrapper"
+            ]
+        },
+        "FileSystem": {
+            "name": "FileSystem",
+            "submodules": {},
+            "classes": {
+                "FileSystem": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\storage\\filesystem.js",
+            "line": 1,
+            "description": "FileSystem",
+            "see": [
+                "http://www.html5rocks.com/de/tutorials/file/filesystem/",
+                "https://gist.github.com/robnyman/1894032",
+                "https://developer.mozilla.org/en-US/docs/Web/API/URL.createObjectURL",
+                "http://www.html5rocks.com/en/tutorials/file/filesystem/#toc-filesystemurls"
+            ]
+        },
+        "Storage": {
+            "name": "Storage",
+            "submodules": {},
+            "classes": {
+                "Storage": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\storage\\index.js",
+            "line": 1,
+            "description": "Storage",
+            "extends": "MuskepeerModule"
+        },
+        "Logger": {
+            "name": "Logger",
+            "submodules": {},
+            "classes": {
+                "Logger": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\util\\logger.js",
+            "line": 1,
+            "author": "Matthieu Holzer",
+            "date": "12.11.13"
+        },
+        "MuskepeerClient": {
+            "name": "MuskepeerClient",
+            "submodules": {},
+            "classes": {
+                "MuskepeerClient": 1,
+                "MuskepeerModule": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\muskepeer-module.js",
+            "line": 14,
+            "author": "Matthieu Holzer",
+            "version": "0.1"
+        },
+        "Project": {
+            "name": "Project",
+            "submodules": {},
+            "classes": {
+                "Project": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\project.js",
+            "line": 1,
+            "description": "Represents the current project"
+        },
+        "Settings": {
+            "name": "Settings",
+            "submodules": {},
+            "classes": {
+                "Settings": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\settings.js",
+            "line": 1,
+            "description": "Store for User-Settings which will be saved/read from\nlocalStorage"
+        },
+        "Uuid": {
+            "name": "Uuid",
+            "submodules": {},
+            "classes": {
+                "Uuid": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\uuid.js",
+            "line": 1,
+            "description": "Module to generate and test UUIDs"
+        }
+    },
+    "classes": {
+        "Jobs": {
+            "name": "Jobs",
+            "shortname": "Jobs",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Jobs",
+            "file": "src\\computation\\collection\\jobs.js",
+            "line": 1
+        },
+        "Workers": {
+            "name": "Workers",
+            "shortname": "Workers",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Workers",
+            "namespace": "",
+            "file": "src\\computation\\collection\\workers.js",
+            "line": 1
+        },
+        "Job": {
+            "name": "Job",
+            "shortname": "Job",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Workers",
+            "namespace": "",
+            "file": "src\\computation\\model\\job.js",
+            "line": 4,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "parameters",
+                    "description": "",
+                    "type": "Object"
+                }
+            ]
+        },
+        "Result": {
+            "name": "Result",
+            "shortname": "Result",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Workers",
+            "namespace": "",
+            "file": "src\\computation\\model\\result.js",
+            "line": 3,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ]
+        },
+        "Worker": {
+            "name": "Worker",
+            "shortname": "Worker",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Workers",
+            "namespace": "",
+            "file": "src\\computation\\model\\worker.js",
+            "line": 1
+        },
+        "Computation": {
+            "name": "Computation",
+            "shortname": "Computation",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Computation",
+            "namespace": "",
+            "file": "src\\computation\\index.js",
+            "line": 1
+        },
+        "Crypto": {
+            "name": "Crypto",
+            "shortname": "Crypto",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Crypto",
+            "namespace": "",
+            "file": "src\\crypto\\index.js",
+            "line": 1,
+            "see": [
+                "http://kjur.github.io/jsrsasign/sample-ecdsa.html"
+            ]
+        },
+        "Nodes": {
+            "name": "Nodes",
+            "shortname": "Nodes",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Network",
+            "namespace": "",
+            "file": "src\\network\\collections\\nodes.js",
+            "line": 1,
+            "description": "Collection for Node-Instances"
+        },
+        "Peers": {
+            "name": "Peers",
+            "shortname": "Peers",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Network",
+            "namespace": "",
+            "file": "src\\network\\collections\\peers.js",
+            "line": 1,
+            "description": "Collection for Peer-Instances"
+        },
+        "Node": {
+            "name": "Node",
+            "shortname": "Node",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Network",
+            "namespace": "",
+            "file": "src\\network\\model\\node.js",
+            "line": 17,
+            "description": "A Node represents a WebSocketServer which is required\nfor signaling between Peers.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "config",
+                    "description": "",
+                    "type": "Object"
+                }
+            ]
+        },
+        "Peer": {
+            "name": "Peer",
+            "shortname": "Peer",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Network",
+            "namespace": "",
+            "file": "src\\network\\model\\peer.js",
+            "line": 47,
+            "description": "A Peer represents another Browser which is connected via\nWebRTCs DataChannel",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "config",
+                    "description": "",
+                    "type": "Object"
+                }
+            ]
+        },
+        "Service": {
+            "name": "Service",
+            "shortname": "Service",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Network",
+            "namespace": "",
+            "file": "src\\network\\model\\service.js",
+            "line": 9,
+            "description": "External  Service to store result data to\na service using HTTP and XHR.\nTested for parse.com",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object"
+                }
+            ]
+        },
+        "GeoLocation": {
+            "name": "GeoLocation",
+            "shortname": "GeoLocation",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "GeoLocation",
+            "namespace": "",
+            "file": "src\\network\\geolocation.js",
+            "line": 1
+        },
+        "Network": {
+            "name": "Network",
+            "shortname": "Network",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Network",
+            "namespace": "",
+            "file": "src\\network\\index.js",
+            "line": 1
+        },
+        "Database": {
+            "name": "Database",
+            "shortname": "Database",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Database",
+            "namespace": "",
+            "file": "src\\storage\\database.js",
+            "line": 1,
+            "description": "Database"
+        },
+        "FileSystem": {
+            "name": "FileSystem",
+            "shortname": "FileSystem",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "FileSystem",
+            "namespace": "",
+            "file": "src\\storage\\filesystem.js",
+            "line": 1,
+            "description": "FileSystem"
+        },
+        "Storage": {
+            "name": "Storage",
+            "shortname": "Storage",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Storage",
+            "namespace": "",
+            "file": "src\\storage\\index.js",
+            "line": 1,
+            "description": "Storage"
+        },
+        "Logger": {
+            "name": "Logger",
+            "shortname": "Logger",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Logger",
+            "namespace": "",
+            "file": "src\\util\\logger.js",
+            "line": 1,
+            "author": "Matthieu Holzer",
+            "date": "12.11.13"
+        },
+        "MuskepeerClient": {
+            "name": "MuskepeerClient",
+            "shortname": "MuskepeerClient",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "MuskepeerClient",
+            "namespace": "",
+            "file": "src\\muskepeer-client.js",
+            "line": 1,
+            "author": "Matthieu Holzer",
+            "version": "0.1"
+        },
+        "MuskepeerModule": {
+            "name": "MuskepeerModule",
+            "shortname": "MuskepeerModule",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "MuskepeerClient",
+            "namespace": "",
+            "file": "src\\muskepeer-module.js",
+            "line": 14,
+            "is_constructor": 1
+        },
+        "Project": {
+            "name": "Project",
+            "shortname": "Project",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Project",
+            "namespace": "",
+            "file": "src\\project.js",
+            "line": 1,
+            "description": "Represents the current project"
+        },
+        "Settings": {
+            "name": "Settings",
+            "shortname": "Settings",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Settings",
+            "namespace": "",
+            "file": "src\\settings.js",
+            "line": 1,
+            "description": "Store for User-Settings which will be saved/read from\nlocalStorage"
+        },
+        "Uuid": {
+            "name": "Uuid",
+            "shortname": "Uuid",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Uuid",
+            "namespace": "",
+            "file": "src\\uuid.js",
+            "line": 1,
+            "description": "Module to generate and test UUIDs"
+        }
+    },
+    "classitems": [
+        {
+            "file": "src\\computation\\collection\\jobs.js",
+            "line": 11,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "getJobsFromStorage",
+            "params": [
+                {
+                    "name": "filterFinished",
+                    "description": "",
+                    "type": "Boolean"
+                },
+                {
+                    "name": "filterLocked",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Jobs",
+            "module": "Jobs"
+        },
+        {
+            "file": "src\\computation\\collection\\jobs.js",
+            "line": 41,
+            "itemtype": "method",
+            "name": "add",
+            "params": [
+                {
+                    "name": "job",
+                    "description": "",
+                    "type": "Job"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Jobs",
+            "module": "Jobs"
+        },
+        {
+            "file": "src\\computation\\collection\\jobs.js",
+            "line": 66,
+            "itemtype": "method",
+            "name": "clear",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Jobs",
+            "module": "Jobs"
+        },
+        {
+            "file": "src\\computation\\collection\\jobs.js",
+            "line": 75,
+            "itemtype": "method",
+            "name": "getNextAvailableJob",
+            "return": {
+                "description": ""
+            },
+            "class": "Jobs",
+            "module": "Jobs"
+        },
+        {
+            "file": "src\\computation\\collection\\jobs.js",
+            "line": 99,
+            "itemtype": "method",
+            "name": "getJobByUuid",
+            "params": [
+                {
+                    "name": "uuid",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Jobs",
+            "module": "Jobs"
+        },
+        {
+            "file": "src\\computation\\collection\\jobs.js",
+            "line": 109,
+            "itemtype": "method",
+            "name": "lockJob",
+            "params": [
+                {
+                    "name": "job",
+                    "description": "",
+                    "type": "Job"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Jobs",
+            "module": "Jobs"
+        },
+        {
+            "file": "src\\computation\\collection\\jobs.js",
+            "line": 121,
+            "itemtype": "method",
+            "name": "unlockJob",
+            "params": [
+                {
+                    "name": "job",
+                    "description": "",
+                    "type": "Job"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Jobs",
+            "module": "Jobs"
+        },
+        {
+            "file": "src\\computation\\collection\\jobs.js",
+            "line": 133,
+            "itemtype": "method",
+            "name": "markJobAsFinished",
+            "params": [
+                {
+                    "name": "job",
+                    "description": "",
+                    "type": "Job"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Jobs",
+            "module": "Jobs"
+        },
+        {
+            "file": "src\\computation\\collection\\jobs.js",
+            "line": 142,
+            "itemtype": "method",
+            "name": "remove",
+            "params": [
+                {
+                    "name": "job",
+                    "description": "",
+                    "type": "Job"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Jobs",
+            "module": "Jobs"
+        },
+        {
+            "file": "src\\computation\\collection\\workers.js",
+            "line": 14,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "workerEventHandler",
+            "params": [
+                {
+                    "name": "e",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Workers",
+            "module": "Workers"
+        },
+        {
+            "file": "src\\computation\\collection\\workers.js",
+            "line": 31,
+            "description": "Amount of worker-instances",
+            "itemtype": "property",
+            "name": "size",
+            "class": "Workers",
+            "module": "Workers"
+        },
+        {
+            "file": "src\\computation\\collection\\workers.js",
+            "line": 38,
+            "itemtype": "method",
+            "name": "create",
+            "params": [
+                {
+                    "name": "url",
+                    "description": "Worker-Script",
+                    "type": "String"
+                }
+            ],
+            "class": "Workers",
+            "module": "Workers"
+        },
+        {
+            "file": "src\\computation\\collection\\workers.js",
+            "line": 57,
+            "itemtype": "method",
+            "name": "getWorkerById",
+            "params": [
+                {
+                    "name": "id",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Worker"
+            },
+            "class": "Workers",
+            "module": "Workers"
+        },
+        {
+            "file": "src\\computation\\collection\\workers.js",
+            "line": 66,
+            "itemtype": "method",
+            "name": "start",
+            "class": "Workers",
+            "module": "Workers"
+        },
+        {
+            "file": "src\\computation\\collection\\workers.js",
+            "line": 81,
+            "itemtype": "method",
+            "name": "stop",
+            "class": "Workers",
+            "module": "Workers"
+        },
+        {
+            "file": "src\\computation\\collection\\workers.js",
+            "line": 97,
+            "itemtype": "method",
+            "name": "pause",
+            "class": "Workers",
+            "module": "Workers"
+        },
+        {
+            "file": "src\\computation\\collection\\workers.js",
+            "line": 106,
+            "itemtype": "method",
+            "name": "resume",
+            "class": "Workers",
+            "module": "Workers"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 14,
+            "description": "Create worker instances",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "createWorkers",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 50,
+            "description": "Create jobFactory",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "createJobFactory",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 80,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "addWorkerEventListeners",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 96,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "removeWorkerEventListeners",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 109,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "addJobFactoryListeners",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 118,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "removeJobFactoryListeners",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 128,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "jobFactoryMessageHandler",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 138,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "jobFactoryErrorHandler",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 146,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "workerResultRequiredHandler",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 165,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "workerJobRequiredHandler",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 213,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "workerResultFoundHandler",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 271,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "workerFileFoundHandler",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 280,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "resultCountIntervalCompleteHandler",
+            "params": [
+                {
+                    "name": "e",
+                    "description": ""
+                }
+            ],
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 300,
+            "itemtype": "property",
+            "name": "isRunning",
+            "type": "Boolean",
+            "default": "false",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 305,
+            "itemtype": "property",
+            "name": "isPaused",
+            "type": "Boolean",
+            "default": "false",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 311,
+            "itemtype": "property",
+            "name": "jobs",
+            "type": "Object",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 316,
+            "itemtype": "property",
+            "name": "jobFactory",
+            "type": "Worker",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 321,
+            "itemtype": "method",
+            "name": "start",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 349,
+            "itemtype": "method",
+            "name": "pause",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 357,
+            "itemtype": "method",
+            "name": "resume",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 365,
+            "itemtype": "method",
+            "name": "stop",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 389,
+            "itemtype": "method",
+            "name": "isComplete",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\crypto\\index.js",
+            "line": 14,
+            "description": "Generate a hash from an Object using SHA256",
+            "itemtype": "method",
+            "name": "hash",
+            "params": [
+                {
+                    "name": "data",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "Crypto",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\crypto\\index.js",
+            "line": 27,
+            "itemtype": "method",
+            "name": "isValidPublicKey",
+            "params": [
+                {
+                    "name": "key",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "Crypto",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\crypto\\index.js",
+            "line": 36,
+            "itemtype": "method",
+            "name": "isValidPrivateKey",
+            "params": [
+                {
+                    "name": "key",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "Crypto",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\crypto\\index.js",
+            "line": 45,
+            "description": "Sign a message using Elliptic Curve DSA",
+            "itemtype": "method",
+            "name": "sign",
+            "params": [
+                {
+                    "name": "message",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "signature",
+                "type": "String"
+            },
+            "class": "Crypto",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\crypto\\index.js",
+            "line": 76,
+            "description": "Verify that a message and signature haven't been manipulated",
+            "itemtype": "method",
+            "name": "verify",
+            "params": [
+                {
+                    "name": "message",
+                    "description": ""
+                },
+                {
+                    "name": "signature",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "Crypto",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\examples\\n-queens\\worker.js",
+            "line": 1,
+            "description": "Simple Brute-Force-Algorithm to solve the\nn-queens problem. It will produce distinct solutions.",
+            "class": "Nodes",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\network\\collections\\nodes.js",
+            "line": 16,
+            "itemtype": "property",
+            "name": "list",
+            "type": "{Array}",
+            "class": "Nodes",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\nodes.js",
+            "line": 22,
+            "itemtype": "method",
+            "name": "connect",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Nodes",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\nodes.js",
+            "line": 38,
+            "itemtype": "method",
+            "name": "update",
+            "params": [
+                {
+                    "name": "nodeData",
+                    "description": "",
+                    "type": "Array"
+                }
+            ],
+            "class": "Nodes",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\nodes.js",
+            "line": 61,
+            "itemtype": "method",
+            "name": "getNodeByUrl",
+            "params": [
+                {
+                    "name": "url",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Node"
+            },
+            "class": "Nodes",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\nodes.js",
+            "line": 72,
+            "itemtype": "method",
+            "name": "getNodeUuidsAsArray",
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "class": "Nodes",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\nodes.js",
+            "line": 82,
+            "itemtype": "method",
+            "name": "getMissingNodeUuidsAsArray",
+            "params": [
+                {
+                    "name": "externalList",
+                    "description": "",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "class": "Nodes",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\nodes.js",
+            "line": 93,
+            "itemtype": "method",
+            "name": "getNodeByUuid",
+            "params": [
+                {
+                    "name": "uuid",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Node"
+            },
+            "class": "Nodes",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\nodes.js",
+            "line": 104,
+            "itemtype": "method",
+            "name": "authenticate",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Nodes",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\nodes.js",
+            "line": 128,
+            "itemtype": "method",
+            "name": "getRelatedPeers",
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "class": "Nodes",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\peers.js",
+            "line": 21,
+            "itemtype": "property",
+            "name": "list",
+            "type": "{Array}",
+            "class": "Peers",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\peers.js",
+            "line": 27,
+            "itemtype": "method",
+            "name": "add",
+            "params": [
+                {
+                    "name": "peer",
+                    "description": ""
+                }
+            ],
+            "class": "Peers",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\peers.js",
+            "line": 37,
+            "itemtype": "method",
+            "name": "connect",
+            "params": [
+                {
+                    "name": "peers",
+                    "description": "",
+                    "type": "Array",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Peers",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\peers.js",
+            "line": 64,
+            "itemtype": "method",
+            "name": "connectToNeighbourPeers",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Peers",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\peers.js",
+            "line": 73,
+            "itemtype": "method",
+            "name": "getPeerByUuid",
+            "params": [
+                {
+                    "name": "uuid",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Peer"
+            },
+            "class": "Peers",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\peers.js",
+            "line": 84,
+            "itemtype": "method",
+            "name": "getNeighbourPeers",
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "class": "Peers",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\peers.js",
+            "line": 102,
+            "description": "Get all known Peers Uuids as an array",
+            "itemtype": "method",
+            "name": "getPeerUuidsAsArray",
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "class": "Peers",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\peers.js",
+            "line": 114,
+            "description": "Compare a list of given peers to the local one,\nreturn the ones that are missing locally.",
+            "itemtype": "method",
+            "name": "getPeerUugetMissingPeerUuidsAsArrayidsAsArray",
+            "params": [
+                {
+                    "name": "externalList",
+                    "description": "",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "class": "Peers",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\peers.js",
+            "line": 132,
+            "itemtype": "method",
+            "name": "update",
+            "params": [
+                {
+                    "name": "peerData",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Peers",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\peers.js",
+            "line": 184,
+            "description": "Broadcast data to peers using a RAD--time.\nWill exclude originPeerUuid from receivers if passed.",
+            "itemtype": "method",
+            "name": "broadcast",
+            "params": [
+                {
+                    "name": "type",
+                    "description": ""
+                },
+                {
+                    "name": "data",
+                    "description": ""
+                },
+                {
+                    "name": "originPeerUuid",
+                    "description": "",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "class": "Peers",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\collections\\peers.js",
+            "line": 225,
+            "description": "Get a list of all peers to which there is an active connection.",
+            "itemtype": "method",
+            "name": "getConnectedPeers",
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "class": "Peers",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\node.js",
+            "line": 46,
+            "itemtype": "method",
+            "name": "connect",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Node",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\node.js",
+            "line": 90,
+            "itemtype": "method",
+            "name": "",
+            "chainable": 1,
+            "return": {
+                "description": "",
+                "type": "Node"
+            },
+            "class": "Node",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 69,
+            "itemtype": "property",
+            "name": "connection",
+            "type": "{RTCPeerCpnnection}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 75,
+            "itemtype": "property",
+            "name": "channel",
+            "type": "{RTCDataChannel}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 81,
+            "description": "Indicates if there is a stable conenction to this peer",
+            "itemtype": "property",
+            "name": "isConnected",
+            "default": "false",
+            "type": "{Boolean}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 89,
+            "description": "Whether this peer is the initiator of a connection",
+            "itemtype": "property",
+            "name": "isSource",
+            "default": "false",
+            "type": "{Boolean}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 97,
+            "description": "Whether this peer is the initiator of a connection",
+            "itemtype": "property",
+            "name": "isTarget",
+            "default": "false",
+            "type": "{Boolean}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 105,
+            "description": "Universal unique identifier for this peer",
+            "itemtype": "property",
+            "name": "uuid",
+            "type": "{String}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 112,
+            "description": "Geolocation of this peer",
+            "itemtype": "property",
+            "name": "location",
+            "type": "{Object}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 119,
+            "description": "Distance to this peer in kilometers",
+            "itemtype": "property",
+            "name": "distance",
+            "default": "undefined",
+            "type": "{Number}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 127,
+            "description": "Uuids of the nodes this peer is connected to,\nused to find a signaling-channel.",
+            "itemtype": "property",
+            "name": "nodes",
+            "type": "{Array}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 136,
+            "description": "A timestamp to prove when the last timout\noccured when trying to connect to the peer.",
+            "itemtype": "property",
+            "name": "timeout",
+            "default": "undefined",
+            "type": "{Number}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 145,
+            "description": "List of timers for synchronization",
+            "type": "{Array}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 152,
+            "description": "Amount of queuedmessages that could not be sent",
+            "itemtype": "property",
+            "name": "queuedMessageAmount",
+            "default": "0",
+            "type": "{Number}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 162,
+            "description": "Indicator to tell which protocol is currently used\nSCTP or SRTP",
+            "itemtype": "property",
+            "name": "protocol",
+            "default": "undefined",
+            "type": "{String}",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 198,
+            "description": "Find a signaling-channel two a given peer",
+            "itemtype": "method",
+            "name": "getSignalChannel",
+            "return": {
+                "description": "",
+                "type": "Node"
+            },
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 218,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "timerCompleteHandler",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 338,
+            "description": "Create a WebRTC-Connection",
+            "itemtype": "method",
+            "name": "createConnection",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 391,
+            "itemtype": "method",
+            "name": "answerOffer",
+            "params": [
+                {
+                    "name": "data",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 435,
+            "description": "Accept a WebRTC-Connection",
+            "itemtype": "method",
+            "name": "acceptConnection",
+            "params": [
+                {
+                    "name": "data",
+                    "description": ""
+                }
+            ],
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 450,
+            "description": "Add candidate info to connection",
+            "itemtype": "method",
+            "name": "addCandidate",
+            "params": [
+                {
+                    "name": "data",
+                    "description": ""
+                }
+            ],
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 460,
+            "description": "Save a reference to a node",
+            "itemtype": "method",
+            "name": "addNodes",
+            "params": [
+                {
+                    "name": "nodeUuids",
+                    "description": "List of nodeUuids",
+                    "type": "Array"
+                }
+            ],
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 477,
+            "description": "Send data via a WebRTC-Channel to a peer",
+            "itemtype": "method",
+            "name": "send",
+            "params": [
+                {
+                    "name": "data",
+                    "description": ""
+                }
+            ],
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 523,
+            "itemtype": "method",
+            "name": "synchronize",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 719,
+            "itemtype": "method",
+            "name": "serialize",
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 732,
+            "itemtype": "method",
+            "name": "broadcast",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\peer.js",
+            "line": 740,
+            "itemtype": "method",
+            "name": "disconnect",
+            "class": "Peer",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\service.js",
+            "line": 28,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "serialize",
+            "params": [
+                {
+                    "name": "mapping",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "Service",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\model\\service.js",
+            "line": 46,
+            "itemtype": "method",
+            "name": "save",
+            "params": [
+                {
+                    "name": "data",
+                    "description": ""
+                }
+            ],
+            "class": "Service",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\geolocation.js",
+            "line": 11,
+            "description": "Earth-radius in kilometers",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "property",
+            "name": "EARH_RADIUS",
+            "type": "{Number}",
+            "readonly": "",
+            "static": 1,
+            "final": 1,
+            "class": "GeoLocation",
+            "module": "GeoLocation"
+        },
+        {
+            "file": "src\\network\\geolocation.js",
+            "line": 23,
+            "description": "Internal caching for the location object",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "property",
+            "name": "location",
+            "type": "Object",
+            "default": "null",
+            "class": "GeoLocation",
+            "module": "GeoLocation"
+        },
+        {
+            "file": "src\\network\\geolocation.js",
+            "line": 32,
+            "description": "Convert angular-value to radian",
+            "itemtype": "method",
+            "name": "deg2grad",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "deg",
+                    "description": "Degrees",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "class": "GeoLocation",
+            "module": "GeoLocation"
+        },
+        {
+            "file": "src\\network\\geolocation.js",
+            "line": 45,
+            "description": "Asynchronously get the latitude/longitude of the device using the W3C-API",
+            "itemtype": "method",
+            "name": "getGeoLocation",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "GeoLocation",
+            "module": "GeoLocation"
+        },
+        {
+            "file": "src\\network\\geolocation.js",
+            "line": 85,
+            "description": "Uses the Haversine formula to calculate the distance between two geoLocations",
+            "itemtype": "method",
+            "name": "getDistanceBetweenTwoLocations",
+            "see": [
+                "http://en.wikipedia.org/wiki/Haversine_formula"
+            ],
+            "params": [
+                {
+                    "name": "position1",
+                    "description": "",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "lat",
+                            "description": "",
+                            "type": "Number"
+                        },
+                        {
+                            "name": "long",
+                            "description": "",
+                            "type": "Number"
+                        }
+                    ]
+                },
+                {
+                    "name": "position2",
+                    "description": "",
+                    "type": "Object",
+                    "optional": true,
+                    "props": [
+                        {
+                            "name": "lat",
+                            "description": "",
+                            "type": "Number"
+                        },
+                        {
+                            "name": "long",
+                            "description": "",
+                            "type": "Number"
+                        }
+                    ]
+                }
+            ],
+            "return": {
+                "description": "[Number] distance in kilometers"
+            },
+            "class": "GeoLocation",
+            "module": "GeoLocation"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 27,
+            "description": "Event-Handler, called when Network state changes",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "networkConnectivityStateChangeHandler",
+            "params": [
+                {
+                    "name": "e",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 43,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "registerExternalServices",
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 59,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "masterMessageHandler",
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 87,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "isValidMasterMessage",
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 114,
+            "description": "Event-Handler, gets called when another Peer sends an offer\nIf the Peer is not yet in the Peers-Collection, it will be created and added.\nThen the answering process gets initialized.",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "peerOfferHandler",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 144,
+            "description": "Event-Handler, gets called when another Peer sends an answer to an offer",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "peerAnswerHandler",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 156,
+            "description": "Event-Handler, gets called when another Peer sends candidate-data.\nAdds the candidate-data to the Peer it came from",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "peerCandidateHandler",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 170,
+            "description": "Event-Handler, gets called when a Peer-connection is completely established.",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "peerConnectedHandler",
+            "params": [
+                {
+                    "name": "peer",
+                    "description": "",
+                    "type": "Peer"
+                }
+            ],
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 181,
+            "description": "Event-Handler, gets called when a Peer-connection is closed.\nCauses a reconnect to nearest Peers if needed.",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "peerDisconnectHandler",
+            "params": [
+                {
+                    "name": "e",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 195,
+            "description": "Event-Handler, gets called when a Peer-connection\ncan't be established after a specific time interval and a timeout occured.",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "peerTimeoutHandler",
+            "params": [
+                {
+                    "name": "e",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 208,
+            "description": "Event-Handler, gets called when a Peer receives a message.",
+            "params": [
+                {
+                    "name": "e",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 352,
+            "description": "Determine if the client is on-/offline",
+            "itemtype": "property",
+            "name": "isOnline",
+            "type": "Boolean",
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 363,
+            "description": "Start the network-module",
+            "itemtype": "method",
+            "name": "start",
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 415,
+            "description": "Stop the network module",
+            "itemtype": "method",
+            "name": "stop",
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 425,
+            "itemtype": "method",
+            "name": "publish",
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\network\\index.js",
+            "line": 440,
+            "itemtype": "method",
+            "name": "broadcastMasterMessage",
+            "params": [
+                {
+                    "name": "type",
+                    "description": ""
+                },
+                {
+                    "name": "data",
+                    "description": ""
+                }
+            ],
+            "class": "Network",
+            "module": "Network"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 26,
+            "description": "Create needed indexedDB-Stores",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "createStores",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 72,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "getStoreByBame",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 91,
+            "description": "Clear all data from stores",
+            "itemtype": "method",
+            "name": "clear",
+            "params": [
+                {
+                    "name": "storeNames",
+                    "description": "",
+                    "type": "Array",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 121,
+            "description": "Counts all entries in a store.",
+            "itemtype": "method",
+            "name": "count",
+            "params": [
+                {
+                    "name": "storeName",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "promise"
+            },
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 140,
+            "description": "Read data by key from indexedDB",
+            "itemtype": "method",
+            "name": "read",
+            "params": [
+                {
+                    "name": "storeName",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "key",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 168,
+            "description": "List all items from a store",
+            "itemtype": "method",
+            "name": "list",
+            "params": [
+                {
+                    "name": "storeName",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object",
+                    "optional": true
+                },
+                {
+                    "name": "keyRangeOptions",
+                    "description": "",
+                    "type": "Object",
+                    "optional": true
+                },
+                {
+                    "name": "filterObject",
+                    "description": "",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 238,
+            "description": "Uses list() and reduces matches by indexedDB.keyranges",
+            "itemtype": "method",
+            "name": "findAndReduceByKeyRange",
+            "params": [
+                {
+                    "name": "storeName",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "keyRangeOptions",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 252,
+            "description": "Uses list() and reduces matches by a filterObject",
+            "itemtype": "method",
+            "name": "findAndReduceByObject",
+            "params": [
+                {
+                    "name": "storeName",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "filterObject",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 266,
+            "description": "Save data to indexedDb, if not uuid is set it will be added automatically",
+            "itemtype": "method",
+            "name": "save",
+            "params": [
+                {
+                    "name": "storeName",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 347,
+            "description": "Save Mutiple objects to a shared store",
+            "itemtype": "method",
+            "name": "saveMultiple",
+            "params": [
+                {
+                    "name": "storeName",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "datasets",
+                    "description": "",
+                    "type": "Array"
+                },
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 366,
+            "description": "Remove an existing dataset",
+            "itemtype": "method",
+            "name": "remove",
+            "params": [
+                {
+                    "name": "storeName",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "key",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 389,
+            "description": "Update an existing dataset",
+            "itemtype": "method",
+            "name": "update",
+            "params": [
+                {
+                    "name": "storeName",
+                    "description": ""
+                },
+                {
+                    "name": "data",
+                    "description": ""
+                },
+                {
+                    "name": "options",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\database.js",
+            "line": 446,
+            "description": "Find out if a store has s specific dataset",
+            "itemtype": "method",
+            "name": "has",
+            "params": [
+                {
+                    "name": "storeName",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "key",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "Database",
+            "module": "Database"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 16,
+            "final": 1,
+            "itemtype": "property",
+            "name": "CHUNK_SIZE",
+            "type": "{Number}",
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 27,
+            "description": "Request access to the local fileSystem,\nwill cause a user prompt at first attempt",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "requestFileSystem",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 47,
+            "description": "Request a specific stoage-quota\nwill cause a user prompt at first attempt",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "requestQuota",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 64,
+            "description": "Parse a fileName from an uri",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "getFileNameFromUri",
+            "params": [
+                {
+                    "name": "uri",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 77,
+            "description": "Create a directory in filesystem",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "createSubDirectory",
+            "params": [
+                {
+                    "name": "dir",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 93,
+            "description": "Gets a file via XHR and returns a promise,\nresolve will contain a Blob",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "download",
+            "params": [
+                {
+                    "name": "file",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 151,
+            "description": "Updates the list by getting the newest info from db",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "updateFileList",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 166,
+            "description": "Converts a base64 String to a Blob",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "base64toBlob",
+            "see": [
+                "http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript"
+            ],
+            "params": [
+                {
+                    "name": "base64",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "contentType",
+                    "description": "",
+                    "type": "String",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Blob"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 204,
+            "description": "List of related files in db,\nwill always be updated automatically",
+            "itemtype": "property",
+            "name": "list",
+            "type": "{Array}",
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 213,
+            "description": "Initialize fileStorage",
+            "chainable": 1,
+            "itemtype": "method",
+            "name": "init",
+            "params": [
+                {
+                    "name": "db",
+                    "description": "Instance of database submodule"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 242,
+            "description": "Write a file/blob to the local filesystem",
+            "itemtype": "method",
+            "name": "write",
+            "params": [
+                {
+                    "name": "file",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "blob",
+                    "description": "or base64-String",
+                    "type": "Blob|String"
+                },
+                {
+                    "name": "pos",
+                    "description": "",
+                    "type": "Number",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 308,
+            "description": "Get a local url to a file in fileSystem",
+            "itemtype": "method",
+            "name": "readFileAsLocalUrl",
+            "params": [
+                {
+                    "name": "file",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 326,
+            "description": "Read some chunks from the file, which will resul in a Blob-Instance.\nChunk size is defined globally by CHUNK_SIZE.",
+            "params": [
+                {
+                    "name": "file",
+                    "description": ""
+                },
+                {
+                    "name": "offset",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 365,
+            "description": "Read some chunks from the file, which will be base64 encodded.\nChunk size is defined globally by CHUNK_SIZE.",
+            "params": [
+                {
+                    "name": "file",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "offset",
+                    "description": "",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 426,
+            "description": "Add file-entries to the storage database,\nnot to the filesystem.",
+            "itemtype": "method",
+            "name": "add",
+            "params": [
+                {
+                    "name": "uris",
+                    "description": "",
+                    "type": "Array|String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 469,
+            "description": "Get an array of incomplete files from storage-database",
+            "itemtype": "method",
+            "name": "getListOfIncompleteFiles",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 479,
+            "description": "Get an array of all files from storage-database",
+            "itemtype": "method",
+            "name": "getFileList",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 490,
+            "description": "This will download all incomplete files from their urls.\nShould be used if you know, that there are no other peers in you pool,\nthat can deliver the files you need.",
+            "itemtype": "method",
+            "name": "downloadIncompleteFiles",
+            "return": {
+                "description": "[Promise}"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 552,
+            "description": "Retrieve a filInfo object from storage (db) by uuid (hash).",
+            "itemtype": "method",
+            "name": "getFileInfoByUuid",
+            "params": [
+                {
+                    "name": "uuid",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 565,
+            "description": "Retrieve a fileInfo object from storage by url.",
+            "itemtype": "method",
+            "name": "getFileInfoByUri",
+            "params": [
+                {
+                    "name": "uri",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "can be multiple files",
+                "type": "Array"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 578,
+            "description": "Will delete all files/folders inside the project-dir recursively\nas well as the references (fileInfo) in database",
+            "itemtype": "method",
+            "name": "clear",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\index.js",
+            "line": 14,
+            "description": "Get all uuids from the documents stored in a specific store",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "getUuidListFromStore",
+            "params": [
+                {
+                    "name": "storeName",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Storage",
+            "module": "Storage"
+        },
+        {
+            "file": "src\\storage\\index.js",
+            "line": 36,
+            "description": "Get the internalList from storage and compare to a given list of uuids.\nOnly the difference from both lists will be returned.\nUsed for synchronization of two peers.",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "getDifferenceFromStoreAndExternalList",
+            "params": [
+                {
+                    "name": "storeName",
+                    "description": ""
+                },
+                {
+                    "name": "externalList",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Storage",
+            "module": "Storage"
+        },
+        {
+            "file": "src\\storage\\index.js",
+            "line": 61,
+            "description": "Initialize Storage Module",
+            "itemtype": "method",
+            "name": "init",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Storage",
+            "module": "Storage"
+        },
+        {
+            "file": "src\\storage\\index.js",
+            "line": 82,
+            "itemtype": "property",
+            "name": "isReady",
+            "type": "{Boolean}",
+            "class": "Storage",
+            "module": "Storage"
+        },
+        {
+            "file": "src\\storage\\index.js",
+            "line": 91,
+            "description": "Get a list of all files (their uuids) from storage",
+            "itemtype": "method",
+            "name": "getFileUuidsAsArray",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Storage",
+            "module": "Storage"
+        },
+        {
+            "file": "src\\storage\\index.js",
+            "line": 101,
+            "description": "Get a list of all jobs (their uuids) from storage",
+            "itemtype": "method",
+            "name": "getJobUuidsAsArray",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Storage",
+            "module": "Storage"
+        },
+        {
+            "file": "src\\storage\\index.js",
+            "line": 111,
+            "description": "Get a list of all results (their uuids) from storage",
+            "itemtype": "method",
+            "name": "getResultUuidsAsArray",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Storage",
+            "module": "Storage"
+        },
+        {
+            "file": "src\\storage\\index.js",
+            "line": 122,
+            "description": "Compare internalList and externalList of files",
+            "itemtype": "method",
+            "name": "getMissingFileUuidsAsArray",
+            "params": [
+                {
+                    "name": "externalList",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Storage",
+            "module": "Storage"
+        },
+        {
+            "file": "src\\storage\\index.js",
+            "line": 134,
+            "description": "Compare internalList and externalList of jobs",
+            "itemtype": "method",
+            "name": "getMissingJobUuidsAsArray",
+            "params": [
+                {
+                    "name": "externalList",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Storage",
+            "module": "Storage"
+        },
+        {
+            "file": "src\\storage\\index.js",
+            "line": 146,
+            "description": "Compare internalList and externalList of results",
+            "itemtype": "method",
+            "name": "getMissingResultUuidsAsArray",
+            "params": [
+                {
+                    "name": "externalList",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Storage",
+            "module": "Storage"
+        },
+        {
+            "file": "src\\util\\logger.js",
+            "line": 16,
+            "description": "Create a timestamp ( format : HH::MM:SS )",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "getPrettyTimeStamp",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "Logger",
+            "module": "Logger"
+        },
+        {
+            "file": "src\\util\\logger.js",
+            "line": 74,
+            "itemtype": "method",
+            "name": "disableHTMLLog",
+            "default": "true",
+            "class": "Logger",
+            "module": "Logger"
+        },
+        {
+            "file": "src\\util\\logger.js",
+            "line": 83,
+            "itemtype": "method",
+            "name": "enableHTMLLog",
+            "default": "true",
+            "class": "Logger",
+            "module": "Logger"
+        },
+        {
+            "file": "src\\util\\logger.js",
+            "line": 91,
+            "description": "Log some information",
+            "itemtype": "method",
+            "name": "log",
+            "params": [
+                {
+                    "name": "msg",
+                    "description": "",
+                    "type": "*"
+                },
+                {
+                    "name": "desc",
+                    "description": "",
+                    "type": "*",
+                    "optional": true
+                },
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "*",
+                    "optional": true
+                }
+            ],
+            "class": "Logger",
+            "module": "Logger"
+        },
+        {
+            "file": "src\\util\\logger.js",
+            "line": 104,
+            "description": "Log a warning",
+            "itemtype": "method",
+            "name": "warn",
+            "params": [
+                {
+                    "name": "msg",
+                    "description": "",
+                    "type": "*"
+                },
+                {
+                    "name": "desc",
+                    "description": "",
+                    "type": "*",
+                    "optional": true
+                },
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "*",
+                    "optional": true
+                }
+            ],
+            "class": "Logger",
+            "module": "Logger"
+        },
+        {
+            "file": "src\\util\\logger.js",
+            "line": 117,
+            "description": "Log an error",
+            "itemtype": "method",
+            "name": "error",
+            "params": [
+                {
+                    "name": "msg",
+                    "description": "",
+                    "type": "*"
+                },
+                {
+                    "name": "desc",
+                    "description": "",
+                    "type": "*",
+                    "optional": true
+                },
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "*",
+                    "optional": true
+                }
+            ],
+            "class": "Logger",
+            "module": "Logger"
+        },
+        {
+            "file": "src\\muskepeer-client.js",
+            "line": 21,
+            "description": "Simple feature testing of the application requirements\nas a lot of the used technologies are still working drafts\nand for from standard",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "getDeviceCapabilities",
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "MuskepeerClient",
+            "module": "MuskepeerClient"
+        },
+        {
+            "file": "src\\muskepeer-client.js",
+            "line": 68,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "coupleModules",
+            "class": "MuskepeerClient",
+            "module": "MuskepeerClient"
+        },
+        {
+            "file": "src\\muskepeer-client.js",
+            "line": 91,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "decoupleModules",
+            "class": "MuskepeerClient",
+            "module": "MuskepeerClient"
+        },
+        {
+            "file": "src\\muskepeer-client.js",
+            "line": 110,
+            "description": "Initiate muskepeer",
+            "itemtype": "method",
+            "name": "init",
+            "chainable": 1,
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "MuskepeerClient",
+            "module": "MuskepeerClient"
+        },
+        {
+            "file": "src\\muskepeer-client.js",
+            "line": 137,
+            "description": "Start muskepeer",
+            "itemtype": "method",
+            "name": "start",
+            "chainable": 1,
+            "params": [
+                {
+                    "name": "config",
+                    "description": "Configuration-Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "MuskepeerClient",
+            "module": "MuskepeerClient"
+        },
+        {
+            "file": "src\\muskepeer-client.js",
+            "line": 199,
+            "description": "Stop muskepeer",
+            "itemtype": "method",
+            "name": "stop",
+            "chainable": 1,
+            "class": "MuskepeerClient",
+            "module": "MuskepeerClient"
+        },
+        {
+            "file": "src\\muskepeer-module.js",
+            "line": 1,
+            "class": "MuskepeerModule",
+            "module": "MuskepeerClient"
+        },
+        {
+            "file": "src\\project.js",
+            "line": 10,
+            "description": "Defaults project-settings",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "property",
+            "name": "defaults",
+            "type": "{Object}",
+            "class": "Project",
+            "module": "Project"
+        },
+        {
+            "file": "src\\project.js",
+            "line": 100,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "isValidUrl",
+            "params": [
+                {
+                    "name": "url",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "Project",
+            "module": "Project"
+        },
+        {
+            "file": "src\\project.js",
+            "line": 112,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "downloadJSON",
+            "params": [
+                {
+                    "name": "url",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Project",
+            "module": "Project"
+        },
+        {
+            "file": "src\\project.js",
+            "line": 146,
+            "description": "Combines passed project settings with defaults",
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "combineWithDefaults",
+            "params": [
+                {
+                    "name": "project",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "class": "Project",
+            "module": "Project"
+        },
+        {
+            "file": "src\\project.js",
+            "line": 163,
+            "description": "Create project from object or url",
+            "itemtype": "method",
+            "name": "create",
+            "params": [
+                {
+                    "name": "config",
+                    "description": "Object or url of json-file",
+                    "type": "Object|String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Project",
+            "module": "Project"
+        },
+        {
+            "file": "src\\settings.js",
+            "line": 15,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "readSettingsFromLocalStorage",
+            "return": {
+                "description": "Settings",
+                "type": "Object"
+            },
+            "class": "Settings",
+            "module": "Settings"
+        },
+        {
+            "file": "src\\settings.js",
+            "line": 24,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "storeSettingsToLocalStorage",
+            "class": "Settings",
+            "module": "Settings"
+        },
+        {
+            "file": "src\\uuid.js",
+            "line": 13,
+            "description": "Generates an universally unique identifier",
+            "itemtype": "method",
+            "name": "generate",
+            "return": {
+                "description": "An Universally unique identifier v4",
+                "type": "String"
+            },
+            "see": [
+                "http://en.wikipedia.org/wiki/Universally_unique_identifier"
+            ],
+            "class": "Uuid",
+            "module": "Uuid"
+        },
+        {
+            "file": "src\\uuid.js",
+            "line": 24,
+            "description": "Test if a uuid is valid",
+            "itemtype": "method",
+            "name": "isValid",
+            "params": [
+                {
+                    "name": "uuid",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "Uuid",
+            "module": "Uuid"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src\\computation\\collection\\jobs.js:75"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src\\network\\collections\\peers.js:73"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src\\network\\model\\node.js:90"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src\\storage\\database.js:389"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src\\storage\\index.js:122"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src\\storage\\index.js:134"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src\\storage\\index.js:146"
+        },
+        {
+            "message": "unknown tag: date",
+            "line": " src\\util\\logger.js:1"
+        },
+        {
+            "message": "unknown tag: version",
+            "line": " src\\muskepeer-client.js:1"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src\\muskepeer-client.js:137"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src\\project.js:100"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src\\uuid.js:24"
+        },
+        {
+            "message": "Missing item type\nSimple Brute-Force-Algorithm to solve the\nn-queens problem. It will produce distinct solutions.",
+            "line": " src\\examples\\n-queens\\worker.js:1"
+        },
+        {
+            "message": "Missing item type\nList of timers for synchronization",
+            "line": " src\\network\\model\\peer.js:145"
+        },
+        {
+            "message": "Missing item type\nEvent-Handler, gets called when a Peer receives a message.",
+            "line": " src\\network\\index.js:208"
+        },
+        {
+            "message": "Missing item type\nRead some chunks from the file, which will resul in a Blob-Instance.\nChunk size is defined globally by CHUNK_SIZE.",
+            "line": " src\\storage\\filesystem.js:326"
+        },
+        {
+            "message": "Missing item type\nRead some chunks from the file, which will be base64 encodded.\nChunk size is defined globally by CHUNK_SIZE.",
+            "line": " src\\storage\\filesystem.js:365"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src\\muskepeer-module.js:1"
+        }
+    ]
+}
