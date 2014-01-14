@@ -422,7 +422,6 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
                     return deferred.promise;
                 }
 
-
                 //get data from store
                 this.read(storeName, data.uuid, options)
                     //merge

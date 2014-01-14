@@ -8,13 +8,14 @@
 define([
     'q',
     'lodash',
-    './computation/index',
-    './crypto/index',
-    './network/index',
-    './project',
-    './settings',
-    './storage/index'
-], function (Q, _, computation, crypto, network, project, settings, storage) {
+    'computation/index',
+    'crypto/index',
+    'network/index',
+    'project',
+    'settings',
+    'storage/index',
+    'mediator'
+], function (Q, _, computation, crypto, network, project, settings, storage, mediator) {
 
     'use strict';
 
@@ -64,44 +65,11 @@ define([
 
     }
 
-
-    /**
-     * @private
-     * @method coupleModules
-     */
-    function coupleModules() {
-
-        //network.on('result:push', function () {});
-
-        network.on('broadcast:computation:start', computation.start);
-        network.on('broadcast:computation:stop', computation.stop);
-
-        computation.on('job:lock', function (e) {
-            network.publish('job:lock', e);
-        });
-        computation.on('job:finished', function (e) {
-            network.publish('job:finished', e);
-        });
-        computation.on('result:push', function (e) {
-            network.publish('result:push', e);
-        });
-
-    }
-
-    /**
-     * @private
-     * @method decoupleModules
-     */
-    function decoupleModules() {
-        network.removeAllListeners();
-        computation.removeAllListeners();
-    }
-
-
     return {
 
         computation: computation,
         crypto: crypto,
+        mediator: mediator,
         network: network,
         project: project,
         settings: settings,
@@ -187,11 +155,13 @@ define([
                 })
                 .done(function () {
 
-                    // Finallly initialize the network and computation module
-                    //coupleModules();
 
-                    //network.start();
-                    computation.start();
+                    mediator.couple();
+
+                    // Finallly initialize the network and computation module
+
+                    network.start();
+                    //computation.start();
                 });
 
             return this;
@@ -204,7 +174,7 @@ define([
          */
         stop: function () {
 
-            decoupleModules();
+            mediator.decouple();
 
             this.computation.stop();
             this.network.stop();

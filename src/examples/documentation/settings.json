@@ -102,8 +102,8 @@
 
         "services": [
             {
-                "enabled": true,
-                "url": "https://api.parse.com/1/classes/Queens/",
+                "enabled": false,
+                "url": "https://api.parse.com/1/classes/Results/",
                 "type": "REST",
                 "params": {},
                 "headers": [

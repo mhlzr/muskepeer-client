@@ -250,57 +250,76 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
          */
         function poolResultFoundHandler(message) {
 
-            var result = new Result(message.data);
+            var result = new Result(message.data),
+                promise = Q();
 
-
-            if (result.jobUuid) {
+            // Using Jobs-Locking?
+            if (project.computation.jobs.lock && result.jobUuid) {
                 // Unlock the job
-                jobs.unlockJob({uuid: result.jobUuid}).then(function () {
-                    //TODO check iterations
-                    // Inform network
-                    module.emit('job:finished', {uuid: result.jobUuid});
-
-                    return jobs.markJobAsFinished({uuid: result.jobUuid});
-                });
-
+                promise = jobs.unlockJob({uuid: result.jobUuid});
             }
 
-
-            // Already existent?
-            return storage.db.has('results', result.uuid, {uuidIsHash: true})
-                .then(function (resultInStorage) {
-                    var deferred = Q.defer();
-
-                    if (resultInStorage) {
-                        deferred.resolve(false);
-                        //result.iteration = resultInStorage.iteration + 1;
+            return promise
+                .then(function () {
+                    // Already existent?
+                    return storage.db.has('results', result.uuid, {uuidIsHash: true});
+                })
+                .then(function (exists) {
+                    // Got a fresh new result, store it!
+                    if (!exists) {
+                        return storage.db.save('results', result, {uuidIsHash: true})
+                            .then(function () {
+                                return true;
+                            });
                     }
-                    else {
-                        deferred.resolve(true);
+                    else if (project.computation.results.validation.enabled && exists) {
+
+                        // Get stored result
+                        return storage.db.read('results', result.uuid, {uuidIsHash: true})
+                            .then(function (resultFromStorage) {
+
+                                //Increase iterations, then Update,
+                                result.iteration = resultFromStorage.iteration + 1;
+
+                                // Already did enough iterations, result is now valid
+                                if (result.iteration >= project.computation.results.validation.iterations) {
+                                    result.isValid = true;
+                                }
+
+                                //Update
+                                return storage.db.update('results', result, {uuidIsHash: true});
+
+                            }).then(function () {
+                                //Pretend it's new
+                                return true;
+                            })
                     }
-                    return deferred.promise;
+                    // Result is not new
+                    else return false;
+
                 })
                 .then(function (isNew) {
 
-
-                    if (isNew) {
-
-                        // Inform network module which will broadcast/publish
-                        module.emit('result:push', result);
-
-                        // Store result to local database
-                        return storage.db.save('results', result, {uuidIsHash: true});
-
+                    // Inform about job status
+                    if (project.computation.jobs.lock && result.jobUuid) {
+                        module.emit('job:unlock', {uuid: result.jobUuid});
                     }
 
-                    // Already did enough iterations, no need to save/update
-                    /*if (project.computation.validationIterations > 0
-                     && result.iteration > project.computation.validationIterations) {
-                     return;
-                     }*/
-                });
+                    // Inform about new result
+                    if (isNew) {
+                        module.emit('result:push', result);
+                    }
 
+                    // No need for the job anymore?
+                    if (project.computation.factories.enabled && result.isValid) {
+                        jobs.markJobAsComplete({uuid: result.jobUuid})
+                            .then(function () {
+                                module.emit('job:complete', {uuid: result.jobUuid});
+                            });
+                    }
+                });
         }
+
 
         /**
          * @private
@@ -442,6 +461,9 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                 this.isRunning = false;
             },
 
+            /**
+             * @method stopWorkers
+             */
             stopWorkers: function () {
                 if (module.workers) {
                     removeEventListenersFromPool(module.workers);
@@ -453,6 +475,9 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                 }
             },
 
+            /**
+             * @method stopFactories
+             */
             stopFactories: function () {
                 if (module.factories) {
                     removeEventListenersFromPool(module.factories);
@@ -475,7 +500,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
 
                 return allFound('results', project.computation.results.expected)
                     .then(function (resultsComplete) {
-                        isComplete = isComplete && resultsComplete;
+                        isComplete = resultsComplete;
                         return allFound('jobs', project.computation.jobs.expected)
                     })
                     .then(function (jobsComplete) {
@@ -486,4 +511,5 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
 
         });
 
-    });
+    })
+;

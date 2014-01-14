@@ -18,5 +18,7 @@ define(['crypto/index', 'settings'], function (crypto, settings) {
 
         this.iteration = 1;
         this.timestamp = Date.now();
+
+        this.isValid = false;
     };
 });

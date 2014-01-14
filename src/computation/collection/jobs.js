@@ -112,10 +112,10 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
      * @return {Promise}
      */
     module.lockJob = function (job) {
-        if (project.computation.jobs.lockJobsWhileSolving) {
+        if (project.computation.jobs.lock) {
             return storage.db.update('jobs', {uuid: job.uuid, locktime: Date.now(), isLocked: true}, {uuidIsHash: true}).then(getJobsFromStorage);
         }
-        else return null;
+        else return Q();
     };
 
     /**
@@ -124,19 +124,19 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
      * @return {Promise}
      */
     module.unlockJob = function (job) {
-        if (project.computation.jobs.lockJobsWhileSolving) {
+        if (project.computation.jobs.lock) {
             return storage.db.update('jobs', {uuid: job.uuid, locktime: null, isLocked: false}, {uuidIsHash: true}).then(getJobsFromStorage);
         }
-        else return null;
+        else return Q();
     };
 
     /**
-     * @method markJobAsFinished
+     * @method markJobAsComplete
      * @param {Job} job
      * @return {Promise}
      */
-    module.markJobAsFinished = function (job) {
-        return storage.db.update('jobs', {uuid: job.uuid, isFinished: true}, {uuidIsHash: true}).then(getJobsFromStorage);
+    module.markJobAsComplete = function (job) {
+        return storage.db.update('jobs', {uuid: job.uuid, isComplete: true}, {uuidIsHash: true}).then(getJobsFromStorage);
     };
 
     /**

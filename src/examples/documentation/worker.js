@@ -36,7 +36,7 @@ self.addEventListener('message', function (e) {
 function start() {
 
     interval = setInterval(function () {
-        self.postMessage({type: 'result:found', data: parseInt(Math.random() * 1000)});
+        self.postMessage({type: 'result:found', data: parseInt(Math.random() * 10)});
     }, (Math.random() * 500) | 0);
     isRunning = true;
 
