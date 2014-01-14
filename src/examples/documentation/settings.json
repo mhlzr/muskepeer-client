@@ -12,6 +12,7 @@
     "computation": {
 
         "offlineAllowed": true,
+        "testIntervalTime": 5000,
 
         "workers": {
             "enabled": true,
@@ -26,19 +27,21 @@
         },
 
         "results": {
+            "groupSize": 1,
             "validation": {
                 "enabled": true,
                 "iterations": 3
             },
-            "expected": -1,
-            "countTimeInterval": 30000
+            "expected": 100,
+            "testIntervalTime": 1000
         },
 
         "jobs": {
             "lock": true,
             "maxLockTime": 3600000,
             "groupSize": 1,
-            "expected": -1
+            "expected": 10,
+            "testIntervalTime": 2500
         }
     },
 

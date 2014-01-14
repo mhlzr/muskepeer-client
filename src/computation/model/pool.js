@@ -85,7 +85,7 @@ define(['eventemitter2', 'computation/index', '../model/thread', 'settings'], fu
          */
         this.stop = function () {
 
-            logger.log('Computation', this.type, 'Pool stopped');
+            logger.log('Computation', this.type + '-Pool', 'stopped');
 
             _threads.forEach(function (thread) {
                 thread.stop();

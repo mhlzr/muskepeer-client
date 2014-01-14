@@ -275,6 +275,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
         function negotiationNeededHandler(e) {
 
             logger.log('Peer ' + _self.id, 'Negotiation needed');
+
             //2. Alice creates an offer (an SDP session description) with the RTCPeerConnection createOffer() method.
             _self.connection.createOffer(function (sessionDescription) {
 
