@@ -5,10 +5,45 @@
  * @extends MuskepeerModule
  */
 
-define(['q', 'muskepeer-module', '../storage/index', '../project', './collection/workers', 'crypto/index', './collection/jobs', './model/job', './model/result'], function (Q, MuskepeerModule, storage, project, workers, crypto, jobs, Job, Result) {
+define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto/index', './collection/jobs', './model/pool', './model/job', './model/result'],
+
+
+    function (Q, MuskepeerModule, storage, settings, project, crypto, jobs, Pool, Job, Result) {
 
         var module = new MuskepeerModule(),
             resultCountInterval;
+
+
+        function createThreadPool(type, url, amount) {
+
+            // Get the cached script from local fileSystem
+            return storage.fs.getFileInfoByUri(url)
+                .then(function (fileInfos) {
+                    return storage.fs.readFileAsLocalUrl(fileInfos[0]);
+                })
+                .then(function (localUrl) {
+
+                    var amount = 1;
+
+                    if (type === module.WORKER) {
+
+                        if (project.computation.workers.multipleAllowed) {
+                            amount = settings.maxWorkers;
+                        }
+
+                        module.workers = new Pool(module.WORKER, localUrl, amount);
+                    }
+                    else {
+
+                        if (project.computation.factories.multipleAllowed) {
+                            amount = settings.maxFactories;
+                        }
+
+                        module.factories = new Pool(module.FACTORY, localUrl, amount);
+                    }
+
+                });
+        }
 
 
         /**
@@ -21,27 +56,24 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
         function createWorkers() {
 
             // No need for Workers
-            if (!project.computation.solving.enabled) {
-                logger.log('Computation', 'Not using Workers!');
+            if (!project.computation.workers.enabled) {
+                logger.log('Computation', 'Not using Workers');
                 return Q();
             }
             // Already initiated?
-            else if (workers.size !== 0) {
+            else if (module.workers) {
                 return Q();
             }
 
             // Instantiate workers
             else {
                 logger.log('Computation', 'Creating Workers');
-                // Get the cached worker-script from local fileSystem
-                return storage.fs.getFileInfoByUri(project.computation.solving.workerUrl)
-                    .then(function (fileInfos) {
-                        return storage.fs.readFileAsLocalUrl(fileInfos[0]);
+
+
+                return createThreadPool(module.WORKER, project.computation.workers.url)
+                    .then(function () {
+                        addEventListenersToPool(module.workers);
                     })
-                    .then(function (localUrl) {
-                        workers.create(localUrl);
-                        addWorkerEventListeners();
-                    });
             }
 
         }
@@ -51,103 +83,71 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
          * Create jobFactory
          *
          * @private
-         * @method createJobFactory
+         * @method createFactories
          * @return {Promise}
          */
-        function createJobFactory() {
+        function createFactories() {
 
-            // No need for a JobFactory
-            if (!project.computation.jobs.enabled) {
-                logger.log('Computation', 'Not using JobFactory');
+            // No need for Workers
+            if (!project.computation.factories.enabled) {
+                logger.log('Computation', 'Not using Factories');
+                return Q();
+            }
+            // Already initiated?
+            else if (module.factories) {
                 return Q();
             }
 
-            logger.log('Computation', 'Creating JobFactory');
+            // Instantiate workers
+            else {
+                logger.log('Computation', 'Creating Factories');
 
-            // Instantiate JobFactory
-            return storage.fs.getFileInfoByUri(project.computation.jobs.factoryUrl)
-                .then(function (fileInfos) {
-                    return storage.fs.readFileAsLocalUrl(fileInfos[0]);
-                })
-                .then(function (localUrl) {
-                    module.jobFactory = new Worker(localUrl);
-                    addJobFactoryListeners();
-                    logger.log('Computation', 'JobFactory started');
-                });
+                return createThreadPool(module.FACTORY, project.computation.factories.url)
+                    .then(function () {
+                        addEventListenersToPool(module.factories);
+                    })
+            }
+
         }
 
 
         /**
          * @private
-         * @method addWorkerEventListeners
+         * @method addEventListenersToPool
          */
-        function addWorkerEventListeners() {
-            workers.on('job:required', workerJobRequiredHandler);
-            workers.on('result:found', workerResultFoundHandler);
-            workers.on('result:required', workerResultRequiredHandler);
-            workers.on('file:required', workerResultRequiredHandler);
-
-            // It's possible, that during computing a Worker finds an (unsolved) job
-            workers.on('job:found', jobFactoryMessageHandler);
-            // Or even found a new file (created one)
-            workers.on('file:found', workerFileFoundHandler)
+        function addEventListenersToPool(pool) {
+            pool.on('job:required', poolJobRequiredHandler);
+            pool.on('result:found', poolResultFoundHandler);
+            pool.on('result:required', poolResultRequiredHandler);
+            pool.on('file:required', poolResultRequiredHandler);
+            pool.on('job:found', poolJobFoundHandler);
+            pool.on('file:found', poolFileFoundHandler);
         }
 
         /**
          * @private
-         * @method removeWorkerEventListeners
+         * @method removeEventListenersFromPool
          */
-        function removeWorkerEventListeners() {
-            workers.off('job:required', workerJobRequiredHandler);
-            workers.off('result:found', workerResultFoundHandler);
-            workers.off('result:required', workerResultRequiredHandler);
-            workers.off('file:required', workerResultRequiredHandler);
-            workers.off('job:found', jobFactoryMessageHandler);
-            workers.off('file:found', workerFileFoundHandler)
+        function removeEventListenersFromPool(pool) {
+            pool.removeAllListeners();
         }
 
         /**
          * @private
-         * @method addJobFactoryListeners
+         * @method poolJobFoundHandler
          */
-        function addJobFactoryListeners() {
-            module.jobFactory.addEventListener('message', jobFactoryMessageHandler);
-            module.jobFactory.addEventListener('error', jobFactoryErrorHandler);
-        }
-
-        /**
-         * @private
-         * @method removeJobFactoryListeners
-         */
-        function removeJobFactoryListeners() {
-            module.jobFactory.removeEventListener('message', jobFactoryMessageHandler);
-            module.jobFactory.removeEventListener('error', jobFactoryErrorHandler);
-        }
-
-
-        /**
-         * @private
-         * @method jobFactoryMessageHandler
-         */
-        function jobFactoryMessageHandler(message) {
+        function poolJobFoundHandler(message) {
             var job = new Job(message.data);
             // Add job to queue (if redundant it will be ignored)
             jobs.add(job);
         }
 
-        /**
-         * @private
-         * @method jobFactoryErrorHandler
-         */
-        function jobFactoryErrorHandler(error) {
-            logger.error('JobFactory', 'an error occurred');
-        }
 
         /**
          * @private
-         * @method workerResultRequiredHandler
+         * @method poolResultRequiredHandler
          */
-        function workerResultRequiredHandler(message) {
+        function poolResultRequiredHandler(message) {
 
             if (!message.data.uuid) return;
 
@@ -164,9 +164,9 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
 
         /**
          * @private
-         * @method workerJobRequiredHandler
+         * @method poolJobRequiredHandler
          */
-        function workerJobRequiredHandler(message) {
+        function poolJobRequiredHandler(message) {
 
             // Specific job?
             if (message.data && message.data.uuid) {
@@ -196,7 +196,7 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
                             .then(function () {
 
                                 // Need to publish lock?
-                                if (project.computation.jobs.lockJobsWhileSolving) {
+                                if (project.computation.jobs.lock) {
                                     module.emit('job:lock', {uuid: job.uuid})
                                 }
 
@@ -212,9 +212,9 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
 
         /**
          * @private
-         * @method workerResultFoundHandler
+         * @method poolResultFoundHandler
          */
-        function workerResultFoundHandler(message) {
+        function poolResultFoundHandler(message) {
 
             var result = new Result(message.data);
 
@@ -270,10 +270,10 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
 
         /**
          * @private
-         * @method workerFileFoundHandler
+         * @method poolFileFoundHandler
          */
-        function workerFileFoundHandler(message) {
-            logger.log('Worker ' + message.id, 'found a file');
+        function poolFileFoundHandler(message) {
+            logger.log('Thread ' + message.id, 'found a file');
         }
 
 
@@ -313,10 +313,12 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
              */
             jobs: jobs,
 
-            /**
-             * @property {Worker} jobFactory
-             */
-            jobFactory: null,
+            workers: null,
+            factories: null,
+
+            WORKER: 'Worker',
+            FACTORY: 'Factory',
+
 
             /**
              * @method start
@@ -325,20 +327,19 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
 
                 if (this.isRunning) return;
 
-                logger.log('Computation', 'starting');
+                logger.log('Computation', 'Starting');
 
-                createJobFactory()
+                createFactories()
                     .then(createWorkers)
                     .then(function () {
-                        // Start the jobFactory
-                        if (module.jobFactory) {
-                            module.jobFactory.postMessage({cmd: 'start'});
-                        }
 
-                        // Start the workers
-                        workers.start();
+                        // Start the factories is disabled, won't do anyhting
+                        if (module.factories) module.factories.start();
 
-                        resultCountInterval = setInterval(resultCountIntervalCompleteHandler, project.computation.solving.resultCountTimeInterval);
+                        // Start the workers, same as factories
+                        if (module.workers) module.workers.start();
+
+                        resultCountInterval = setInterval(resultCountIntervalCompleteHandler, project.computation.results.countTimeInterval);
 
                     });
 
@@ -350,16 +351,18 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
              * @method pause
              */
             pause: function () {
-                logger.log('Computation', 'pause');
-                workers.pause();
+                logger.log('Computation', 'Pause');
+                module.factories.pause();
+                module.workers.pause();
                 this.isPaused = true;
             },
             /**
              * @method resume
              */
             resume: function () {
-                logger.log('Computation', 'resume');
-                workers.resume();
+                logger.log('Computation', 'Resume');
+                module.factories.resume();
+                module.workers.resume();
                 this.isPaused = false;
             },
             /**
@@ -369,19 +372,23 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
 
                 if (!this.isRunning) return;
 
-                logger.log('Computation', 'stopping');
+                logger.log('Computation', 'Stopping');
 
-                if (this.jobFactory) {
-                    removeJobFactoryListeners();
-                    this.jobFactory.terminate();
-                    this.jobFactory = null;
+
+                if (module.workers) {
+                    removeEventListenersFromPool(module.workers);
+                    module.workers.stop();
                 }
 
-                clearInterval(resultCountInterval);
-                resultCountTimeInterval = null;
+                if (module.factories) {
+                    removeEventListenersFromPool(module.factories);
+                    module.factories.stop();
+                }
 
-                removeWorkerEventListeners();
-                workers.stop();
+                // Stop the timer
+                clearInterval(resultCountInterval);
+                resultCountInterval = null;
+
 
                 this.isRunning = false;
             },
@@ -398,12 +405,12 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
                         logger.log('Computation', amount, 'results');
 
                         // We don't know how much to expect, so we can't say
-                        if (!project.computation.solving.expectedAmount || !_.isFinite(project.computation.solving.expectedAmount)) {
+                        if (!project.computation.results.expected < 0 || !_.isFinite(project.computation.results.expected)) {
                             deferred.resolve(false);
                         }
 
                         // We already have all results?
-                        if (amount >= project.computation.solving.expectedAmount) {
+                        if (amount >= project.computation.results.expected) {
                             deferred.resolve(true);
                         }
                         return deferred.promise;
@@ -413,7 +420,4 @@ define(['q', 'muskepeer-module', '../storage/index', '../project', './collection
 
         });
 
-    }
-
-)
-;
+    });

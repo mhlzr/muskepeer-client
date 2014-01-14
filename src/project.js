@@ -178,7 +178,7 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
             }
             else if (_.isString(config) && isValidUrl(config)) {
 
-                logger.log('Project', 'Downloading settings');
+                logger.log('Project', 'Downloading settings from', config);
 
                 downloadJSON(config)
                     .then(function (config) {

@@ -168,29 +168,30 @@ define([
                     var requiredFiles = [];
 
                     // Add workerFile
-                    if (project.computation.solving.enabled && project.computation.solving.workerUrl) {
-                        requiredFiles.push(project.computation.solving.workerUrl);
+                    if (project.computation.workers.enabled && project.computation.workers.url) {
+                        requiredFiles.push({ url: project.computation.workers.url });
                     }
 
                     // Add factoryFile
-                    if (project.computation.jobs.enabled && project.computation.jobs.factoryUrl) {
-                        requiredFiles.push(project.computation.jobs.factoryUrl);
+                    if (project.computation.factories.enabled && project.computation.factories.url) {
+                        requiredFiles.push({ url: project.computation.factories.url });
                     }
 
                     // Store fileInfo to fileSystem
                     return storage.fs.add(_.union(project.files, requiredFiles))
                 })
                 .then(function () {
-                    //TODO Currently all files get downloaded not loaded from other peers
+                    //TODO Currently all files get downloaded not loaded from other peers as
+                    // Blob is not yet supported via DataChannel
                     return storage.fs.downloadIncompleteFiles();
                 })
                 .done(function () {
 
                     // Finallly initialize the network and computation module
-                    coupleModules();
+                    //coupleModules();
 
-                    network.start();
-                    // computation.start();
+                    //network.start();
+                    computation.start();
                 });
 
             return this;

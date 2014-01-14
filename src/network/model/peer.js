@@ -235,8 +235,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             if (!e || !e.candidate) return;
 
             // III. In the handler, Alice sends stringified candidate data to Eve, via their signaling channel.
-            var signal = _self.getSignalChannel();
-            signal.sendPeerCandidate(_self.uuid, e.candidate);
+            _self.getSignalChannel().sendPeerCandidate(_self.uuid, e.candidate);
 
         }
 
@@ -287,7 +286,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
 
                 },
                 function (err) {
-                    logger.error(err);
+                    logger.error('Peer ' + _self.id, err, 'Was using', _self.protocol, 'protocol.');
                 },
                 connectionConstraint);
         }
@@ -570,6 +569,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
                 _self.send({type: 'file:pull', uuid: uuid});
             });
         };
+
 
         this.sendFile = function (uuid, chunk, pos) {
             pos = pos || 0;

@@ -41,6 +41,7 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
         authToken: uuid.generate(), //will never be sent to any peer (private)
         i18n: 'en_GB',
         maxPeers: 3,
+        maxFactories: 1,
         maxWorkers: 1,
         fileStorageSize: 500 * 1024 * 1024, //500MB
         protocol: 'sctp', //srtp || sctp

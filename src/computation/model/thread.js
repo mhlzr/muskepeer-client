@@ -4,15 +4,15 @@
 
 define(['eventemitter2'], function (EventEmitter) {
 
-    var WebWorker = window.Worker;
 
-    return function Worker(url) {
+    return function Thread(url) {
 
         var _self = this,
             _webworker,
             _ee = new EventEmitter({delimiter: ':'});
 
         this.id = null;
+        this.type = null;
 
         this.emit = _ee.emit;
         this.on = _ee.on;
@@ -24,16 +24,16 @@ define(['eventemitter2'], function (EventEmitter) {
         this.isPaused = false;
 
         function workerMessageHandler(e) {
-            _self.emit(e.data.type.toLowerCase(), {id: self.id, data: e.data });
+            _self.emit(e.data.type.toLowerCase(), {id: _self.id, type: _self.type, data: e.data });
         }
 
         function workerErrorHandler(e) {
-            logger.log('Worker', 'error occured', e);
+            logger.log('Thread', 'error occured', e);
         }
 
         this.start = function () {
 
-            _webworker = new WebWorker(url);
+            _webworker = new Worker(url);
             _webworker.addEventListener('message', workerMessageHandler, false);
             _webworker.addEventListener('error', workerErrorHandler, false);
 

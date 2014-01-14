@@ -428,33 +428,33 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
          * not to the filesystem.
          *
          * @method add
-         * @param {Array|String} uris
+         * @param {Array|String} files
          * @return {Promise}
          */
-        add: function (uris) {
+        add: function (files) {
 
             var promises = [];
 
             //just a single uri?
-            if (!_.isArray(uris)) {
-                uris = [uris];
+            if (!_.isArray(files)) {
+                files = [files];
             }
 
-            uris.forEach(function (uri) {
+            files.forEach(function (file) {
 
-                var file = {
-                    name: getFileNameFromUri(uri),
-                    uri: uri,
+                var fileInfo = {
+                    name: file.name || getFileNameFromUri(file.url),
+                    uri: file.url,
                     size: 0,
                     position: 0,
                     isComplete: false,
-                    uuid: crypto.hash(uri)
+                    uuid: crypto.hash(file.url)
                 };
 
-                var promise = _db.read('files', file.uuid, {uuidIsHash: true})
+                var promise = _db.read('files', fileInfo.uuid, {uuidIsHash: true})
                     .then(function (result) {
                         if (!result) {
-                            return _db.save('files', file, {allowDuplicates: false, uuidIsHash: true});
+                            return _db.save('files', fileInfo, {allowDuplicates: false, uuidIsHash: true});
                         }
 
                     });
