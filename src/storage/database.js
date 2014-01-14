@@ -394,9 +394,10 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
              * @param storeName
              * @param data
              * @param options
+             * @param [comparisonFunction] Will be use to indicate if there were cahnges
              * @returns {Promise}
              */
-            update: function (storeName, data, options) {
+            update: function (storeName, data, options, comparisonFunction) {
                 var store = getStoreByName(storeName),
                     deferred = Q.defer();
 
@@ -426,6 +427,14 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
                 this.read(storeName, data.uuid, options)
                     //merge
                     .then(function (existingData) {
+
+                        //compare
+                        if (comparisonFunction) {
+                            var hasChanged = comparisonFunction(existingData, data);
+                            // skip the rest
+                            if (!hasChanged) deferred.resolve(false);
+                            return;
+                        }
                         data = _.extend(existingData, data);
                         store.put(data);
                     })
@@ -443,6 +452,31 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
 
 
             /**
+             * @method upsert
+             */
+            upsert: function (storeName, data, options, comparisonFunction) {
+                var self = this;
+
+                return this.has(storeName, data.uuid)
+                    .then(function (exists) {
+
+                        // Brand new!
+                        if (!exists) {
+                            return self.save('results', e.data, options).then(function (e) {
+                                return true;
+                            })
+                        }
+
+                        // Update!
+                        else {
+                            return self.update('results', e.data, {uuidIsHash: true}, comparisonFunction)
+                        }
+
+                    });
+            },
+
+
+            /**
              * Find out if a store has s specific dataset
              *
              * @method has
@@ -450,6 +484,7 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
              * @param {String} key
              */
             has: function (storeName, key) {
+
                 var deferred = Q.defer(),
                     store = getStoreByName(storeName);
 

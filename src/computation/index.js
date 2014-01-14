@@ -267,12 +267,15 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                 .then(function (exists) {
                     // Got a fresh new result, store it!
                     if (!exists) {
+                        console.log('IS NEW', result.uuid);
                         return storage.db.save('results', result, {uuidIsHash: true})
                             .then(function () {
                                 return true;
                             });
                     }
                     else if (project.computation.results.validation.enabled && exists) {
+
+                        console.log('IS NOT NEW', result.uuid);
 
                         // Get stored result
                         return storage.db.read('results', result.uuid, {uuidIsHash: true})
@@ -284,10 +287,28 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                                 // Already did enough iterations, result is now valid
                                 if (result.iteration >= project.computation.results.validation.iterations) {
                                     result.isValid = true;
+
+                                    console.log('IS NOW VALID', result.uuid);
+
+                                    // So there is need for the job anymore!
+                                    if (project.computation.factories.enabled) {
+                                        return jobs.markJobAsComplete({uuid: result.jobUuid})
+                                            .then(function () {
+                                                console.log('STORIGN VALID ONE');
+                                                module.emit('job:push', {job: jobs.getJobByUuid(result.jobUuid)});
+                                                return storage.db.update('results', result, {uuidIsHash: true});
+                                            });
+                                    }
+                                    // No need to unlock a job
+                                    else return storage.db.update('results', result, {uuidIsHash: true});
+
+                                }
+                                else {
+                                    //Update
+                                    console.log('IS NOT VALID', result.uuid);
+                                    return storage.db.update('results', result, {uuidIsHash: true});
                                 }
 
-                                //Update
-                                return storage.db.update('results', result, {uuidIsHash: true});
 
                             }).then(function () {
                                 //Pretend it's new
@@ -310,13 +331,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                         module.emit('result:push', result);
                     }
 
-                    // No need for the job anymore?
-                    if (project.computation.factories.enabled && result.isValid) {
-                        jobs.markJobAsComplete({uuid: result.jobUuid})
-                            .then(function () {
-                                module.emit('job:complete', {uuid: result.jobUuid});
-                            });
-                    }
+
                 });
         }
 

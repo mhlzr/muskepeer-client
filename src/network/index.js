@@ -61,6 +61,7 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
          * @method masterMessageHandler
          */
         function masterMessageHandler(e) {
+
             if (isValidMasterMessage(e.data.message, e.data.signature)) {
 
                 storage.db.has('messages', e.data.message.uuid)
@@ -91,7 +92,7 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
         function isValidMasterMessage(message, signature) {
             var now = Date.now();
 
-            if (!message || !signature) return;
+            if (!message || !signature) return false;
 
             // Signature is okay?
             if (!crypto.verify(JSON.stringify(message), signature)) {
@@ -211,139 +212,23 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
          * @param {Object} e
          */
         function peerMessageHandler(e) {
-            var peer = e.target,
-                externalList = e.list,
-                uuid = e.uuid,
-                list;
 
-            logger.log('Peer ' + peer.id, 'Received', e.type);
+            logger.log('Peer ' + e.target.id, 'Received', e.type);
 
             if (!e.type) {
-                logger.log('Network', 'peer:message without type received');
+                logger.log('Network', 'Peer-message without type received');
                 return;
             }
-            switch (e.type.toLowerCase()) {
 
-                case 'node:list:pull' :
-                    peer.sendNodeList(nodes.getNodeUuidsAsArray());
-                    break;
-                case 'peer:list:pull' :
-                    peer.sendPeerList(peers.getPeerUuidsAsArray());
-                    break;
-                case 'file:list:pull' :
-                    storage.getFileUuidsAsArray().then(function (list) {
-                        peer.sendFileList(list);
-                    });
-                    break;
-                case 'job:list:pull' :
-                    storage.getJobUuidsAsArray().then(function (list) {
-                        peer.sendJobList(list);
-                    });
-                    break;
-                case 'result:list:pull' :
-                    storage.getResultUuidsAsArray().then(function (list) {
-                        peer.sendResultList(list);
-                    });
-                    break;
-                case 'node:list:push':
-                    list = nodes.getMissingNodeUuidsAsArray(externalList);
-                    logger.log('Peer ' + peer.id, 'Result of node:sync', list.length);
-                    peer.getNodeByUuid(list);
-                    break;
-                case 'peer:list:push':
-                    list = peers.getMissingPeerUuidsAsArray(externalList);
-                    logger.log('Peer ' + peer.id, 'Result of peer:sync', list.length);
-                    peer.getPeerByUuid(list);
-                    break;
-                case 'file:list:push':
-                    storage.getMissingFileUuidsAsArray(externalList).then(function (list) {
-                        logger.log('Peer ' + peer.id, 'Result of file:sync', list.length);
-                        peer.getFileByUuid(list);
-                    });
-                    break;
-                case 'job:list:push':
-                    storage.getMissingJobUuidsAsArray(externalList).then(function (list) {
-                        logger.log('Peer ' + peer.id, 'Result of job:sync', list.length);
-                        peer.getJobByUuid(list);
-                    });
-                    break;
-                case 'result:list:push':
-                    storage.getMissingResultUuidsAsArray(externalList).then(function (list) {
-                        logger.log('Peer ' + peer.id, 'Result of result:sync', list.length);
-                        peer.getResultByUuid(list);
-                    });
-                    break;
-
-                case 'node:pull':
-                    peer.sendPeer(nodes.getNodeByUuid(uuid).serialize());
-                    break;
-                case 'peer:pull':
-                    peer.sendPeer(peers.getPeerByUuid(uuid).serialize());
-                    break;
-                case 'file:pull':
-                    break;
-                case 'job:pull':
-                    storage.db.read('jobs', uuid, {uuidIsHash: true}).then(function (job) {
-                        peer.sendJob(job);
-                    });
-                    break;
-                case 'result:pull':
-                    storage.db.read('results', uuid, {uuidIsHash: true}).then(function (result) {
-                        if (result) peer.sendResult(result);
-                    });
-                    break;
-
-                case 'node:push':
-                    nodes.update(e.node);
-                    break;
-                case 'peer:push':
-                    peers.update(e.peer);
-                    break;
-                case 'file:push':
-                    break;
-                case 'job:push':
-                    storage.db.save('jobs', e.job, {uuidIsHash: true});
-                    break;
-                case 'result:push':
-                    storage.db.save('results', e.result, {uuidIsHash: true});
-                    break;
-
-                case 'broadcast:job':
-                    break;
-                case 'broadcast:result:push':
-
-                    // Do i already know about this?
-                    storage.db.has('results', e.data.uuid)
-                        .then(function (exists) {
-
-                            if (!exists) {
-                                // Rebroadcast
-                                peers.broadcast('result', e.data, peer.uuid);
-
-                                // Store the result
-                                return storage.db.save('results', e.data, {uuidIsHash: true})
-                                    .then(function () {
-                                        module.emit('result:push');
-                                    });
-
-                            }
-                            else return Q();
-
-                        });
-
-
-                    break;
-                case 'broadcast:peer':
-                    break;
-                case 'broadcast:file':
-                    break;
-                case 'broadcast:computation:start':
-                    masterMessageHandler(e);
-                    break;
-                case 'broadcast:computation:stop':
-                    masterMessageHandler(e);
-                    break;
+            // Seems to be a master-message
+            if (e.data && e.data.message && e.data.signature) {
+                masterMessageHandler(e);
+                return;
             }
+
+            // Pass-through events
+            module.emit(e.type, e);
+
         }
 
 

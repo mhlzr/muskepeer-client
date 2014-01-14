@@ -136,7 +136,8 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
      * @return {Promise}
      */
     module.markJobAsComplete = function (job) {
-        return storage.db.update('jobs', {uuid: job.uuid, isComplete: true}, {uuidIsHash: true}).then(getJobsFromStorage);
+        return storage.db.update('jobs', {uuid: job.uuid, isComplete: true}, {uuidIsHash: true})
+            .then(getJobsFromStorage);
     };
 
     /**
