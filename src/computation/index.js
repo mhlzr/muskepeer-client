@@ -19,6 +19,9 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
         /**
          * @private
          * @method allFound
+         * @param type
+         * @param expected
+         * @return {Promise}
          */
         function allFound(type, expected) {
 
@@ -66,7 +69,15 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
         }
 
 
-        function createThreadPool(type, url, amount) {
+        /**
+         * @private
+         * @method createThreadPool
+         *
+         * @param type
+         * @param url
+         * @return {Promise}
+         */
+        function createThreadPool(type, url) {
 
             // Get the cached script from local fileSystem
             return storage.fs.getFileInfoByUri(url)
@@ -175,7 +186,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
             pool.on('job:pull', poolJobRequiredHandler);
 
             pool.on('file:push', poolFileFoundHandler);
-            pool.on('file:pull', poolResultRequiredHandler);
+            pool.on('file:pull', poolFileRequiredHandler);
 
         }
 
@@ -188,56 +199,45 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
         }
 
         /**
+         * Event-Listener, listens for
+         * job:push from Thread-Pool
+         *
          * @private
          * @method poolJobFoundHandler
          */
-        function poolJobFoundHandler(message) {
-            var job = new Job(message.data);
+        function poolJobFoundHandler(e) {
+
+            logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a job');
+
+            var job = new Job(e.data);
             // Add job to queue (if redundant it will be ignored)
             jobs.add(job);
         }
 
-
         /**
-         * @private
-         * @method poolResultRequiredHandler
-         */
-        function poolResultRequiredHandler(message) {
-
-            if (!message.data.uuid) return;
-
-            logger.log('Worker ' + message.id, 'needs result ' + message.data.uuid);
-
-            // Get result from storage
-            storage.db.read('results', message.data.uuid)
-                .then(function (result) {
-                    // Push to worker
-                    workers.getWorkerById(message.id).pushResult(result);
-                });
-
-        }
-
-        /**
+         * Event-Listener, listens for
+         * job:pull from Thread-Pool
+         *
          * @private
          * @method poolJobRequiredHandler
          */
-        function poolJobRequiredHandler(message) {
+        function poolJobRequiredHandler(e) {
 
             // Specific job?
-            if (message.data && message.data.uuid) {
+            if (e.data && e.data.uuid) {
 
-                logger.log('Worker ' + message.id, 'needs specific job ' + message.data.uuid);
+                logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'needs a specific job');
 
-                jobs.getJobByUuid(message.data.uuid).then(function (job) {
+                jobs.getJobByUuid(e.data.uuid).then(function (job) {
                     if (job) {
-                        // Push to worker
-                        workers.getWorkerById(message.id).pushJob(job);
+                        e.target.pushJob(job);
                     }
                 });
             }
             // Use next job in queue
             else {
-                logger.log('Worker ' + message.id, 'needs job');
+
+                logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'needs a job');
 
                 jobs.getNextAvailableJob().then(function (job) {
 
@@ -255,8 +255,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                                     module.emit('job:lock', {uuid: job.uuid})
                                 }
 
-                                // Send to worker
-                                workers.getWorkerById(message.id).pushJob(job);
+                                e.target.pushJob(job);
                             });
 
                     }
@@ -266,13 +265,18 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
 
 
         /**
+         * Event-Listener, listens for
+         * result:push from Thread-Pool
+         *
          * @private
          * @method poolResultFoundHandler
          */
-        function poolResultFoundHandler(message) {
+        function poolResultFoundHandler(e) {
 
-            var result = new Result(message.data),
+            var result = new Result(e.data),
                 promise = Q();
+
+            logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a result');
 
             // Using Jobs-Locking?
             if (project.computation.jobs.lock && result.jobUuid) {
@@ -310,12 +314,63 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                 });
         }
 
+
         /**
+         * Event-Listener, listens for
+         * result:pull from Thread-Pool
+         *
+         * @private
+         * @method poolResultRequiredHandler
+         */
+        function poolResultRequiredHandler(e) {
+
+            if (!e.data.uuid) return;
+
+            logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'needs a specific result');
+
+            // Get result from storage
+            storage.db.read('results', e.data.uuid)
+                .then(function (result) {
+                    e.target.pushResult(result);
+                });
+
+        }
+
+
+        /**
+         * Event-Listener, listens for
+         * file:push from Thread-Pool
+         *
          * @private
          * @method poolFileFoundHandler
          */
-        function poolFileFoundHandler(message) {
-            logger.log('Thread ' + message.id, 'found a file');
+        function poolFileFoundHandler(e) {
+            //TODO pass a url or name, actually name would be better
+            logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a file');
+        }
+
+        /**
+         * Event-Listener, listens for
+         * file:pull from Thread-Pool
+         *
+         * @private
+         * @method poolFileRequiredHandler
+         */
+        function poolFileRequiredHandler(e) {
+
+            if (!e.data || ( !e.data.url && !e.data.name )) {
+                return;
+            }
+
+            // Get file by url
+            if (e.data.url) {
+                logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'needs a specific file (gave url)');
+            }
+            // Get file by name
+            else if (e.data.name) {
+                logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'needs a specific file (gave name)');
+            }
+
         }
 
 
@@ -351,7 +406,6 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
          * @param e
          */
         function counterCompleteHandler(e) {
-
             return module.isComplete()
                 .then(function (isComplete) {
                     if (isComplete) module.stop();

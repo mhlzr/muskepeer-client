@@ -24,11 +24,11 @@ define(['eventemitter2'], function (EventEmitter) {
         this.isPaused = false;
 
         function workerMessageHandler(e) {
-            _self.emit(e.data.type.toLowerCase(), {id: _self.id, type: _self.type, data: e.data });
+            _self.emit(e.data.type, {target: _self, data: e.data.data });
         }
 
         function workerErrorHandler(e) {
-            logger.log('Thread', 'error occured', e);
+            logger.log('Thread (' + _self.type + ' ' + _self.id + ')', 'error occured', e);
         }
 
         this.start = function () {

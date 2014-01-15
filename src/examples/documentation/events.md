@@ -1,23 +1,20 @@
 
 
-__Worker__
-{ type: 'result:required', data: {uuid: '2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3'}}}
+__THREAD___
 
-{ type: 'job:found', data: { a: 10, b: 20, c: 50} }}
-{ type: 'job:required', data: {uuid: 'c25945fcf5508f52661464831d54de84a228bad76a9474222fb2aa1d7a7d5850'}}}
-{ type: 'job:required' });}
+{ type: 'result:push', data: { a : 10, b : 'Foo'}}}
+{ type: 'result:pull', data: {uuid: '2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3'}}}
 
-{ type: 'file:required', data: {uri: 'https://dl.dropboxusercontent.com/u/959008/webstorm.pdf'} }}
-{ type: 'file:found', data: {} }}
+{ type: 'job:push', data: { a: 10, b: 20, c: 50} }}
 
+{ type: 'job:pull', data: {uuid: 'c25945fcf5508f52661464831d54de84a228bad76a9474222fb2aa1d7a7d5850'}}}
+{ type: 'job:pull' });}
 
-__JobFactory__
-        workers.off('job:required', workerJobRequiredHandler);
-        workers.off('result:found', workerResultFoundHandler);
-        workers.off('result:required', workerResultRequiredHandler);
-        workers.off('file:required', workerResultRequiredHandler);
-        workers.off('job:found', jobFactoryMessageHandler);
-        workers.off('file:found', workerFileFoundHandler
+{ type: 'file:pull', data: {uri: 'https://dl.dropboxusercontent.com/u/959008/webstorm.pdf'} }}
+{ type: 'file:pull', data: {name: 'webstorm'} }}
+
+{ type: 'file:push', data: {} }}
+
 
 __Peer__
 
