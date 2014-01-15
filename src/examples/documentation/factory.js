@@ -35,7 +35,7 @@ self.addEventListener('message', function (e) {
 function start() {
 
     interval = setInterval(function () {
-        self.postMessage({type: 'job:found', data: parseInt(Math.random() * 1000)});
+        self.postMessage({type: 'job:push', data: parseInt(Math.random() * 1000)});
     }, (Math.random() * 500) | 0);
 
 }

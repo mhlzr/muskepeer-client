@@ -36,18 +36,18 @@ self.addEventListener('message', function (e) {
 function start() {
 
     interval = setInterval(function () {
-        self.postMessage({type: 'result:found', data: parseInt(Math.random() * 10)});
-    }, (Math.random() * 500) | 0);
+        self.postMessage({type: 'result:push', data: parseInt(Math.random() * 1000)});
+    }, (Math.random() * 10) | 0);
     isRunning = true;
 
     //Testing
     /*
-    self.postMessage({type: 'result:required', data: {uuid: '2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3'}});
-    self.postMessage({type: 'job:required', data: {uuid: 'c25945fcf5508f52661464831d54de84a228bad76a9474222fb2aa1d7a7d5850'}});
-    self.postMessage({type: 'job:required' });
-    self.postMessage({type: 'file:required', data: {uri: 'https://dl.dropboxusercontent.com/u/959008/webstorm.pdf'} });
-    self.postMessage({type: 'job:found', data: { a: 10, b: 20, c: 50} });
-    self.postMessage({type: 'file:found', data: {} });
+    self.postMessage({type: 'result:push', data: {uuid: '2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3'}});
+    self.postMessage({type: 'job:pull', data: {uuid: 'c25945fcf5508f52661464831d54de84a228bad76a9474222fb2aa1d7a7d5850'}});
+    self.postMessage({type: 'job:pull' });
+    self.postMessage({type: 'file:pull', data: {uri: 'https://dl.dropboxusercontent.com/u/959008/webstorm.pdf'} });
+    self.postMessage({type: 'job:push', data: { a: 10, b: 20, c: 50} });
+    self.postMessage({type: 'file:push', data: {} });
     */
 
 

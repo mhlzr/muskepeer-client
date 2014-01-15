@@ -26,9 +26,7 @@ define(['computation/index', 'network/index', 'storage/index'],
                  * Broadcast Messages
                  */
                 network.on('broadcast:result:push', function (e) {
-                    storage.db.upsert('results', e.data.uuid, {uuidIsHash: true}, function (oldObj, newObj) {
-                        return oldObj.isValid != newObj.isValid || oldObj.iteration < newObj.iteration;
-                    })
+                    computation.results.add(e.data)
                         .then(function (hasChanged) {
                             if (hasChanged) network.peers.broadcast('result:push', e.data, e.target.uuid);
                         });

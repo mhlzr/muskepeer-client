@@ -5,10 +5,10 @@
  * @extends MuskepeerModule
  */
 
-define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto/index', './collection/jobs', './model/pool', './model/job', './model/result'],
+define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto/index', './collection/jobs', './collection/results', './model/pool', './model/job', './model/result'],
 
 
-    function (Q, MuskepeerModule, storage, settings, project, crypto, jobs, Pool, Job, Result) {
+    function (Q, MuskepeerModule, storage, settings, project, crypto, jobs, results, Pool, Job, Result) {
 
         var module = new MuskepeerModule(),
             countTimer,
@@ -32,16 +32,37 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                     if (!expected || expected < 0 || !_.isFinite(expected)) {
                         deferred.resolve(false);
                     }
-                    // We already have all results?
+
+                    // We already have all found?
                     else if (amount >= expected) {
-                        logger.log('Computation', 'All', type, 'found!');
-                        deferred.resolve(true);
+                        // Need to check validity?
+                        if (type === 'results' && project.computation.results.validation.enabled) {
+
+                            results.allValid()
+                                .then(function (answer) {
+                                    if (answer) {
+                                        logger.log('Computation', 'All results are valid!');
+                                    }
+                                    else {
+                                        logger.log('Computation', 'Results are not all valid!');
+                                    }
+                                    deferred.resolve(answer);
+                                });
+                        }
+                        else {
+                            logger.log('Computation', 'All', type, 'found!');
+                            deferred.resolve(true);
+                        }
+                    }
+                    else {
+                        deferred.resolve(false);
                     }
 
                     return deferred.promise;
 
-                });
+                }
 
+            );
         }
 
 
@@ -147,14 +168,14 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
          * @method addEventListenersToPool
          */
         function addEventListenersToPool(pool) {
-            pool.on('result:found', poolResultFoundHandler);
-            pool.on('result:required', poolResultRequiredHandler);
+            pool.on('result:push', poolResultFoundHandler);
+            pool.on('result:pull', poolResultRequiredHandler);
 
-            pool.on('job:found', poolJobFoundHandler);
-            pool.on('job:required', poolJobRequiredHandler);
+            pool.on('job:push', poolJobFoundHandler);
+            pool.on('job:pull', poolJobRequiredHandler);
 
-            pool.on('file:found', poolFileFoundHandler);
-            pool.on('file:required', poolResultRequiredHandler);
+            pool.on('file:push', poolFileFoundHandler);
+            pool.on('file:pull', poolResultRequiredHandler);
 
         }
 
@@ -261,80 +282,33 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
 
             return promise
                 .then(function () {
-                    // Already existent?
-                    return storage.db.has('results', result.uuid, {uuidIsHash: true});
+                    return results.add(result)
                 })
-                .then(function (exists) {
-                    // Got a fresh new result, store it!
-                    if (!exists) {
-                        console.log('IS NEW', result.uuid);
-                        return storage.db.save('results', result, {uuidIsHash: true})
-                            .then(function () {
-                                return true;
-                            });
-                    }
-                    else if (project.computation.results.validation.enabled && exists) {
-
-                        console.log('IS NOT NEW', result.uuid);
-
-                        // Get stored result
-                        return storage.db.read('results', result.uuid, {uuidIsHash: true})
-                            .then(function (resultFromStorage) {
-
-                                //Increase iterations, then Update,
-                                result.iteration = resultFromStorage.iteration + 1;
-
-                                // Already did enough iterations, result is now valid
-                                if (result.iteration >= project.computation.results.validation.iterations) {
-                                    result.isValid = true;
-
-                                    console.log('IS NOW VALID', result.uuid);
-
-                                    // So there is need for the job anymore!
-                                    if (project.computation.factories.enabled) {
-                                        return jobs.markJobAsComplete({uuid: result.jobUuid})
-                                            .then(function () {
-                                                console.log('STORIGN VALID ONE');
-                                                module.emit('job:push', {job: jobs.getJobByUuid(result.jobUuid)});
-                                                return storage.db.update('results', result, {uuidIsHash: true});
-                                            });
-                                    }
-                                    // No need to unlock a job
-                                    else return storage.db.update('results', result, {uuidIsHash: true});
-
-                                }
-                                else {
-                                    //Update
-                                    console.log('IS NOT VALID', result.uuid);
-                                    return storage.db.update('results', result, {uuidIsHash: true});
-                                }
-
-
-                            }).then(function () {
-                                //Pretend it's new
-                                return true;
-                            })
-                    }
-                    // Result is not new
-                    else return false;
-
-                })
-                .then(function (isNew) {
+                .then(function (hasChanged) {
 
                     // Inform about job status
                     if (project.computation.jobs.lock && result.jobUuid) {
                         module.emit('job:unlock', {uuid: result.jobUuid});
                     }
 
-                    // Inform about new result
-                    if (isNew) {
+                    if (hasChanged) {
+
+                        // Inform about new or changed result
                         module.emit('result:push', result);
+
+                        // What about the job?
+                        if (project.computation.factories.enabled && result.jobUuid) {
+
+                            if (results.isValid(result)) {
+                                return jobs.markJobAsComplete({uuid: result.jobUuid})
+                                    .then(function () {
+                                        module.emit('job:push', {job: jobs.getJobByUuid(result.jobUuid)});
+                                    });
+                            }
+                        }
                     }
-
-
                 });
         }
-
 
         /**
          * @private
@@ -351,6 +325,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
          * @param e
          */
         function resultCounterCompleteHandler(e) {
+
             return allFound('results', project.computation.results.expected)
                 .then(function (isComplete) {
                     if (isComplete) module.stopWorkers();
@@ -376,6 +351,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
          * @param e
          */
         function counterCompleteHandler(e) {
+
             return module.isComplete()
                 .then(function (isComplete) {
                     if (isComplete) module.stop();
@@ -400,6 +376,11 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
              * @property {Object} jobs
              */
             jobs: jobs,
+
+            /**
+             * @property {Object} results
+             */
+            results: results,
 
             workers: null,
             factories: null,
@@ -428,9 +409,9 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                         if (module.workers) module.workers.start();
 
                         // Starting timers
-                        countTimer = setInterval(counterCompleteHandler, project.computation.testIntervalTime);
-                        resultCountTimer = setInterval(resultCounterCompleteHandler, project.computation.results.testIntervalTime);
-                        jobCountTimer = setInterval(jobCounterCompleteHandler, project.computation.jobs.testIntervalTime);
+                        countTimer = window.setInterval(counterCompleteHandler, project.computation.testIntervalTime);
+                        resultCountTimer = window.setInterval(resultCounterCompleteHandler, project.computation.results.testIntervalTime);
+                        jobCountTimer = window.setInterval(jobCounterCompleteHandler, project.computation.jobs.testIntervalTime);
 
 
                     });
@@ -470,8 +451,9 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                 module.stopFactories();
 
                 // Global timer
-                clearInterval(countTimer);
+                window.clearInterval(countTimer);
                 countTimer = null;
+
 
                 this.isRunning = false;
             },
@@ -484,8 +466,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                     removeEventListenersFromPool(module.workers);
                     module.workers.stop();
                     module.workers = null;
-
-                    clearInterval(resultCountTimer);
+                    window.clearInterval(resultCountTimer);
                     resultCountTimer = null;
                 }
             },
@@ -498,9 +479,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                     removeEventListenersFromPool(module.factories);
                     module.factories.stop();
                     module.factories = null;
-
-                    clearInterval(jobCountTimer);
-
+                    window.clearInterval(jobCountTimer);
 
                     jobCountTimer = null;
                 }
