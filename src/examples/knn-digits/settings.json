@@ -11,19 +11,26 @@
 
     "computation": {
 
-        "solving": {
-            "workerUrl": "https://muskepeer.net/examples/knn-digits/worker.js"
+        "workers": {
+            "enabled": true,
+            "url": "https://muskepeer.net/examples/knn-digits/worker.js"
         },
 
-        "jobs": {
+        "factories": {
             "enabled": true,
-            "factoryUrl": "https://muskepeer.net/examples/knn-digits/factory.js"
+            "url": "https://muskepeer.net/examples/knn-digits/factory.js"
         }
     },
 
     "files": [
-        "https://muskepeer.net/examples/knn-digits/digits-train.json",
-        "https://muskepeer.net/examples/knn-digits/digits-test.json"
+        {
+            "name": "training",
+            "url": "https://muskepeer.net/examples/knn-digits/digits-train.json"
+        },
+        {
+            "name": "test",
+            "url": "https://muskepeer.net/examples/knn-digits/digits-test.json"
+        }
 
     ]
 }

@@ -358,6 +358,9 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
          */
         function poolFileRequiredHandler(e) {
 
+            var promise,
+                fileInfo;
+
             if (!e.data || ( !e.data.url && !e.data.name )) {
                 return;
             }
@@ -365,11 +368,40 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
             // Get file by url
             if (e.data.url) {
                 logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'needs a specific file (gave url)');
+                promise = storage.fs.getFileInfoByUri(e.data.url);
+
             }
             // Get file by name
             else if (e.data.name) {
-                logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'needs a specific file (gave name)');
+                logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'needs a specific file (gave name: ' + e.data.name + ')');
+                promise = storage.fs.getFileInfoByName(e.data.name);
             }
+
+            promise
+                .then(function (info) {
+                    fileInfo = info[0];
+
+                    var offset = e.data.offset || 0,
+                        completeFile = offset === 0;
+
+                    // Blob
+                    if (e.data.type === 'blob') {
+                        return storage.fs.readFileChunkAsBlob(fileInfo, offset, completeFile);
+                    }
+                    // DataUrl
+                    else if (e.data.type === 'localUrl') {
+                        return storage.fs.readFileChunkAsDataUrl(fileInfo, offset, completeFile);
+                    }
+                    // Default is localUrl
+                    else {
+                        return storage.fs.readFileAsLocalUrl(fileInfo)
+                    }
+
+                }).then(function (file) {
+                    console.log(file);
+                    e.target.pushFile(fileInfo, file);
+                })
+
 
         }
 

@@ -32,7 +32,7 @@
                 "enabled": true,
                 "iterations": 10
             },
-            "expected": 100,
+            "expected": -1,
             "testIntervalTime": 5000
         },
 
@@ -40,7 +40,7 @@
             "lock": true,
             "maxLockTime": 3600000,
             "groupSize": 1,
-            "expected": 10,
+            "expected": -1,
             "testIntervalTime": 5000
         }
     },

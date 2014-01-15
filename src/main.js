@@ -29,7 +29,7 @@ require(['muskepeer-client', 'util/logger', 'domready'], function (Muskepeer, Lo
     window.Muskepeer = Muskepeer.init();
 
     Muskepeer.start({
-        project: 'https://muskepeer.net/examples/documentation/settings.json',
+        project: 'https://muskepeer.net/examples/knn-digits/settings.json',
         nodes: [
             {
                 host: 'node01-muskepeer.rhcloud.com',

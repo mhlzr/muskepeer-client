@@ -22,22 +22,34 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
         "computation": {
 
             "offlineAllowed": true,
+            "testIntervalTime": 10000,
 
-            "solving": {
-                "enabled": true,
-                "multipleAllowed": true,
+            "workers": {
+                "enabled": false,
+                "multipleAllowed": true
+            },
+
+            "factories": {
+                "enabled": false,
+                "multipleAllowed": true
+            },
+
+            "results": {
+                "groupSize": 1,
                 "validation": {
                     "enabled": false,
-                    "iterations": 0
+                    "iterations": 1
                 },
-                "resultCountTimeInterval": 10000
+                "expected": -1,
+                "testIntervalTime": 5000
             },
 
             "jobs": {
-                "enabled": false,
-                "lockJobsWhileSolving": true,
+                "lock": true,
                 "maxLockTime": 3600000,
-                "groupSize": 1
+                "groupSize": 1,
+                "expected": -1,
+                "testIntervalTime": 5000
             }
         },
 
@@ -69,31 +81,37 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
             "synchronization": {
                 "results": {
                     "enabled": true,
-                    "groupSize": 500
+                    "interval": 3600000,
+                    "groupSize": 15
                 },
                 "jobs": {
                     "enabled": true,
-                    "groupSize": 500
+                    "interval": 3600000,
+                    "groupSize": 15
                 },
                 "files": {
                     "enabled": false,
+                    "interval": 3600000,
                     "groupSize": 1
                 },
                 "peers": {
                     "enabled": true,
-                    "groupSize": 500
+                    "interval": 3600000,
+                    "groupSize": 15
                 },
                 "nodes": {
                     "enabled": true,
-                    "groupSize": 100
+                    "interval": 3600000,
+                    "groupSize": 15
                 }
             },
 
-            "services": [],
+            "useGeoLocation": true,
 
-            "useGeoLocation": true
+            "services": []
+        },
 
-        }
+        "files": []
     };
 
 

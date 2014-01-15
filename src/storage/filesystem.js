@@ -326,14 +326,17 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
         /**
          * Read some chunks from the file, which will resul in a Blob-Instance.
          * Chunk size is defined globally by CHUNK_SIZE.
+         * Slicing can be disabled using completeFile param.
          *
          * @param file
          * @param offset
          *
          * @return {Promise}
          */
-        readFileChunkAsBlob: function (file, offset) {
+        readFileChunkAsBlob: function (file, offset, completeFile) {
             var deferred = Q.defer();
+
+            completeFile = completeFile || false;
 
             _fs.root.getFile(project.uuid + '/' + file.uuid, {}, function (fileEntry) {
 
@@ -349,7 +352,11 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                     }
 
                     // Slice that file
-                    blob = file.slice(start, end);
+                    if (!completeFile) {
+                        blob = file.slice(start, end);
+                    } else {
+                        blob = file;
+                    }
 
                     deferred.resolve(blob);
 
@@ -365,13 +372,17 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
         /**
          * Read some chunks from the file, which will be base64 encodded.
          * Chunk size is defined globally by CHUNK_SIZE.
+         * Slicing can be disabled using completeFile param.
          *
          * @param {Object} file
          * @param {Number} offset
+         * @param {Boolean} completeFile
          * @return {Promise}
          */
-        readFileChunkAsDataUrl: function (file, offset) {
+        readFileChunkAsDataUrl: function (file, offset, completeFile) {
             var deferred = Q.defer();
+
+            completeFile = completeFile || false;
 
             _fs.root.getFile(project.uuid + '/' + file.uuid, {}, function (fileEntry) {
 
@@ -390,7 +401,9 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                     }
 
                     // Slice that file
-                    blob = file.slice(start, end);
+                    if (!completeFile) {
+                        blob = file.slice(start, end);
+                    }
 
                     reader.onloadend = function (e) {
 
@@ -574,6 +587,15 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
             return _db.findAndReduceByObject('files', {}, {uri: uri});
         },
 
+        /**
+         * etrieve a fileInfo object from storage by name.
+         *
+         * @param name
+         * @return {Array}
+         */
+        getFileInfoByName: function (name) {
+            return _db.findAndReduceByObject('files', {}, {name: name});
+        },
 
         /**
          * Will delete all files/folders inside the project-dir recursively
