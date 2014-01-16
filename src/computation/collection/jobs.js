@@ -39,6 +39,8 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
 
     /**
+     * Wiil return true if the job was added, false it wasn't.
+     *
      * @method add
      * @param {Job} job
      * @return {Promise}
@@ -48,17 +50,30 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
         //Valid job?
         if (!job.uuid) return null;
 
-        return module.getJobByUuid(job.uuid)
-            .then(function (result) {
-                // Already got this one?
-                if (result) return null;
-            })
-            // Save job to storage
-            .then(function () {
+        return storage.db.has('jobs', job.uuid, {uuidIsHash: true})
+            .then(function (exists) {
+                if (exists) {
+                    // Not new, but finished
+                    if (job.isComplete) {
+                        return module.markJobAsComplete(job)
+                            .then(function () {
+                                return true;
+                            })
+                    }
+                    // Not new, not finished
+                    else {
+                        return false;
+                    }
+
+                }
+                // Store
                 return storage.db.save('jobs', job, {uuidIsHash: true});
             })
             // And update list
-            .then(getJobsFromStorage);
+            .then(getJobsFromStorage)
+            .then(function () {
+                return true;
+            });
 
 
     };

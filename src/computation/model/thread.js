@@ -23,6 +23,8 @@ define(['eventemitter2'], function (EventEmitter) {
         this.isRunning = false;
         this.isPaused = false;
 
+        this.isWaitingForJob = false;
+
         function workerMessageHandler(e) {
             _self.emit(e.data.type, {target: _self, data: e.data.data });
         }
@@ -67,6 +69,7 @@ define(['eventemitter2'], function (EventEmitter) {
         };
 
         this.pushJob = function (job) {
+            this.isWaitingForJob = false;
             _webworker.postMessage({cmd: 'job', job: job});
         };
 

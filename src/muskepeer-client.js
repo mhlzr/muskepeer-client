@@ -137,12 +137,12 @@ define([
 
                     // Add workerFile
                     if (project.computation.workers.enabled && project.computation.workers.url) {
-                        requiredFiles.push({ url: project.computation.workers.url });
+                        requiredFiles.push({ url: project.computation.workers.url, type: 'text/javascript'});
                     }
 
                     // Add factoryFile
                     if (project.computation.factories.enabled && project.computation.factories.url) {
-                        requiredFiles.push({ url: project.computation.factories.url });
+                        requiredFiles.push({ url: project.computation.factories.url, type: 'text/javascript'});
                     }
 
                     // Store fileInfo to fileSystem

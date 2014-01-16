@@ -28,12 +28,20 @@ define(['computation/index', 'network/index', 'storage/index'],
                 network.on('broadcast:result:push', function (e) {
                     computation.results.add(e.data)
                         .then(function (hasChanged) {
-                            if (hasChanged) network.peers.broadcast('result:push', e.data, e.target.uuid);
+                            if (hasChanged) {
+                                network.peers.broadcast('result:push', e.data, e.target.uuid);
+                            }
                         });
                 });
 
                 network.on('broadcast:job:push', function (e) {
-
+                    computation.jobs.add(e.data)
+                        .then(function (hasChanged) {
+                            if (hasChanged) {
+                                computation.workers.pushJobToAwaitingThreads(e.data);
+                                network.peers.broadcast('job:push', e.data, e.target.uuid);
+                            }
+                        });
                 });
 
                 network.on('broadcast:job:lock', function (e) {
@@ -174,10 +182,10 @@ define(['computation/index', 'network/index', 'storage/index'],
                     network.publish('job:lock', e);
                 });
                 computation.on('job:unlock', function (e) {
-                    network.publish('job:complete', e);
+                    network.publish('job:unlock', e);
                 });
                 computation.on('job:push', function (e) {
-                    network.publish('job:complete', e);
+                    network.publish('job:push', e);
                 });
                 computation.on('result:push', function (e) {
                     network.publish('result:push', e);

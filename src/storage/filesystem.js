@@ -331,13 +331,13 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
          *
          * @method write
          *
-         * @param {Object} file
+         * @param {Object} fileInfo
          * @param {Blob|String} blob or base64-String
          * @param {Number} [pos]
          *
          * @return {Promise}
          */
-        write: function (file, blob, pos) {
+        write: function (fileInfo, blob, pos) {
             var deferred = Q.defer(),
                 writtenBytes = 0,
                 isNewFile = true;
@@ -348,16 +348,16 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
             }
 
             // Does the file exist in database?
-            _db.read('files', file.uuid, {uuidIsHash: true})
-                .then(function (fileInfo) {
+            _db.read('files', fileInfo.uuid, {uuidIsHash: true})
+                .then(function (info) {
                     // Just to make sure, we have data that is up to date
-                    file = fileInfo;
+                    fileInfo = info;
                     //Is it marked as complete?)
-                    if (!file || file.isComplete) {
+                    if (!fileInfo || fileInfo.isComplete) {
                         deferred.reject('File does not exist, or is already complete');
                     }
 
-                    writtenBytes = file.position;
+                    writtenBytes = fileInfo.position;
                     isNewFile = writtenBytes === 0;
 
                     // We won't overwrite fileDate
@@ -367,7 +367,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                 })
                 .then(function () {
                     // Append bytes
-                    _fs.root.getFile(project.uuid + '/' + file.uuid, {create: isNewFile }, function (fileEntry) {
+                    _fs.root.getFile(project.uuid + '/' + fileInfo.uuid, {create: isNewFile }, function (fileEntry) {
 
                         fileEntry.createWriter(function (writer) {
 
@@ -383,8 +383,8 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                 })
                 .then(function () {
                     // Update fileInfo in database
-                    var currentPosition = file.position + blob.size;
-                    return _db.update('files', {uuid: file.uuid, isComplete: currentPosition >= file.size, position: currentPosition}, {uuidIsHash: true});
+                    var currentPosition = fileInfo.position + blob.size;
+                    return _db.update('files', {uuid: fileInfo.uuid, isComplete: currentPosition >= fileInfo.size, position: currentPosition}, {uuidIsHash: true});
                 })
                 .then(updateFileList);
 
@@ -504,6 +504,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                     uri: file.url,
                     size: 0,
                     position: 0,
+                    type: file.type || 'text/plain',
                     isComplete: false,
                     uuid: crypto.hash(file.url)
                 };

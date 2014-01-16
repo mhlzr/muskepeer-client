@@ -116,6 +116,21 @@ define(['eventemitter2', 'computation/index', '../model/thread', 'settings'], fu
             _threads.forEach(function (thread) {
                 thread.resume();
             });
+        };
+
+        /**
+         * @method pushJobToAwaitingThreads
+         * @returns {Array}
+         */
+        this.pushJobToAwaitingThread = function (job) {
+
+            var threads = _.filter(_threads, function (thread) {
+                return thread.isWaitingForJob === true;
+            });
+
+            if (threads.length > 0) {
+                threads[0].pushJob(job);
+            }
         }
 
 

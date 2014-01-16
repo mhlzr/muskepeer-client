@@ -207,12 +207,21 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
          */
         function poolJobFoundHandler(e) {
 
-            logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a job');
-
             var job = new Job(e.data);
+
             // Add job to queue (if redundant it will be ignored)
-            jobs.add(job);
+            jobs.add(job).then(function (isNew) {
+                if (isNew) {
+                    logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a new job');
+                    module.emit('job:push', job);
+                }
+            });
+
+            // Trhow the job in the pool
+            module.workers.pushJobToAwaitingThread(job);
+
         }
+
 
         /**
          * Event-Listener, listens for
@@ -243,6 +252,8 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
 
                         if (!job) {
                             logger.log('Computation', 'No more jobs left!');
+                            // Mark the thread as idle
+                            e.target.isWaitingForJob = true;
                             return;
                         }
 
@@ -276,8 +287,6 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
             var result = new Result(e.data),
                 promise = Q();
 
-            logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a result');
-
             // Using Jobs-Locking?
             if (project.computation.jobs.lock && result.jobUuid) {
                 // Unlock the job
@@ -296,6 +305,8 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                     }
 
                     if (hasChanged) {
+
+                        logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a new result');
 
                         // Inform about new or changed result
                         module.emit('result:push', result);

@@ -25,11 +25,13 @@
     "files": [
         {
             "name": "training",
-            "url": "https://muskepeer.net/examples/knn-digits/digits-train.json"
+            "url": "https://muskepeer.net/examples/knn-digits/digits-train.json",
+            "type": "application/json"
         },
         {
             "name": "test",
-            "url": "https://muskepeer.net/examples/knn-digits/digits-test.json"
+            "url": "https://muskepeer.net/examples/knn-digits/digits-test.json",
+            "type": "application/json"
         }
 
     ]

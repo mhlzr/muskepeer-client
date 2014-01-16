@@ -22,9 +22,11 @@ require.config({
     }
 });
 
-require(['muskepeer-client', 'util/logger', 'domready'], function (Muskepeer, Logger) {
+require(['muskepeer-client', 'util/logger'], function (Muskepeer, Logger) {
 
     window.logger = Logger;
+
+    logger.log('Client', 'Loading...');
 
     window.Muskepeer = Muskepeer.init();
 

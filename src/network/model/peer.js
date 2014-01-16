@@ -7,7 +7,7 @@
 define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'project'], function (_, Q, EventEmitter2, nodes, settings, project) {
 
     var TIMEOUT_WAIT_TIME = 30000, //30s
-        QUEUE_RETRY_TIME = 150,
+        QUEUE_RETRY_TIME = 5,
         ICE_SERVER_SETTINGS = {
             iceServers: settings.iceServers
         };

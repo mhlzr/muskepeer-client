@@ -123,11 +123,13 @@
     "files": [
         {
             "name": "test",
-            "url": "https://dl.dropboxusercontent.com/u/959008/download.pdf"
+            "url": "https://dl.dropboxusercontent.com/u/959008/download.pdf",
+            "type": "application/pdf"
         },
         {
             "name": "train",
-            "url": "https://dl.dropboxusercontent.com/u/959008/webstorm.pdf"
+            "url": "https://dl.dropboxusercontent.com/u/959008/webstorm.pdf",
+            "type": "application/pdf"
         }
     ]
 }

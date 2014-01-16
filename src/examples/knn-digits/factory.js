@@ -1,10 +1,13 @@
 /**
  *
- **/
+ */
 
-var trainingFile,
-    testFile;
+var testFile,
+    testData;
 
+/**********************************************
+ * COMMUNICATION BLOCK START
+ **********************************************/
 self.addEventListener('message', function (e) {
 
     if (!e.data.cmd) {
@@ -12,25 +15,42 @@ self.addEventListener('message', function (e) {
     }
 
     switch (e.data.cmd.toLowerCase()) {
-        case 'pause':
-            break;
-        case 'resume':
-            start();
-            break;
         case 'start':
             start();
             break;
-        case 'stop':
+        case 'file' :
+            if (e.data.fileInfo.name === 'test') {
+
+                testFile = new Blob([e.data.file], {type: e.data.fileInfo.type});
+                var json = JSON.parse(new FileReaderSync().readAsText(testFile));
+                testData = json.data;
+
+                //testFile = null;
+
+                start();
+            }
             break;
         default:
             break;
     }
 });
+/**********************************************
+ * COMMUNICATION BLOCK END
+ **********************************************/
 
+function start(job) {
 
-function start() {
-
-    if (!trainingFile) {
-        self.postMessage({ type: 'file:pull', data: {uri: 'https://muskepeer.net/examples/knn-digits/digits-train.json'}});
+    if (!testFile) {
+        postMessage({ type: 'file:pull', data: {name: 'test', type: 'arrayBuffer'} });
+        return;
     }
+
+    var index = (testData.length * Math.random()) | 0,
+        dataset = testData.splice(index, 1);
+
+    postMessage({ type: 'job:push', data: {id: index, dataset: dataset}});
+
+    // Come again
+    setTimeout(start, 50);
+
 }

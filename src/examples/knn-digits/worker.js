@@ -19,24 +19,17 @@ self.addEventListener('message', function (e) {
             start();
             break;
         case 'job' :
-            //e.data.job
             start(e.data.job);
             break;
         case 'file' :
-
             if (e.data.fileInfo.name === 'training') {
-                trainingFile = new Blob([e.data.file], {type: 'application/json'});
-                // trainingFile = new Blob(['{"foo":"bar"}'], {type: 'application/json'});
-                getJSONFromBlob(trainingFile, function (json) {
-                    trainingData = json;
-                    console.log(trainingData);
-                    start();
-                });
 
+                trainingFile = new Blob([e.data.file], {type: e.data.fileInfo.type});
+                var json = JSON.parse(new FileReaderSync().readAsText(trainingFile));
+                trainingData = json.data;
+
+                start();
             }
-
-            //e.data.fileInfo
-            //e.data.file
             break;
         default:
             break;
@@ -58,13 +51,246 @@ function start(job) {
         return;
     }
 
+    //var result = knn(job.parameters.dataset);
+    var result = job.parameters.dataset;
+    self.postMessage(
+        {
+            type: 'result:push',
+            data: {
+                id: job.parameters.id,
+                jobUuid: job.uuid,
+                result: result
+            }
+        });
+
+    self.postMessage({ type: 'job:pull' });
 }
 
 
-function getJSONFromBlob(file) {
+/**********************************************
+ * KNN
 
-    var data = new FileReaderSync().readAsText(file);
-    console.log(data);
-    return JSON.parse(data);
+
+ var Kernel = {
+    fn: {
+        rect: function (d, sigma) {
+            return (d <= sigma) ? 1 : 0;
+        },
+        triangle: function (d, sigma) {
+            return Kernel.fn.rect(d, sigma) * (1 - d / sigma);
+        },
+        tricubic: function (d, sigma) {
+            return Kernel.fn.rect(d, sigma) * Math.pow((1 - Math.pow(d, 3) / Math.pow(sigma, 3)), 3);
+        },
+        gauss: function (d, sigma) {
+            return Math.exp(-((d * d) / (2 * sigma * sigma)));
+        }
+    }
+};
+
+
+ var Distance = {
+    fn: {
+        //Minkowski p=1
+        manhattan: function (p1, p2) {
+            return Math.abs(p1 - p2);
+        },
+        //Minkowski p=2
+        euclid: function (p1, p2) {
+            return Math.pow(p1 - p2, 2);
+        }
+    }
+};
+
+ /**
+ * k-Nearest-Neighbour implementation in a javascript webworker
+ * Classifies objects based on closest training examples in the feature space
+ * http://en.wikipedia.org/wiki/K-nearest_neighbor_algorithm
+ *
+ * @author Matthieu Holzer
+ * @date 07/01/2012
+ *
+ * @requires underscore.js (http://underscorejs.org)
+ *
+ * @method knn
+ * @param {Object} trainingData A Object including all the trainingDataSets
+ * @param {Object} testData A Object including all the testDataSets
+ * @param {number} k Number of neighbours to analyze
+ * @param {number} sigma Range in which the neighbours have to be located
+ * @param {String} kernelFuncName The name of the kernel-function which should be used
+ * @param {String} distanceFuncName The name of the distance-function which should be used
+ *
+ * @param {Boolean} sigmaAutoIncrease Whether you wish to autoincrease sigma to include exactly k-neighbours (might slow everything down!)
+ * @param {number} classAmount Amount of classes that exist in the trainingData
+ * @param {number} classAttributePosition The index of your class-atrribute in the trainingData
+
+ function knn(trainingData, testData, k, sigma, kernelFuncName, distanceFuncName, sigmaAutoIncrease, classAmount, classAttributePosition) {
+
+    sigmaAutoIncrease = sigmaAutoIncrease || false;
+    classAttributePosition = classAttributePosition || 0;
+
+    var kernelFunction,
+        distanceFunction = Distance.fn[distanceFuncName] || Distance.fn.euclid,
+        sigmaIncreased = sigma,
+        neighbours = null,
+        co = null;
+
+    if (kernelFuncName === 'none') {
+        kernelFunction = null;
+    } else {
+        kernelFunction = Kernel.fn[kernelFuncName] || Kernel.fn.rect;
+    }
+
+    //finds the nearest neighbours
+    function getNeighbours(index, sigmaToTest) {
+
+        var j, k, weight, minAttributesLength;
+        var distance = 0,
+            neighbours = [];
+
+        //loop trainingData
+        for (j = 0; j < trainingData.length; j++) {
+
+            //it's possible that both datasets have a different amount of attributes
+            minAttributesLength = Math.min(trainingData[j].length, testData[i].length);
+
+            //loop testData & trainingData attributes
+            for (k = 0; k < minAttributesLength; k++) {
+                //no need to check this if k = classAttribute or simply not a number
+                if (k === classAttributePosition || isNaN(trainingData[j][k]) || isNaN(testData[index][k])) {
+                    continue;
+                }
+                distance += distanceFunction(testData[index][k], trainingData[j][k]);
+            }
+
+            distance = Math.sqrt(distance);
+
+            //[ [ id, distance, weight ] ]
+            if (kernelFunction === null) {
+                neighbours.push([j, distance, 1]);
+            } else {
+                weight = kernelFunction(distance, sigmaToTest);
+                if (weight > 0) {
+                    neighbours.push([j, distance, weight]);
+                }
+            }
+
+            //cleanup
+            weight = distance = 0;
+
+        }
+
+        return neighbours;
+
+
+    }
+
+    //counts how many neighbours have which class, restricted by sigma or not and it's weight
+    function getClassOccurencies() {
+        var currentClassName;
+        var classOccurencies = {
+            total: {},
+            weight: {},
+            withinSigma: {}
+        };
+
+        neighbours.forEach(function (n) {
+
+            currentClassName = trainingData[n[0]][this.classAttributePosition];
+
+            //get class occurency total
+            if (typeof classOccurencies.total[currentClassName] === 'undefined') {
+                classOccurencies.total[currentClassName] = 0;
+            }
+            classOccurencies.total[currentClassName] += 1;
+
+            //if weight > 0
+            if (n[2] > 0) {
+                //get class weights
+                if (typeof classOccurencies.weight[currentClassName] === 'undefined') {
+                    classOccurencies.weight[currentClassName] = 0;
+                }
+                classOccurencies.weight[currentClassName] += n[2];
+
+                //get class occurency within original sigma
+                if (n[1] <= sigma) {
+                    if (typeof classOccurencies.withinSigma[currentClassName] === 'undefined') {
+                        classOccurencies.withinSigma[currentClassName] = 0;
+                    }
+                    classOccurencies.withinSigma[currentClassName] += 1;
+                }
+            }
+
+        });
+
+        return classOccurencies;
+
+    }
+
+    //predicts the class by highest weight
+    function getClassWithHighestWeight() {
+
+        var maxClassName;
+
+        for (var key in co.weight) {
+            if (typeof maxClassName === 'undefined' || co.weight[key] > co.weight[maxClassName]) {
+                maxClassName = key;
+            }
+        }
+
+        return (typeof maxClassName === 'undefined') ? null : maxClassName;
+    }
+
 }
 
+
+ /**
+ //loop testData
+ for (var i = 0; i < testData.length; i++) {
+
+        //first time to look for neighbors
+        neighbours = getNeighbours(i, sigmaIncreased);
+
+        //increase sigma if activated
+        if (sigmaAutoIncrease) {
+            //as long as there are not enough neighbors in reach, increase reach (sigma)
+            while (neighbours.length < k) {
+                neighbours = getNeighbours(i, ++sigmaIncreased);
+            }
+
+        }
+
+        //sort neighbours by distance-value
+        neighbours = _.sortBy(neighbours, function (n) {
+            return n[1];
+        });
+
+        //remove every neighbour, which position is > k
+        neighbours = neighbours.slice(0, this.k);
+
+
+        co = getClassOccurencies();
+
+
+        postMessage({
+            "point": i,
+            "neighbours": neighbours,
+            "predictedClass": getClassWithHighestWeight(),
+            "sigmaIncreased": (sigmaIncreased !== sigma) ? sigmaIncreased : null,
+            "classOccurencyTotal": co.total,
+            "classOccurencyWithinSigma": co.withinSigma,
+            "classWeight": co.weight
+        });
+
+        //resetting sigma
+        sigmaIncreased = sigma;
+
+    }
+
+
+ /**
+
+
+ }
+
+ **********************************************/
