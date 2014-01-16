@@ -31,6 +31,6 @@ self.addEventListener('message', function (e) {
 function start() {
 
     if (!trainingFile) {
-        self.postMessage({ type: 'file:required', data: {uri: 'https://muskepeer.net/examples/knn-digits/digits-train.json'}});
+        self.postMessage({ type: 'file:pull', data: {uri: 'https://muskepeer.net/examples/knn-digits/digits-train.json'}});
     }
 }

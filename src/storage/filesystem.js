@@ -404,6 +404,9 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                     if (!completeFile) {
                         blob = file.slice(start, end);
                     }
+                    else {
+                        blob = file;
+                    }
 
                     reader.onloadend = function (e) {
 

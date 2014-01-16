@@ -24,6 +24,7 @@ define(['eventemitter2'], function (EventEmitter) {
         this.isPaused = false;
 
         function workerMessageHandler(e) {
+            console.log(e);
             _self.emit(e.data.type, {target: _self, data: e.data.data });
         }
 

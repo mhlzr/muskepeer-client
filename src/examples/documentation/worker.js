@@ -60,6 +60,8 @@ function start() {
     self.postMessage({ type: 'file:pull', data: {name: 'webstorm', type: 'localUrl', offset: 0} });
     self.postMessage({ type: 'file:pull', data: {name: 'webstorm', type: 'blob', offset: 1234} });
     self.postMessage({ type: 'file:pull', data: {name: 'webstorm', type: 'dataUrl'} });
+    self.postMessage({ type: 'file:pull', data: {name: 'webstorm', type: 'path'} });
+
 
     self.postMessage({ type: 'file:push', data: {} });
 

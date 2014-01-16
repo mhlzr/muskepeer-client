@@ -2,8 +2,10 @@
  *
  */
 
+//resolveLocalFileSystemSyncURL = webkitResolveLocalFileSystemSyncURL || resolveLocalFileSystemSyncURL;
 
-var trainingFile;
+var trainingFile,
+    trainingData;
 
 /**********************************************
  * COMMUNICATION BLOCK START
@@ -24,7 +26,16 @@ self.addEventListener('message', function (e) {
             break;
         case 'file' :
             if (e.data.fileInfo.name === 'training') {
-                trainingFile = e.data.file;
+
+                console.log(e.data.file);
+                //trainingFile = resolveLocalFileSystemSyncURL(e.data.file);
+                //console.log(trainingFile);
+
+                 convertFileToJSON(e.data.file, function (json) {
+                     self.postMessage('got json');
+                     trainingData = json;
+                     self.postMessage(json);
+                 });
             }
             //e.data.fileInfo
             //e.data.file
@@ -41,8 +52,6 @@ function start(job) {
 
     if (!trainingFile) {
         self.postMessage({ type: 'file:pull', data: {name: 'training', type: 'blob'} });
-        self.postMessage({ type: 'file:pull', data: {name: 'training', type: 'dataUrl'} });
-        self.postMessage({ type: 'file:pull', data: {name: 'training', type: 'localUrl'} });
         return;
     }
 
@@ -51,5 +60,23 @@ function start(job) {
         return;
     }
 
+}
+
+
+function convertFileToJSON(file, callback) {
+
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+        console.log(e);
+        self.postMessage('converted');
+        callback(JSON.parse(e.target.result));
+    };
+
+    reader.readAsText(file);
+
+    console.log(file, reader);
+
 
 }
+

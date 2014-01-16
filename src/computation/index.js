@@ -384,12 +384,16 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                     var offset = e.data.offset || 0,
                         completeFile = offset === 0;
 
+                    // FileSystem Path
+                    if (e.data.type === 'path') {
+                        return project.uuid + '/' + fileInfo.uuid;
+                    }
                     // Blob
                     if (e.data.type === 'blob') {
                         return storage.fs.readFileChunkAsBlob(fileInfo, offset, completeFile);
                     }
                     // DataUrl
-                    else if (e.data.type === 'localUrl') {
+                    else if (e.data.type === 'dataUrl') {
                         return storage.fs.readFileChunkAsDataUrl(fileInfo, offset, completeFile);
                     }
                     // Default is localUrl
@@ -398,7 +402,6 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                     }
 
                 }).then(function (file) {
-                    console.log(file);
                     e.target.pushFile(fileInfo, file);
                 })
 
