@@ -24,7 +24,6 @@ define(['eventemitter2'], function (EventEmitter) {
         this.isPaused = false;
 
         function workerMessageHandler(e) {
-            console.log(e);
             _self.emit(e.data.type, {target: _self, data: e.data.data });
         }
 
@@ -71,8 +70,18 @@ define(['eventemitter2'], function (EventEmitter) {
             _webworker.postMessage({cmd: 'job', job: job});
         };
 
-        this.pushFile = function (fileInfo, file) {
+        this.pushFileAsClone = function (fileInfo, file) {
             _webworker.postMessage({cmd: 'file', fileInfo: fileInfo, file: file});
+        };
+
+
+        this.pushFileAsTransferableObject = function (fileInfo, file) {
+            var transfer = {
+                cmd: 'file',
+                fileInfo: fileInfo,
+                file: file
+            };
+            _webworker.postMessage(transfer, [transfer.file]);
         };
 
         this.pushResult = function (result) {

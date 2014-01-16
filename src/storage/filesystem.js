@@ -90,6 +90,93 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
         return deferred.promise;
     }
 
+
+    /**
+     *
+     * @param fileInfo
+     * @param mode
+     * @param offset
+     * @param completeFile
+     * @returns {Promise}
+     */
+    function readFile(fileInfo, mode, offset, completeFile) {
+
+        var deferred = Q.defer();
+
+        mode = mode || 'blob';
+        completeFile = completeFile || false;
+
+        _fs.root.getFile(project.uuid + '/' + fileInfo.uuid, {}, function (fileEntry) {
+
+            fileEntry.file(function (file) {
+
+                var start = offset || 0,
+                    end = start + CHUNK_SIZE,
+                    blob;
+
+                // Every file has an end
+                if (start + CHUNK_SIZE > file.size) {
+                    end = file.size;
+                }
+
+                // Slice that file
+                if (!completeFile) {
+                    blob = file.slice(start, end);
+                } else {
+                    blob = file;
+                }
+
+                // Blob Mode, no need for FileReader
+                if (mode === 'blob') {
+                    deferred.resolve(blob);
+                }
+
+                // Using FileReader
+                else {
+                    var reader = new FileReader();
+
+                    reader.onloadend = function (e) {
+
+                        if (e.target.readyState === FileReader.DONE) {
+
+                            if (mode === 'dataUrl') {
+                                // Remove data attribute prefix
+                                var chunk = reader.result.match(/,(.*)$/);
+                                if (chunk) {
+                                    deferred.resolve(chunk[1]);
+                                } else {
+                                    deferred.reject();
+                                }
+                            } else {
+                                deferred.resolve(reader.result);
+                            }
+                            reader = null;
+
+                        } else {
+                            deferred.reject();
+                        }
+
+                    };
+
+                    // DataUrl Mode
+                    if (mode === 'dataUrl') {
+                        reader.readAsDataURL(blob);
+                        // ArrayBuffer Mode
+                    } else if (mode === 'arrayBuffer') {
+                        reader.readAsArrayBuffer(blob);
+                    }
+
+                }
+
+
+            }, deferred.reject);
+
+
+        }, deferred.reject);
+
+        return deferred.promise;
+    }
+
     /**
      * Gets a file via XHR and returns a promise,
      * resolve will contain a Blob
@@ -175,7 +262,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
      *
      * @return {Blob}
      */
-    function base64oBlob(base64, contentType) {
+    function base64toBlob(base64, contentType) {
         contentType = contentType || '';
 
         var byteCharacters = atob(base64);
@@ -257,7 +344,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
             // Test if we need to convert from base64
             if (!blob instanceof Blob) {
-                blob = base64oBlob(blob);
+                blob = base64toBlob(blob);
             }
 
             // Does the file exist in database?
@@ -309,14 +396,36 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
          * Get a local url to a file in fileSystem
          *
          * @method readFileAsLocalUrl
-         * @param {Object} file
+         * @param {Object} fileInfo
          * @return {Promise}
          */
-        readFileAsLocalUrl: function (file) {
+        readFileAsLocalUrl: function (fileInfo) {
             var deferred = Q.defer();
 
-            _fs.root.getFile(project.uuid + '/' + file.uuid, {}, function (fileEntry) {
+            _fs.root.getFile(project.uuid + '/' + fileInfo.uuid, {}, function (fileEntry) {
                 deferred.resolve(fileEntry.toURL());
+            }, deferred.reject);
+
+            return deferred.promise;
+        },
+
+
+        /**
+         * Get an ObjectUrl to a file from FileSystem
+         *
+         * @method readFileAsObjectUrl
+         * @param {Object} fileInfo
+         * @return {Promise}
+         */
+        readFileAsObjectUrl: function (fileInfo) {
+            var deferred = Q.defer();
+
+            _fs.root.getFile(project.uuid + '/' + fileInfo.uuid, {}, function (fileEntry) {
+
+                fileEntry.file(function (file) {
+                    deferred.resolve(URL.createObjectURL(file));
+                }, deferred.reject);
+
             }, deferred.reject);
 
             return deferred.promise;
@@ -328,45 +437,15 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
          * Chunk size is defined globally by CHUNK_SIZE.
          * Slicing can be disabled using completeFile param.
          *
-         * @param file
-         * @param offset
-         *
+         * @method readFileChunkAsBlob
+         * @param {Object} file
+         * @param {Number} offset
+         * @param {Boolean} completeFile
          * @return {Promise}
          */
         readFileChunkAsBlob: function (file, offset, completeFile) {
-            var deferred = Q.defer();
+            return readFile(file, 'blob', offset, completeFile);
 
-            completeFile = completeFile || false;
-
-            _fs.root.getFile(project.uuid + '/' + file.uuid, {}, function (fileEntry) {
-
-                fileEntry.file(function (file) {
-
-                    var start = offset || 0,
-                        end = start + CHUNK_SIZE,
-                        blob;
-
-                    // Every file has an end
-                    if (start + CHUNK_SIZE > file.size) {
-                        end = file.size;
-                    }
-
-                    // Slice that file
-                    if (!completeFile) {
-                        blob = file.slice(start, end);
-                    } else {
-                        blob = file;
-                    }
-
-                    deferred.resolve(blob);
-
-
-                }, deferred.reject);
-
-
-            }, deferred.reject);
-
-            return deferred.promise;
         },
 
         /**
@@ -374,68 +453,30 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
          * Chunk size is defined globally by CHUNK_SIZE.
          * Slicing can be disabled using completeFile param.
          *
+         * @method readFileChunkAsDataUrl
          * @param {Object} file
          * @param {Number} offset
          * @param {Boolean} completeFile
          * @return {Promise}
          */
         readFileChunkAsDataUrl: function (file, offset, completeFile) {
-            var deferred = Q.defer();
-
-            completeFile = completeFile || false;
-
-            _fs.root.getFile(project.uuid + '/' + file.uuid, {}, function (fileEntry) {
-
-                // Get a File object representing the file,
-                // then use FileReader to read its contents.
-                fileEntry.file(function (file) {
-
-                    var reader = new FileReader(),
-                        start = offset || 0,
-                        end = start + CHUNK_SIZE,
-                        blob, chunk;
-
-                    // Every file has an end
-                    if (start + CHUNK_SIZE > file.size) {
-                        end = file.size;
-                    }
-
-                    // Slice that file
-                    if (!completeFile) {
-                        blob = file.slice(start, end);
-                    }
-                    else {
-                        blob = file;
-                    }
-
-                    reader.onloadend = function (e) {
-
-                        if (e.target.readyState === FileReader.DONE) {
-
-                            // Remove data attribute prefix
-                            chunk = reader.result.match(/,(.*)$/);
-
-                            if (chunk) {
-                                deferred.resolve(chunk[1]);
-                                reader = null;
-                            } else {
-                                deferred.reject();
-                            }
-
-                        } else {
-                            deferred.reject();
-                        }
-
-                    };
-
-                    reader.readAsDataURL(blob);
-
-                }, deferred.reject);
+            return readFile(file, 'dataUrl', offset, completeFile);
+        },
 
 
-            }, deferred.reject);
-
-            return deferred.promise;
+        /**
+         * Read some chunks from the file and return an ArrayBuffer.
+         * Chunk size is defined globally by CHUNK_SIZE.
+         * Slicing can be disabled using completeFile param.
+         *
+         * @method readFileChunkAsArrayBuffer
+         * @param {Object} file
+         * @param {Number} offset
+         * @param {Boolean} completeFile
+         * @return {Promise}
+         */
+        readFileChunkAsArrayBuffer: function (file, offset, completeFile) {
+            return readFile(file, 'arrayBuffer', offset, completeFile);
         },
 
 

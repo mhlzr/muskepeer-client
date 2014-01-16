@@ -82,9 +82,9 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
             // Get the cached script from local fileSystem
             return storage.fs.getFileInfoByUri(url)
                 .then(function (fileInfos) {
-                    return storage.fs.readFileAsLocalUrl(fileInfos[0]);
+                    return storage.fs.readFileAsObjectUrl(fileInfos[0]);
                 })
-                .then(function (localUrl) {
+                .then(function (objectURL) {
 
                     var amount = 1;
 
@@ -94,7 +94,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                             amount = settings.maxWorkers;
                         }
 
-                        module.workers = new Pool(module.WORKER, localUrl, amount);
+                        module.workers = new Pool(module.WORKER, objectURL, amount);
                     }
                     else {
 
@@ -102,7 +102,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                             amount = settings.maxFactories;
                         }
 
-                        module.factories = new Pool(module.FACTORY, localUrl, amount);
+                        module.factories = new Pool(module.FACTORY, objectURL, amount);
                     }
 
                 });
@@ -384,25 +384,36 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                     var offset = e.data.offset || 0,
                         completeFile = offset === 0;
 
-                    // FileSystem Path
-                    if (e.data.type === 'path') {
-                        return project.uuid + '/' + fileInfo.uuid;
-                    }
-                    // Blob
-                    if (e.data.type === 'blob') {
-                        return storage.fs.readFileChunkAsBlob(fileInfo, offset, completeFile);
-                    }
-                    // DataUrl
-                    else if (e.data.type === 'dataUrl') {
-                        return storage.fs.readFileChunkAsDataUrl(fileInfo, offset, completeFile);
-                    }
-                    // Default is localUrl
-                    else {
-                        return storage.fs.readFileAsLocalUrl(fileInfo)
+                    switch (e.data.type) {
+                        case 'path' :
+                            return project.uuid + '/' + fileInfo.uuid;
+                            break;
+                        case 'blob' :
+                            return storage.fs.readFileChunkAsBlob(fileInfo, offset, completeFile);
+                            break;
+                        case 'dataUrl' :
+                            return storage.fs.readFileChunkAsDataUrl(fileInfo, offset, completeFile);
+                            break;
+                        case 'localUrl' :
+                            return storage.fs.readFileAsLocalUrl(fileInfo);
+                            break;
+                        default :
+                        case 'arrayBuffer' :
+                            return storage.fs.readFileChunkAsArrayBuffer(fileInfo, offset, completeFile);
+                            break;
                     }
 
                 }).then(function (file) {
-                    e.target.pushFile(fileInfo, file);
+
+                    // Transfer as transferable Object
+                    if (e.data.type === 'arrayBuffer') {
+                        e.target.pushFileAsTransferableObject(fileInfo, file)
+                    }
+                    // Transfer as clone (can get expensive!)
+                    else {
+                        e.target.pushFileAsClone(fileInfo, file)
+                    }
+
                 })
 
 

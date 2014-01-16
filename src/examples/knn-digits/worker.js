@@ -2,8 +2,6 @@
  *
  */
 
-//resolveLocalFileSystemSyncURL = webkitResolveLocalFileSystemSyncURL || resolveLocalFileSystemSyncURL;
-
 var trainingFile,
     trainingData;
 
@@ -25,18 +23,18 @@ self.addEventListener('message', function (e) {
             start(e.data.job);
             break;
         case 'file' :
+
             if (e.data.fileInfo.name === 'training') {
+                trainingFile = new Blob([e.data.file], {type: 'application/json'});
+                // trainingFile = new Blob(['{"foo":"bar"}'], {type: 'application/json'});
+                getJSONFromBlob(trainingFile, function (json) {
+                    trainingData = json;
+                    console.log(trainingData);
+                    start();
+                });
 
-                console.log(e.data.file);
-                //trainingFile = resolveLocalFileSystemSyncURL(e.data.file);
-                //console.log(trainingFile);
-
-                 convertFileToJSON(e.data.file, function (json) {
-                     self.postMessage('got json');
-                     trainingData = json;
-                     self.postMessage(json);
-                 });
             }
+
             //e.data.fileInfo
             //e.data.file
             break;
@@ -51,7 +49,7 @@ self.addEventListener('message', function (e) {
 function start(job) {
 
     if (!trainingFile) {
-        self.postMessage({ type: 'file:pull', data: {name: 'training', type: 'blob'} });
+        self.postMessage({ type: 'file:pull', data: {name: 'training', type: 'arrayBuffer'} });
         return;
     }
 
@@ -63,20 +61,10 @@ function start(job) {
 }
 
 
-function convertFileToJSON(file, callback) {
+function getJSONFromBlob(file) {
 
-    var reader = new FileReader();
-
-    reader.onload = function (e) {
-        console.log(e);
-        self.postMessage('converted');
-        callback(JSON.parse(e.target.result));
-    };
-
-    reader.readAsText(file);
-
-    console.log(file, reader);
-
-
+    var data = new FileReaderSync().readAsText(file);
+    console.log(data);
+    return JSON.parse(data);
 }
 
