@@ -58,7 +58,7 @@ function start(job) {
             type: 'result:push',
             data: {
                 id: job.parameters.id,
-                jobUuid: job.uuid,
+                job: { uuid: job.uuid },
                 result: result
             }
         });

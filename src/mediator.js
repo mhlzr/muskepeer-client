@@ -38,7 +38,7 @@ define(['computation/index', 'network/index', 'storage/index'],
                     computation.jobs.add(e.data)
                         .then(function (hasChanged) {
                             if (hasChanged) {
-                                computation.workers.pushJobToAwaitingThreads(e.data);
+                                computation.pushJobToAwaitingWorker(e.data);
                                 network.peers.broadcast('job:push', e.data, e.target.uuid);
                             }
                         });

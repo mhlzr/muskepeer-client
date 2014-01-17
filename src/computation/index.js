@@ -79,33 +79,54 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
          */
         function createThreadPool(type, url) {
 
-            // Get the cached script from local fileSystem
-            return storage.fs.getFileInfoByUri(url)
-                .then(function (fileInfos) {
-                    return storage.fs.readFileAsObjectUrl(fileInfos[0]);
-                })
-                .then(function (objectURL) {
+            var expected = project.computation.jobs.expected,
+                storeName = 'jobs';
 
-                    var amount = 1;
+            if (type === module.WORKER) {
+                expected = project.computation.results.expected;
+                storeName = 'results';
+            }
 
-                    if (type === module.WORKER) {
+            return allFound(storeName, expected)
+                .then(function (isComplete) {
 
-                        if (project.computation.workers.multipleAllowed) {
-                            amount = settings.maxWorkers;
-                        }
-
-                        module.workers = new Pool(module.WORKER, objectURL, amount);
+                    // No need to create a pool if it's already complete
+                    if (isComplete) {
+                        logger.log('Computation', 'Already finished, not creating a ' + type + 'Pool!');
+                        return Q();
                     }
                     else {
+                        // Get the cached script from local fileSystem
+                        return storage.fs.getFileInfoByUri(url)
+                            .then(function (fileInfos) {
+                                return storage.fs.readFileAsObjectUrl(fileInfos[0]);
+                            })
+                            .then(function (objectURL) {
 
-                        if (project.computation.factories.multipleAllowed) {
-                            amount = settings.maxFactories;
-                        }
+                                var amount = 1;
 
-                        module.factories = new Pool(module.FACTORY, objectURL, amount);
+                                if (type === module.WORKER) {
+
+                                    if (project.computation.workers.multipleAllowed) {
+                                        amount = settings.maxWorkers;
+                                    }
+
+                                    module.workers = new Pool(module.WORKER, objectURL, amount);
+                                }
+                                else {
+
+                                    if (project.computation.factories.multipleAllowed) {
+                                        amount = settings.maxFactories;
+                                    }
+
+                                    module.factories = new Pool(module.FACTORY, objectURL, amount);
+                                }
+
+                            });
+
                     }
-
                 });
+
         }
 
 
@@ -132,10 +153,9 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
             else {
                 logger.log('Computation', 'Creating Workers');
 
-
                 return createThreadPool(module.WORKER, project.computation.workers.url)
                     .then(function () {
-                        addEventListenersToPool(module.workers);
+                        if (module.workers) addEventListenersToPool(module.workers);
                     })
             }
 
@@ -163,11 +183,10 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
 
             // Instantiate workers
             else {
-                logger.log('Computation', 'Creating Factories');
 
                 return createThreadPool(module.FACTORY, project.computation.factories.url)
                     .then(function () {
-                        addEventListenersToPool(module.factories);
+                        if (module.factories)  addEventListenersToPool(module.factories);
                     })
             }
 
@@ -214,11 +233,11 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                 if (isNew) {
                     logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a new job');
                     module.emit('job:push', job);
+
+                    // Throw the job in the pool
+                    module.pushJobToAwaitingWorker(job);
                 }
             });
-
-            // Trhow the job in the pool
-            module.workers.pushJobToAwaitingThread(job);
 
         }
 
@@ -248,12 +267,13 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
 
                 logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'needs a job');
 
-                jobs.getNextAvailableJob().then(function (job) {
+                jobs.getNextAvailableJob()
+                    .then(function (job) {
 
                         if (!job) {
                             logger.log('Computation', 'No more jobs left!');
                             // Mark the thread as idle
-                            e.target.isWaitingForJob = true;
+                            e.target.isIdle = true;
                             return;
                         }
 
@@ -290,7 +310,10 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
             // Using Jobs-Locking?
             if (project.computation.jobs.lock && result.jobUuid) {
                 // Unlock the job
-                promise = jobs.unlockJob({uuid: result.jobUuid});
+                promise = jobs.unlockJob({uuid: result.jobUuid})
+                    .then(function () {
+                        module.emit('job:unlock', {uuid: result.jobUuid});
+                    });
             }
 
             return promise
@@ -298,11 +321,6 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                     return results.add(result)
                 })
                 .then(function (hasChanged) {
-
-                    // Inform about job status
-                    if (project.computation.jobs.lock && result.jobUuid) {
-                        module.emit('job:unlock', {uuid: result.jobUuid});
-                    }
 
                     if (hasChanged) {
 
@@ -612,9 +630,37 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                         return isComplete = isComplete && jobsComplete;
                     })
 
+            },
+
+
+            /**
+             * @method pushJobToAwaitingWorker
+             * @returns {Array}
+             */
+            pushJobToAwaitingWorker: function (job) {
+
+                // Are there workers at all?
+                if (!module.workers) return;
+
+                var workers = module.workers.getIdleThreads();
+
+                if (workers.length > 0) {
+
+                    // Need to publish lock?
+                    if (project.computation.jobs.lock) {
+                        jobs.lockJob(job).then(function () {
+                            module.emit('job:lock', {uuid: job.uuid});
+                            workers[0].pushJob(job);
+                        });
+                    }
+                    // No need to lock
+                    else {
+                        workers[0].pushJob(job);
+                    }
+
+                }
             }
 
         });
 
-    })
-;
+    });

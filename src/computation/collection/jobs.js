@@ -25,7 +25,7 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
         };
 
         if (filterFinished) {
-            filter.isFinished = false;
+            filter.isComplete = false;
         }
 
         if (filterLocked) {
@@ -69,8 +69,6 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
                 // Store
                 return storage.db.save('jobs', job, {uuidIsHash: true});
             })
-            // And update list
-            .then(getJobsFromStorage)
             .then(function () {
                 return true;
             });
@@ -83,7 +81,7 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
      * @return {Promise}
      */
     module.clear = function () {
-        return storage.db.clear(['jobs']).then(getJobsFromStorage);
+        return storage.db.clear(['jobs']);
     };
 
 
@@ -96,11 +94,13 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
             position;
 
         getJobsFromStorage(true, true).then(function (jobs) {
+
             if (jobs.length > 0) {
-                // We do'nt take the first, but any random one!
+                // We don't take the first, but any random one!
                 //deferred.resolve(jobs.shift());
                 position = (Math.random() * jobs.length | 0);
-                deferred.resolve(jobs.splice(position, 1));
+                var job = jobs.splice(position, 1)[0];
+                deferred.resolve(job);
             }
             else {
                 deferred.resolve(null);
@@ -128,7 +128,7 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
      */
     module.lockJob = function (job) {
         if (project.computation.jobs.lock) {
-            return storage.db.update('jobs', {uuid: job.uuid, locktime: Date.now(), isLocked: true}, {uuidIsHash: true}).then(getJobsFromStorage);
+            return storage.db.update('jobs', {uuid: job.uuid, locktime: Date.now(), isLocked: true}, {uuidIsHash: true});
         }
         else return Q();
     };
@@ -140,7 +140,7 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
      */
     module.unlockJob = function (job) {
         if (project.computation.jobs.lock) {
-            return storage.db.update('jobs', {uuid: job.uuid, locktime: null, isLocked: false}, {uuidIsHash: true}).then(getJobsFromStorage);
+            return storage.db.update('jobs', {uuid: job.uuid, locktime: null, isLocked: false}, {uuidIsHash: true});
         }
         else return Q();
     };
@@ -152,7 +152,6 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
      */
     module.markJobAsComplete = function (job) {
         return storage.db.update('jobs', {uuid: job.uuid, isComplete: true}, {uuidIsHash: true})
-            .then(getJobsFromStorage);
     };
 
     /**
@@ -161,11 +160,10 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
      * @return {Promise}
      */
     module.remove = function (job) {
-        return storage.db.remove('jobs', job.uuid).then(getJobsFromStorage);
+        return storage.db.remove('jobs', job.uuid);
     };
 
 
     return module;
-
 
 });

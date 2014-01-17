@@ -131,7 +131,6 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
 
                 store.count(function (amount) {
                     deferred.resolve(amount);
-
                 }, {});
 
                 return deferred.promise;

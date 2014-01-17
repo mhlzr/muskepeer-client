@@ -38,8 +38,8 @@ define(['lodash', './uuid', 'observe-js'], function (_, uuid) {
 
     //Defaults
     _.defaults(_settings, {
-        authToken: uuid.generate(), //will never be sent to any peer (private)
-        i18n: 'en_GB',
+        authToken: uuid.generate(), // Will never be sent to any peer (private)
+        i18n: 'en_US',
         maxPeers: 3,
         maxFactories: 1,
         maxWorkers: 1,
