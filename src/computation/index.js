@@ -31,6 +31,10 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
 
                     logger.log('Computation', amount, type);
 
+                    // Update the size
+                    if (type === 'results') results.size = amount;
+                    else jobs.size = amount;
+
                     // We don't know how much to expect, so we can't say
                     if (!expected || expected < 0 || !_.isFinite(expected)) {
                         deferred.resolve(false);

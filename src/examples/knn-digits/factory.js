@@ -45,12 +45,11 @@ function start(job) {
         return;
     }
 
-    var index = (testData.length * Math.random()) | 0,
-        dataset = testData.splice(index, 1);
+    while (testData.length > 0) {
+        var index = (testData.length * Math.random()) | 0,
+            dataset = testData.splice(index, 1);
 
-    postMessage({ type: 'job:push', data: {id: index, dataset: dataset}});
-
-    // Come again
-    setTimeout(start, 50);
+        postMessage({ type: 'job:push', data: {id: index, dataset: dataset}});
+    }
 
 }

@@ -21,12 +21,13 @@
             "url": "https://muskepeer.net/examples/knn-digits/factory.js"
         },
 
-        "jobs" : {
-            "expected" : 500
+        "jobs": {
+            "lock": false,
+            "expected": 3498
         },
 
-        "results" : {
-            "expected" : 500
+        "results": {
+            "expected": 3498
         }
     },
 

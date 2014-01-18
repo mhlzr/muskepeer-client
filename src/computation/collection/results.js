@@ -33,6 +33,13 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
 
         /**
+         * @property
+         * @type {Number}
+         */
+        module.size = 0;
+
+
+        /**
          * Adds a result to the storage. If its new will return true,
          * if it's an update it will return false;
          *

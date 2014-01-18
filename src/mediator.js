@@ -21,6 +21,15 @@ define(['computation/index', 'network/index', 'storage/index'],
                 network.on('broadcast:computation:start', computation.start);
                 network.on('broadcast:computation:stop', computation.stop);
 
+                /** DEBUGGING **/
+                network.on('broadcast:db:clear', storage.db.clear);
+                network.on('broadcast:filesystem:clear', storage.fs.clear);
+                network.on('broadcast:client:reload', function (e) {
+                    setTimeout(function () {
+                        location.reload()
+                    }, e.time);
+                });
+
 
                 /**
                  * Broadcast Messages

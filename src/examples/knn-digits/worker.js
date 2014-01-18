@@ -51,15 +51,14 @@ function start(job) {
         return;
     }
 
-    //var result = knn(job.parameters.dataset);
-    var result = job.parameters.dataset;
+
     self.postMessage(
         {
             type: 'result:push',
             data: {
                 id: job.parameters.id,
                 job: { uuid: job.uuid },
-                result: result
+                result: knn(trainingData, job.parameters.dataset, 20, 40, 'rect', 'euclid', false, 16)
             }
         });
 
@@ -67,42 +66,7 @@ function start(job) {
 }
 
 
-/**********************************************
- * KNN
-
-
- var Kernel = {
-    fn: {
-        rect: function (d, sigma) {
-            return (d <= sigma) ? 1 : 0;
-        },
-        triangle: function (d, sigma) {
-            return Kernel.fn.rect(d, sigma) * (1 - d / sigma);
-        },
-        tricubic: function (d, sigma) {
-            return Kernel.fn.rect(d, sigma) * Math.pow((1 - Math.pow(d, 3) / Math.pow(sigma, 3)), 3);
-        },
-        gauss: function (d, sigma) {
-            return Math.exp(-((d * d) / (2 * sigma * sigma)));
-        }
-    }
-};
-
-
- var Distance = {
-    fn: {
-        //Minkowski p=1
-        manhattan: function (p1, p2) {
-            return Math.abs(p1 - p2);
-        },
-        //Minkowski p=2
-        euclid: function (p1, p2) {
-            return Math.pow(p1 - p2, 2);
-        }
-    }
-};
-
- /**
+/**
  * k-Nearest-Neighbour implementation in a javascript webworker
  * Classifies objects based on closest training examples in the feature space
  * http://en.wikipedia.org/wiki/K-nearest_neighbor_algorithm
@@ -110,7 +74,6 @@ function start(job) {
  * @author Matthieu Holzer
  * @date 07/01/2012
  *
- * @requires underscore.js (http://underscorejs.org)
  *
  * @method knn
  * @param {Object} trainingData A Object including all the trainingDataSets
@@ -121,13 +84,44 @@ function start(job) {
  * @param {String} distanceFuncName The name of the distance-function which should be used
  *
  * @param {Boolean} sigmaAutoIncrease Whether you wish to autoincrease sigma to include exactly k-neighbours (might slow everything down!)
- * @param {number} classAmount Amount of classes that exist in the trainingData
  * @param {number} classAttributePosition The index of your class-atrribute in the trainingData
+ **/
 
- function knn(trainingData, testData, k, sigma, kernelFuncName, distanceFuncName, sigmaAutoIncrease, classAmount, classAttributePosition) {
+function knn(trainingData, testData, k, sigma, kernelFuncName, distanceFuncName, sigmaAutoIncrease, classAttributePosition) {
 
     sigmaAutoIncrease = sigmaAutoIncrease || false;
     classAttributePosition = classAttributePosition || 0;
+
+    var Kernel = {
+        fn: {
+            rect: function (d, sigma) {
+                return (d <= sigma) ? 1 : 0;
+            },
+            triangle: function (d, sigma) {
+                return Kernel.fn.rect(d, sigma) * (1 - d / sigma);
+            },
+            tricubic: function (d, sigma) {
+                return Kernel.fn.rect(d, sigma) * Math.pow((1 - Math.pow(d, 3) / Math.pow(sigma, 3)), 3);
+            },
+            gauss: function (d, sigma) {
+                return Math.exp(-((d * d) / (2 * sigma * sigma)));
+            }
+        }
+    };
+
+
+    var Distance = {
+        fn: {
+            //Minkowski p=1
+            manhattan: function (p1, p2) {
+                return Math.abs(p1 - p2);
+            },
+            //Minkowski p=2
+            euclid: function (p1, p2) {
+                return Math.pow(p1 - p2, 2);
+            }
+        }
+    };
 
     var kernelFunction,
         distanceFunction = Distance.fn[distanceFuncName] || Distance.fn.euclid,
@@ -142,7 +136,7 @@ function start(job) {
     }
 
     //finds the nearest neighbours
-    function getNeighbours(index, sigmaToTest) {
+    function getNeighbours(testData, sigmaToTest) {
 
         var j, k, weight, minAttributesLength;
         var distance = 0,
@@ -152,15 +146,15 @@ function start(job) {
         for (j = 0; j < trainingData.length; j++) {
 
             //it's possible that both datasets have a different amount of attributes
-            minAttributesLength = Math.min(trainingData[j].length, testData[i].length);
+            minAttributesLength = Math.min(trainingData[j].length, testData.length);
 
             //loop testData & trainingData attributes
             for (k = 0; k < minAttributesLength; k++) {
                 //no need to check this if k = classAttribute or simply not a number
-                if (k === classAttributePosition || isNaN(trainingData[j][k]) || isNaN(testData[index][k])) {
+                if (k === classAttributePosition || isNaN(trainingData[j][k]) || isNaN(testData[k])) {
                     continue;
                 }
-                distance += distanceFunction(testData[index][k], trainingData[j][k]);
+                distance += distanceFunction(testData[k], trainingData[j][k]);
             }
 
             distance = Math.sqrt(distance);
@@ -196,7 +190,7 @@ function start(job) {
 
         neighbours.forEach(function (n) {
 
-            currentClassName = trainingData[n[0]][this.classAttributePosition];
+            currentClassName = trainingData[n[0]][classAttributePosition];
 
             //get class occurency total
             if (typeof classOccurencies.total[currentClassName] === 'undefined') {
@@ -241,56 +235,41 @@ function start(job) {
         return (typeof maxClassName === 'undefined') ? null : maxClassName;
     }
 
-}
 
+    // Start analysis
+    // First time to look for neighbors
+    neighbours = getNeighbours(testData, sigmaIncreased);
 
- /**
- //loop testData
- for (var i = 0; i < testData.length; i++) {
-
-        //first time to look for neighbors
-        neighbours = getNeighbours(i, sigmaIncreased);
-
-        //increase sigma if activated
-        if (sigmaAutoIncrease) {
-            //as long as there are not enough neighbors in reach, increase reach (sigma)
-            while (neighbours.length < k) {
-                neighbours = getNeighbours(i, ++sigmaIncreased);
-            }
-
+    // Increase sigma if activated
+    if (sigmaAutoIncrease) {
+        //as long as there are not enough neighbors in reach, increase reach (sigma)
+        while (neighbours.length < k) {
+            neighbours = getNeighbours(testData, ++sigmaIncreased);
         }
-
-        //sort neighbours by distance-value
-        neighbours = _.sortBy(neighbours, function (n) {
-            return n[1];
-        });
-
-        //remove every neighbour, which position is > k
-        neighbours = neighbours.slice(0, this.k);
-
-
-        co = getClassOccurencies();
-
-
-        postMessage({
-            "point": i,
-            "neighbours": neighbours,
-            "predictedClass": getClassWithHighestWeight(),
-            "sigmaIncreased": (sigmaIncreased !== sigma) ? sigmaIncreased : null,
-            "classOccurencyTotal": co.total,
-            "classOccurencyWithinSigma": co.withinSigma,
-            "classWeight": co.weight
-        });
-
-        //resetting sigma
-        sigmaIncreased = sigma;
 
     }
 
 
- /**
+    // Sort neighbours by distance-value
+    neighbours.sort(function (n1, n2) {
+        return n1[1] - n2[1];
+    });
+
+    // Remove every neighbour, which position is > k
+    neighbours = neighbours.slice(0, k);
 
 
- }
+    co = getClassOccurencies();
 
- **********************************************/
+
+    return {
+        "neighbours": neighbours,
+        "predictedClass": getClassWithHighestWeight(),
+        "sigmaIncreased": (sigmaIncreased !== sigma) ? sigmaIncreased : null,
+        "classOccurencyTotal": co.total,
+        "classOccurencyWithinSigma": co.withinSigma,
+        "classWeight": co.weight
+    };
+
+
+}
