@@ -24,23 +24,35 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
          * @return {Promise}
          */
         function allFound(type, expected) {
+            var deferred = Q.defer();
 
-            return storage.db.count(type)
+            // If not enabled no need to check the module
+            if ((type === 'results' && !project.computation.workers.enabled) ||
+                (type === 'jobs' && !project.computation.factories.enabled)) {
+                deferred.resolve(true);
+                return deferred.promise;
+            }
+
+
+            storage.db.count(type)
                 .then(function (amount) {
-                    var deferred = Q.defer();
 
                     logger.log('Computation', amount, type);
 
                     // Update the size
-                    if (type === 'results') results.size = amount;
-                    else jobs.size = amount;
+                    if (type === 'results') {
+                        results.size = amount;
+                    }
+                    else {
+                        jobs.size = amount;
+                    }
 
                     // We don't know how much to expect, so we can't say
                     if (!expected || expected < 0 || !_.isFinite(expected)) {
                         deferred.resolve(false);
                     }
 
-                    // We already have all found?
+                    // We already found all?
                     else if (amount >= expected) {
                         // Need to check validity?
                         if (type === 'results' && project.computation.results.validation.enabled) {
@@ -65,11 +77,10 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                         deferred.resolve(false);
                     }
 
-                    return deferred.promise;
-
                 }
-
             );
+
+            return deferred.promise;
         }
 
 
@@ -96,7 +107,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
 
                     // No need to create a pool if it's already complete
                     if (isComplete) {
-                        logger.log('Computation', 'Already finished, not creating a ' + type + 'Pool!');
+                        logger.log('Computation', 'Already finished, not creating a ' + type + '-Pool!');
                         return Q();
                     }
                     else {
@@ -328,7 +339,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
 
                     if (hasChanged) {
 
-                        logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a new result');
+                        //logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a new result');
 
                         // Inform about new or changed result
                         module.emit('result:push', result);
@@ -515,6 +526,12 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
              */
             results: results,
 
+            stats: {
+                startTime: null,
+                endTime: null,
+                duration: 0
+            },
+
             workers: null,
             factories: null,
 
@@ -535,17 +552,28 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                     .then(createWorkers)
                     .then(function () {
 
+                        // Nothing to do
+                        if (!module.workers && !module.factories) {
+                            return;
+                        }
+
                         // Start the factories if disabled, won't do anyhting
-                        if (module.factories) module.factories.start();
+                        if (module.factories) {
+                            module.factories.start();
+                            jobCountTimer = window.setInterval(jobCounterCompleteHandler, project.computation.jobs.testIntervalTime);
+                        }
 
                         // Start the workers, same as factories
-                        if (module.workers) module.workers.start();
+                        if (module.workers) {
+                            module.workers.start();
+                            resultCountTimer = window.setInterval(resultCounterCompleteHandler, project.computation.results.testIntervalTime);
+                        }
 
-                        // Starting timers
+                        // Timestamp for performance measuring
+                        module.stats.startTime = Date.now();
+
+                        // Starting global timer
                         countTimer = window.setInterval(counterCompleteHandler, project.computation.testIntervalTime);
-                        resultCountTimer = window.setInterval(resultCounterCompleteHandler, project.computation.results.testIntervalTime);
-                        jobCountTimer = window.setInterval(jobCounterCompleteHandler, project.computation.jobs.testIntervalTime);
-
 
                     });
 
@@ -580,8 +608,15 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
 
                 logger.log('Computation', 'Stopping');
 
+
                 module.stopWorkers();
                 module.stopFactories();
+
+                // Performance stats
+                module.stats.endTime = Date.now();
+                module.stats.duration = module.stats.endTime - module.stats.startTime;
+
+                logger.log('Computation', 'Runtime was', module.stats.duration / 1000, 'seconds');
 
                 // Global timer
                 window.clearInterval(countTimer);
@@ -667,4 +702,5 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
 
         });
 
-    });
+    })
+;

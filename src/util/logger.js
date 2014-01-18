@@ -11,6 +11,7 @@ define(['lodash'], function (_) {
 
     var output = document.getElementsByTagName('output')[0],
         htmlLogging = true,
+        consoleLogging = true,
         msgAmount = 0;
 
     /**
@@ -77,7 +78,6 @@ define(['lodash'], function (_) {
 
         /**
          * @method disableHTMLLog
-         * @default true
          */
         disableHTMLLog: function () {
             htmlLogging = false;
@@ -86,10 +86,39 @@ define(['lodash'], function (_) {
 
         /**
          * @method enableHTMLLog
-         * @default true
          */
         enableHTMLLog: function () {
             htmlLogging = true;
+        },
+
+        /**
+         * @method disableConsoleLog
+         */
+        disableConsoleLog: function () {
+            consoleLogging = false;
+        },
+
+        /**
+         * @method enableConsoleLog
+         */
+        enableConsoleLog: function () {
+            consoleLogging = true;
+        },
+
+        /**
+         * @method disable
+         */
+        disable: function () {
+            this.disableHTMLLog();
+            this.disableConsoleLog();
+        },
+
+        /**
+         * @method enable
+         */
+        enable: function () {
+            this.enableHTMLLog();
+            this.enableConsoleLog();
         },
 
         /**
