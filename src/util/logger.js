@@ -7,7 +7,7 @@
 
 define(['lodash'], function (_) {
 
-    var MAX_MESSAGES = 50;
+    var MAX_MESSAGES = 100;
 
     var output = document.getElementsByTagName('output')[0],
         htmlLogging = true,
@@ -36,6 +36,10 @@ define(['lodash'], function (_) {
 
 
     function print(type, args) {
+
+        if (!output) {
+            htmlLogging = false;
+        }
 
         if (msgAmount >= MAX_MESSAGES) {
             output.innerHTML = '';
