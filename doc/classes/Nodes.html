@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -252,6 +260,13 @@
                         
                             <li class="index-item method">
                                 <a href="#method_getRelatedPeers">getRelatedPeers</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_knn">knn</a>
 
                                 
                                 
@@ -878,6 +893,253 @@
                 
             </div>
         </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_knn" class="method item">
+    <h3 class="name"><code>knn</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>trainingData</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>testData</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>k</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>sigma</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>kernelFuncName</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>distanceFuncName</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>sigmaAutoIncrease</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>classAttributePosition</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                    <p>Provided by the <a href="../modules/Crypto.html">Crypto</a> module.</p>
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_examples_knn-digits_worker.js.html#l69"><code>src\examples\knn-digits\worker.js:69</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>k-Nearest-Neighbour implementation in a javascript webworker
+Classifies objects based on closest training examples in the feature space
+<a href="http://en.wikipedia.org/wiki/K-nearest_neighbor_algorithm">http://en.wikipedia.org/wiki/K-nearest_neighbor_algorithm</a></p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">trainingData</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>A Object including all the trainingDataSets</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">testData</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>A Object including all the testDataSets</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">k</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Number of neighbours to analyze</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">sigma</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Range in which the neighbours have to be located</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">kernelFuncName</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The name of the kernel-function which should be used</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">distanceFuncName</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The name of the distance-function which should be used</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">sigmaAutoIncrease</code>
+                        <span class="type">Boolean</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Whether you wish to autoincrease sigma to include exactly k-neighbours (might slow everything down!)</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">classAttributePosition</code>
+                        <span class="type">Number</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>The index of your class-atrribute in the trainingData</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
     
 
     

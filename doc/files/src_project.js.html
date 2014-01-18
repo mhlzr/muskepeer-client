@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -182,22 +190,34 @@ define([&#x27;q&#x27;, &#x27;lodash&#x27;, &#x27;mixing&#x27;], function (Q, _, 
         &quot;computation&quot;: {
 
             &quot;offlineAllowed&quot;: true,
+            &quot;testIntervalTime&quot;: 10000,
 
-            &quot;solving&quot;: {
-                &quot;enabled&quot;: true,
-                &quot;multipleAllowed&quot;: true,
+            &quot;workers&quot;: {
+                &quot;enabled&quot;: false,
+                &quot;multipleAllowed&quot;: true
+            },
+
+            &quot;factories&quot;: {
+                &quot;enabled&quot;: false,
+                &quot;multipleAllowed&quot;: true
+            },
+
+            &quot;results&quot;: {
+                &quot;groupSize&quot;: 1,
                 &quot;validation&quot;: {
                     &quot;enabled&quot;: false,
-                    &quot;iterations&quot;: 0
+                    &quot;iterations&quot;: 1
                 },
-                &quot;resultCountTimeInterval&quot;: 10000
+                &quot;expected&quot;: -1,
+                &quot;testIntervalTime&quot;: 5000
             },
 
             &quot;jobs&quot;: {
-                &quot;enabled&quot;: false,
-                &quot;lockJobsWhileSolving&quot;: true,
+                &quot;lock&quot;: true,
                 &quot;maxLockTime&quot;: 3600000,
-                &quot;groupSize&quot;: 1
+                &quot;groupSize&quot;: 1,
+                &quot;expected&quot;: -1,
+                &quot;testIntervalTime&quot;: 5000
             }
         },
 
@@ -229,31 +249,37 @@ define([&#x27;q&#x27;, &#x27;lodash&#x27;, &#x27;mixing&#x27;], function (Q, _, 
             &quot;synchronization&quot;: {
                 &quot;results&quot;: {
                     &quot;enabled&quot;: true,
-                    &quot;groupSize&quot;: 500
+                    &quot;interval&quot;: 3600000,
+                    &quot;groupSize&quot;: 15
                 },
                 &quot;jobs&quot;: {
                     &quot;enabled&quot;: true,
-                    &quot;groupSize&quot;: 500
+                    &quot;interval&quot;: 3600000,
+                    &quot;groupSize&quot;: 15
                 },
                 &quot;files&quot;: {
                     &quot;enabled&quot;: false,
+                    &quot;interval&quot;: 3600000,
                     &quot;groupSize&quot;: 1
                 },
                 &quot;peers&quot;: {
                     &quot;enabled&quot;: true,
-                    &quot;groupSize&quot;: 500
+                    &quot;interval&quot;: 3600000,
+                    &quot;groupSize&quot;: 15
                 },
                 &quot;nodes&quot;: {
                     &quot;enabled&quot;: true,
-                    &quot;groupSize&quot;: 100
+                    &quot;interval&quot;: 3600000,
+                    &quot;groupSize&quot;: 15
                 }
             },
 
-            &quot;services&quot;: [],
+            &quot;useGeoLocation&quot;: true,
 
-            &quot;useGeoLocation&quot;: true
+            &quot;services&quot;: []
+        },
 
-        }
+        &quot;files&quot;: []
     };
 
 
@@ -338,7 +364,7 @@ define([&#x27;q&#x27;, &#x27;lodash&#x27;, &#x27;mixing&#x27;], function (Q, _, 
             }
             else if (_.isString(config) &amp;&amp; isValidUrl(config)) {
 
-                logger.log(&#x27;Project&#x27;, &#x27;Downloading settings&#x27;);
+                logger.log(&#x27;Project&#x27;, &#x27;Downloading settings from&#x27;, config);
 
                 downloadJSON(config)
                     .then(function (config) {

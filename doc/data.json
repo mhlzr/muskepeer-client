@@ -16,13 +16,13 @@
             "fors": {},
             "namespaces": {}
         },
-        "src\\computation\\collection\\workers.js": {
-            "name": "src\\computation\\collection\\workers.js",
+        "src\\computation\\collection\\results.js": {
+            "name": "src\\computation\\collection\\results.js",
             "modules": {
-                "Workers": 1
+                "Results": 1
             },
             "classes": {
-                "Workers": 1
+                "Results": 1
             },
             "fors": {},
             "namespaces": {}
@@ -36,6 +36,17 @@
             "fors": {},
             "namespaces": {}
         },
+        "src\\computation\\model\\pool.js": {
+            "name": "src\\computation\\model\\pool.js",
+            "modules": {
+                "Pool": 1
+            },
+            "classes": {
+                "Pool": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
         "src\\computation\\model\\result.js": {
             "name": "src\\computation\\model\\result.js",
             "modules": {},
@@ -45,8 +56,8 @@
             "fors": {},
             "namespaces": {}
         },
-        "src\\computation\\model\\worker.js": {
-            "name": "src\\computation\\model\\worker.js",
+        "src\\computation\\model\\thread.js": {
+            "name": "src\\computation\\model\\thread.js",
             "modules": {},
             "classes": {
                 "Worker": 1
@@ -73,6 +84,27 @@
             "classes": {
                 "Crypto": 1
             },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\examples\\documentation\\worker.js": {
+            "name": "src\\examples\\documentation\\worker.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\examples\\knn-digits\\factory.js": {
+            "name": "src\\examples\\knn-digits\\factory.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src\\examples\\knn-digits\\worker.js": {
+            "name": "src\\examples\\knn-digits\\worker.js",
+            "modules": {},
+            "classes": {},
             "fors": {},
             "namespaces": {}
         },
@@ -194,6 +226,17 @@
             "fors": {},
             "namespaces": {}
         },
+        "src\\mediator.js": {
+            "name": "src\\mediator.js",
+            "modules": {
+                "Mediator": 1
+            },
+            "classes": {
+                "Mediator": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
         "src\\muskepeer-client.js": {
             "name": "src\\muskepeer-client.js",
             "modules": {
@@ -261,19 +304,31 @@
             "file": "src\\computation\\collection\\jobs.js",
             "line": 1
         },
-        "Workers": {
-            "name": "Workers",
+        "Results": {
+            "name": "Results",
             "submodules": {},
             "classes": {
-                "Workers": 1,
-                "Job": 1,
+                "Results": 1,
+                "Job": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\computation\\model\\job.js",
+            "line": 4
+        },
+        "Pool": {
+            "name": "Pool",
+            "submodules": {},
+            "classes": {
+                "Pool": 1,
                 "Result": 1,
                 "Worker": 1
             },
             "fors": {},
             "namespaces": {},
             "tag": "module",
-            "file": "src\\computation\\model\\worker.js",
+            "file": "src\\computation\\model\\thread.js",
             "line": 1
         },
         "Computation": {
@@ -404,6 +459,18 @@
             "author": "Matthieu Holzer",
             "date": "12.11.13"
         },
+        "Mediator": {
+            "name": "Mediator",
+            "submodules": {},
+            "classes": {
+                "Mediator": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src\\mediator.js",
+            "line": 1
+        },
         "MuskepeerClient": {
             "name": "MuskepeerClient",
             "submodules": {},
@@ -472,17 +539,17 @@
             "file": "src\\computation\\collection\\jobs.js",
             "line": 1
         },
-        "Workers": {
-            "name": "Workers",
-            "shortname": "Workers",
+        "Results": {
+            "name": "Results",
+            "shortname": "Results",
             "classitems": [],
             "plugins": [],
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "Workers",
+            "module": "Results",
             "namespace": "",
-            "file": "src\\computation\\collection\\workers.js",
+            "file": "src\\computation\\collection\\results.js",
             "line": 1
         },
         "Job": {
@@ -493,7 +560,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "Workers",
+            "module": "Results",
             "namespace": "",
             "file": "src\\computation\\model\\job.js",
             "line": 4,
@@ -506,6 +573,19 @@
                 }
             ]
         },
+        "Pool": {
+            "name": "Pool",
+            "shortname": "Pool",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Pool",
+            "namespace": "",
+            "file": "src\\computation\\model\\pool.js",
+            "line": 1
+        },
         "Result": {
             "name": "Result",
             "shortname": "Result",
@@ -514,7 +594,7 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "Workers",
+            "module": "Pool",
             "namespace": "",
             "file": "src\\computation\\model\\result.js",
             "line": 3,
@@ -535,9 +615,9 @@
             "extensions": [],
             "plugin_for": [],
             "extension_for": [],
-            "module": "Workers",
+            "module": "Pool",
             "namespace": "",
-            "file": "src\\computation\\model\\worker.js",
+            "file": "src\\computation\\model\\thread.js",
             "line": 1
         },
         "Computation": {
@@ -746,6 +826,19 @@
             "author": "Matthieu Holzer",
             "date": "12.11.13"
         },
+        "Mediator": {
+            "name": "Mediator",
+            "shortname": "Mediator",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Mediator",
+            "namespace": "",
+            "file": "src\\mediator.js",
+            "line": 1
+        },
         "MuskepeerClient": {
             "name": "MuskepeerClient",
             "shortname": "MuskepeerClient",
@@ -847,7 +940,17 @@
         },
         {
             "file": "src\\computation\\collection\\jobs.js",
-            "line": 41,
+            "line": 40,
+            "itemtype": "property",
+            "name": "",
+            "type": "{Number}",
+            "class": "Jobs",
+            "module": "Jobs"
+        },
+        {
+            "file": "src\\computation\\collection\\jobs.js",
+            "line": 47,
+            "description": "Wiil return true if the job was added, false it wasn't.",
             "itemtype": "method",
             "name": "add",
             "params": [
@@ -866,7 +969,7 @@
         },
         {
             "file": "src\\computation\\collection\\jobs.js",
-            "line": 66,
+            "line": 85,
             "itemtype": "method",
             "name": "clear",
             "return": {
@@ -878,7 +981,7 @@
         },
         {
             "file": "src\\computation\\collection\\jobs.js",
-            "line": 75,
+            "line": 94,
             "itemtype": "method",
             "name": "getNextAvailableJob",
             "return": {
@@ -889,7 +992,7 @@
         },
         {
             "file": "src\\computation\\collection\\jobs.js",
-            "line": 99,
+            "line": 120,
             "itemtype": "method",
             "name": "getJobByUuid",
             "params": [
@@ -908,7 +1011,7 @@
         },
         {
             "file": "src\\computation\\collection\\jobs.js",
-            "line": 109,
+            "line": 130,
             "itemtype": "method",
             "name": "lockJob",
             "params": [
@@ -927,7 +1030,7 @@
         },
         {
             "file": "src\\computation\\collection\\jobs.js",
-            "line": 121,
+            "line": 142,
             "itemtype": "method",
             "name": "unlockJob",
             "params": [
@@ -946,9 +1049,9 @@
         },
         {
             "file": "src\\computation\\collection\\jobs.js",
-            "line": 133,
+            "line": 154,
             "itemtype": "method",
-            "name": "markJobAsFinished",
+            "name": "markJobAsComplete",
             "params": [
                 {
                     "name": "job",
@@ -965,7 +1068,7 @@
         },
         {
             "file": "src\\computation\\collection\\jobs.js",
-            "line": 142,
+            "line": 163,
             "itemtype": "method",
             "name": "remove",
             "params": [
@@ -983,8 +1086,138 @@
             "module": "Jobs"
         },
         {
-            "file": "src\\computation\\collection\\workers.js",
-            "line": 14,
+            "file": "src\\computation\\collection\\results.js",
+            "line": 11,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "getResultsFromStorage",
+            "params": [
+                {
+                    "name": "filterValidated",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Results",
+            "module": "Results"
+        },
+        {
+            "file": "src\\computation\\collection\\results.js",
+            "line": 35,
+            "itemtype": "property",
+            "name": "",
+            "type": "{Number}",
+            "class": "Results",
+            "module": "Results"
+        },
+        {
+            "file": "src\\computation\\collection\\results.js",
+            "line": 42,
+            "description": "Adds a result to the storage. If its new will return true,\nif it's an update it will return false;",
+            "itemtype": "method",
+            "name": "add",
+            "params": [
+                {
+                    "name": "result",
+                    "description": "",
+                    "type": "Result"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Results",
+            "module": "Results"
+        },
+        {
+            "file": "src\\computation\\collection\\results.js",
+            "line": 68,
+            "description": "Update a result, will return true, if the result really changed.",
+            "itemtype": "method",
+            "name": "update",
+            "params": [
+                {
+                    "name": "result",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
+            "class": "Results",
+            "module": "Results"
+        },
+        {
+            "file": "src\\computation\\collection\\results.js",
+            "line": 113,
+            "itemtype": "method",
+            "name": "clear",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Results",
+            "module": "Results"
+        },
+        {
+            "file": "src\\computation\\collection\\results.js",
+            "line": 122,
+            "itemtype": "method",
+            "name": "getResultByUuid",
+            "params": [
+                {
+                    "name": "uuid",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Results",
+            "module": "Results"
+        },
+        {
+            "file": "src\\computation\\collection\\results.js",
+            "line": 132,
+            "itemtype": "method",
+            "name": "isValid",
+            "params": [
+                {
+                    "name": "result",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Results",
+            "module": "Results"
+        },
+        {
+            "file": "src\\computation\\collection\\results.js",
+            "line": 145,
+            "itemtype": "method",
+            "name": "allValid",
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Results",
+            "module": "Results"
+        },
+        {
+            "file": "src\\computation\\model\\pool.js",
+            "line": 26,
             "access": "private",
             "tagname": "",
             "itemtype": "method",
@@ -996,38 +1229,23 @@
                     "type": "Object"
                 }
             ],
-            "class": "Workers",
-            "module": "Workers"
+            "class": "Pool",
+            "module": "Pool"
         },
         {
-            "file": "src\\computation\\collection\\workers.js",
-            "line": 31,
+            "file": "src\\computation\\model\\pool.js",
+            "line": 35,
             "description": "Amount of worker-instances",
             "itemtype": "property",
             "name": "size",
-            "class": "Workers",
-            "module": "Workers"
+            "class": "Pool",
+            "module": "Pool"
         },
         {
-            "file": "src\\computation\\collection\\workers.js",
-            "line": 38,
+            "file": "src\\computation\\model\\pool.js",
+            "line": 59,
             "itemtype": "method",
-            "name": "create",
-            "params": [
-                {
-                    "name": "url",
-                    "description": "Worker-Script",
-                    "type": "String"
-                }
-            ],
-            "class": "Workers",
-            "module": "Workers"
-        },
-        {
-            "file": "src\\computation\\collection\\workers.js",
-            "line": 57,
-            "itemtype": "method",
-            "name": "getWorkerById",
+            "name": "getThreadById",
             "params": [
                 {
                     "name": "id",
@@ -1039,44 +1257,104 @@
                 "description": "",
                 "type": "Worker"
             },
-            "class": "Workers",
-            "module": "Workers"
+            "class": "Pool",
+            "module": "Pool"
         },
         {
-            "file": "src\\computation\\collection\\workers.js",
-            "line": 66,
+            "file": "src\\computation\\model\\pool.js",
+            "line": 68,
             "itemtype": "method",
             "name": "start",
-            "class": "Workers",
-            "module": "Workers"
+            "class": "Pool",
+            "module": "Pool"
         },
         {
-            "file": "src\\computation\\collection\\workers.js",
-            "line": 81,
+            "file": "src\\computation\\model\\pool.js",
+            "line": 83,
             "itemtype": "method",
             "name": "stop",
-            "class": "Workers",
-            "module": "Workers"
+            "class": "Pool",
+            "module": "Pool"
         },
         {
-            "file": "src\\computation\\collection\\workers.js",
-            "line": 97,
+            "file": "src\\computation\\model\\pool.js",
+            "line": 102,
             "itemtype": "method",
             "name": "pause",
-            "class": "Workers",
-            "module": "Workers"
+            "class": "Pool",
+            "module": "Pool"
         },
         {
-            "file": "src\\computation\\collection\\workers.js",
-            "line": 106,
+            "file": "src\\computation\\model\\pool.js",
+            "line": 112,
             "itemtype": "method",
             "name": "resume",
-            "class": "Workers",
-            "module": "Workers"
+            "class": "Pool",
+            "module": "Pool"
+        },
+        {
+            "file": "src\\computation\\model\\pool.js",
+            "line": 122,
+            "itemtype": "method",
+            "name": "getIdleThreads",
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "class": "Pool",
+            "module": "Pool"
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 14,
+            "line": 19,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "allFound",
+            "params": [
+                {
+                    "name": "type",
+                    "description": ""
+                },
+                {
+                    "name": "expected",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 76,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "createThreadPool",
+            "params": [
+                {
+                    "name": "type",
+                    "description": ""
+                },
+                {
+                    "name": "url",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 137,
             "description": "Create worker instances",
             "access": "private",
             "tagname": "",
@@ -1091,12 +1369,12 @@
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 50,
+            "line": 169,
             "description": "Create jobFactory",
             "access": "private",
             "tagname": "",
             "itemtype": "method",
-            "name": "createJobFactory",
+            "name": "createFactories",
             "return": {
                 "description": "",
                 "type": "Promise"
@@ -1106,111 +1384,97 @@
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 80,
+            "line": 200,
             "access": "private",
             "tagname": "",
             "itemtype": "method",
-            "name": "addWorkerEventListeners",
+            "name": "addEventListenersToPool",
             "class": "Computation",
             "module": "Computation"
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 96,
+            "line": 216,
             "access": "private",
             "tagname": "",
             "itemtype": "method",
-            "name": "removeWorkerEventListeners",
+            "name": "removeEventListenersFromPool",
             "class": "Computation",
             "module": "Computation"
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 109,
+            "line": 224,
+            "description": "Event-Listener, listens for\njob:push from Thread-Pool",
             "access": "private",
             "tagname": "",
             "itemtype": "method",
-            "name": "addJobFactoryListeners",
+            "name": "poolJobFoundHandler",
             "class": "Computation",
             "module": "Computation"
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 118,
+            "line": 249,
+            "description": "Event-Listener, listens for\njob:pull from Thread-Pool",
             "access": "private",
             "tagname": "",
             "itemtype": "method",
-            "name": "removeJobFactoryListeners",
+            "name": "poolJobRequiredHandler",
             "class": "Computation",
             "module": "Computation"
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 128,
+            "line": 302,
+            "description": "Event-Listener, listens for\nresult:push from Thread-Pool",
             "access": "private",
             "tagname": "",
             "itemtype": "method",
-            "name": "jobFactoryMessageHandler",
+            "name": "poolResultFoundHandler",
             "class": "Computation",
             "module": "Computation"
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 138,
+            "line": 351,
+            "description": "Event-Listener, listens for\nresult:pull from Thread-Pool",
             "access": "private",
             "tagname": "",
             "itemtype": "method",
-            "name": "jobFactoryErrorHandler",
+            "name": "poolResultRequiredHandler",
             "class": "Computation",
             "module": "Computation"
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 146,
+            "line": 373,
+            "description": "Event-Listener, listens for\nfile:push from Thread-Pool",
             "access": "private",
             "tagname": "",
             "itemtype": "method",
-            "name": "workerResultRequiredHandler",
+            "name": "poolFileFoundHandler",
             "class": "Computation",
             "module": "Computation"
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 165,
+            "line": 385,
+            "description": "Event-Listener, listens for\nfile:pull from Thread-Pool",
             "access": "private",
             "tagname": "",
             "itemtype": "method",
-            "name": "workerJobRequiredHandler",
+            "name": "poolFileRequiredHandler",
             "class": "Computation",
             "module": "Computation"
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 213,
+            "line": 456,
             "access": "private",
             "tagname": "",
             "itemtype": "method",
-            "name": "workerResultFoundHandler",
-            "class": "Computation",
-            "module": "Computation"
-        },
-        {
-            "file": "src\\computation\\index.js",
-            "line": 271,
-            "access": "private",
-            "tagname": "",
-            "itemtype": "method",
-            "name": "workerFileFoundHandler",
-            "class": "Computation",
-            "module": "Computation"
-        },
-        {
-            "file": "src\\computation\\index.js",
-            "line": 280,
-            "access": "private",
-            "tagname": "",
-            "itemtype": "method",
-            "name": "resultCountIntervalCompleteHandler",
+            "name": "resultCounterCompleteHandler",
             "params": [
                 {
                     "name": "e",
@@ -1222,7 +1486,39 @@
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 300,
+            "line": 469,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "jobCounterCompleteHandler",
+            "params": [
+                {
+                    "name": "e",
+                    "description": ""
+                }
+            ],
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 482,
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "counterCompleteHandler",
+            "params": [
+                {
+                    "name": "e",
+                    "description": ""
+                }
+            ],
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 497,
             "itemtype": "property",
             "name": "isRunning",
             "type": "Boolean",
@@ -1232,7 +1528,7 @@
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 305,
+            "line": 502,
             "itemtype": "property",
             "name": "isPaused",
             "type": "Boolean",
@@ -1242,7 +1538,7 @@
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 311,
+            "line": 508,
             "itemtype": "property",
             "name": "jobs",
             "type": "Object",
@@ -1251,16 +1547,16 @@
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 316,
+            "line": 513,
             "itemtype": "property",
-            "name": "jobFactory",
-            "type": "Worker",
+            "name": "results",
+            "type": "Object",
             "class": "Computation",
             "module": "Computation"
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 321,
+            "line": 525,
             "itemtype": "method",
             "name": "start",
             "class": "Computation",
@@ -1268,7 +1564,7 @@
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 349,
+            "line": 556,
             "itemtype": "method",
             "name": "pause",
             "class": "Computation",
@@ -1276,7 +1572,7 @@
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 357,
+            "line": 565,
             "itemtype": "method",
             "name": "resume",
             "class": "Computation",
@@ -1284,7 +1580,7 @@
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 365,
+            "line": 574,
             "itemtype": "method",
             "name": "stop",
             "class": "Computation",
@@ -1292,12 +1588,40 @@
         },
         {
             "file": "src\\computation\\index.js",
-            "line": 389,
+            "line": 594,
+            "itemtype": "method",
+            "name": "stopWorkers",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 607,
+            "itemtype": "method",
+            "name": "stopFactories",
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 621,
             "itemtype": "method",
             "name": "isComplete",
             "return": {
                 "description": "",
                 "type": "Promise"
+            },
+            "class": "Computation",
+            "module": "Computation"
+        },
+        {
+            "file": "src\\computation\\index.js",
+            "line": 640,
+            "itemtype": "method",
+            "name": "pushJobToAwaitingWorker",
+            "return": {
+                "description": "",
+                "type": "Array"
             },
             "class": "Computation",
             "module": "Computation"
@@ -1397,6 +1721,113 @@
                 "type": "Boolean"
             },
             "class": "Crypto",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\examples\\documentation\\worker.js",
+            "line": 4,
+            "description": "COMMUNICATION BLOCK START",
+            "class": "Nodes",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\examples\\documentation\\worker.js",
+            "line": 38,
+            "description": "COMMUNICATION BLOCK END",
+            "class": "Nodes",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\examples\\knn-digits\\factory.js",
+            "line": 1,
+            "class": "Nodes",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\examples\\knn-digits\\factory.js",
+            "line": 8,
+            "description": "COMMUNICATION BLOCK START",
+            "class": "Nodes",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\examples\\knn-digits\\factory.js",
+            "line": 37,
+            "description": "COMMUNICATION BLOCK END",
+            "class": "Nodes",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\examples\\knn-digits\\worker.js",
+            "line": 1,
+            "class": "Nodes",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\examples\\knn-digits\\worker.js",
+            "line": 8,
+            "description": "COMMUNICATION BLOCK START",
+            "class": "Nodes",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\examples\\knn-digits\\worker.js",
+            "line": 38,
+            "description": "COMMUNICATION BLOCK END",
+            "class": "Nodes",
+            "module": "Crypto"
+        },
+        {
+            "file": "src\\examples\\knn-digits\\worker.js",
+            "line": 69,
+            "description": "k-Nearest-Neighbour implementation in a javascript webworker\nClassifies objects based on closest training examples in the feature space\nhttp://en.wikipedia.org/wiki/K-nearest_neighbor_algorithm",
+            "author": "Matthieu Holzer",
+            "date": "07/01/2012",
+            "itemtype": "method",
+            "name": "knn",
+            "params": [
+                {
+                    "name": "trainingData",
+                    "description": "A Object including all the trainingDataSets",
+                    "type": "Object"
+                },
+                {
+                    "name": "testData",
+                    "description": "A Object including all the testDataSets",
+                    "type": "Object"
+                },
+                {
+                    "name": "k",
+                    "description": "Number of neighbours to analyze",
+                    "type": "Number"
+                },
+                {
+                    "name": "sigma",
+                    "description": "Range in which the neighbours have to be located",
+                    "type": "Number"
+                },
+                {
+                    "name": "kernelFuncName",
+                    "description": "The name of the kernel-function which should be used",
+                    "type": "String"
+                },
+                {
+                    "name": "distanceFuncName",
+                    "description": "The name of the distance-function which should be used",
+                    "type": "String"
+                },
+                {
+                    "name": "sigmaAutoIncrease",
+                    "description": "Whether you wish to autoincrease sigma to include exactly k-neighbours (might slow everything down!)",
+                    "type": "Boolean"
+                },
+                {
+                    "name": "classAttributePosition",
+                    "description": "The index of your class-atrribute in the trainingData",
+                    "type": "Number"
+                }
+            ],
+            "class": "Nodes",
             "module": "Crypto"
         },
         {
@@ -1990,7 +2421,7 @@
         },
         {
             "file": "src\\network\\model\\peer.js",
-            "line": 719,
+            "line": 720,
             "itemtype": "method",
             "name": "serialize",
             "return": {
@@ -2002,7 +2433,7 @@
         },
         {
             "file": "src\\network\\model\\peer.js",
-            "line": 732,
+            "line": 733,
             "itemtype": "method",
             "name": "broadcast",
             "class": "Peer",
@@ -2010,7 +2441,7 @@
         },
         {
             "file": "src\\network\\model\\peer.js",
-            "line": 740,
+            "line": 741,
             "itemtype": "method",
             "name": "disconnect",
             "class": "Peer",
@@ -2206,7 +2637,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 87,
+            "line": 88,
             "access": "private",
             "tagname": "",
             "itemtype": "method",
@@ -2216,7 +2647,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 114,
+            "line": 115,
             "description": "Event-Handler, gets called when another Peer sends an offer\nIf the Peer is not yet in the Peers-Collection, it will be created and added.\nThen the answering process gets initialized.",
             "access": "private",
             "tagname": "",
@@ -2234,7 +2665,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 144,
+            "line": 145,
             "description": "Event-Handler, gets called when another Peer sends an answer to an offer",
             "access": "private",
             "tagname": "",
@@ -2252,7 +2683,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 156,
+            "line": 157,
             "description": "Event-Handler, gets called when another Peer sends candidate-data.\nAdds the candidate-data to the Peer it came from",
             "access": "private",
             "tagname": "",
@@ -2270,7 +2701,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 170,
+            "line": 171,
             "description": "Event-Handler, gets called when a Peer-connection is completely established.",
             "access": "private",
             "tagname": "",
@@ -2288,7 +2719,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 181,
+            "line": 182,
             "description": "Event-Handler, gets called when a Peer-connection is closed.\nCauses a reconnect to nearest Peers if needed.",
             "access": "private",
             "tagname": "",
@@ -2306,7 +2737,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 195,
+            "line": 196,
             "description": "Event-Handler, gets called when a Peer-connection\ncan't be established after a specific time interval and a timeout occured.",
             "access": "private",
             "tagname": "",
@@ -2324,7 +2755,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 208,
+            "line": 209,
             "description": "Event-Handler, gets called when a Peer receives a message.",
             "params": [
                 {
@@ -2338,7 +2769,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 352,
+            "line": 237,
             "description": "Determine if the client is on-/offline",
             "itemtype": "property",
             "name": "isOnline",
@@ -2348,7 +2779,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 363,
+            "line": 248,
             "description": "Start the network-module",
             "itemtype": "method",
             "name": "start",
@@ -2357,7 +2788,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 415,
+            "line": 300,
             "description": "Stop the network module",
             "itemtype": "method",
             "name": "stop",
@@ -2366,7 +2797,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 425,
+            "line": 310,
             "itemtype": "method",
             "name": "publish",
             "class": "Network",
@@ -2374,7 +2805,7 @@
         },
         {
             "file": "src\\network\\index.js",
-            "line": 440,
+            "line": 325,
             "itemtype": "method",
             "name": "broadcastMasterMessage",
             "params": [
@@ -2467,7 +2898,7 @@
         },
         {
             "file": "src\\storage\\database.js",
-            "line": 140,
+            "line": 139,
             "description": "Read data by key from indexedDB",
             "itemtype": "method",
             "name": "read",
@@ -2498,7 +2929,7 @@
         },
         {
             "file": "src\\storage\\database.js",
-            "line": 168,
+            "line": 167,
             "description": "List all items from a store",
             "itemtype": "method",
             "name": "list",
@@ -2536,7 +2967,7 @@
         },
         {
             "file": "src\\storage\\database.js",
-            "line": 238,
+            "line": 237,
             "description": "Uses list() and reduces matches by indexedDB.keyranges",
             "itemtype": "method",
             "name": "findAndReduceByKeyRange",
@@ -2566,7 +2997,7 @@
         },
         {
             "file": "src\\storage\\database.js",
-            "line": 252,
+            "line": 251,
             "description": "Uses list() and reduces matches by a filterObject",
             "itemtype": "method",
             "name": "findAndReduceByObject",
@@ -2596,7 +3027,7 @@
         },
         {
             "file": "src\\storage\\database.js",
-            "line": 266,
+            "line": 265,
             "description": "Save data to indexedDb, if not uuid is set it will be added automatically",
             "itemtype": "method",
             "name": "save",
@@ -2626,7 +3057,7 @@
         },
         {
             "file": "src\\storage\\database.js",
-            "line": 347,
+            "line": 346,
             "description": "Save Mutiple objects to a shared store",
             "itemtype": "method",
             "name": "saveMultiple",
@@ -2656,7 +3087,7 @@
         },
         {
             "file": "src\\storage\\database.js",
-            "line": 366,
+            "line": 365,
             "description": "Remove an existing dataset",
             "itemtype": "method",
             "name": "remove",
@@ -2681,7 +3112,7 @@
         },
         {
             "file": "src\\storage\\database.js",
-            "line": 389,
+            "line": 388,
             "description": "Update an existing dataset",
             "itemtype": "method",
             "name": "update",
@@ -2708,7 +3139,7 @@
         },
         {
             "file": "src\\storage\\database.js",
-            "line": 446,
+            "line": 453,
             "description": "Find out if a store has s specific dataset",
             "itemtype": "method",
             "name": "has",
@@ -2813,7 +3244,35 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 93,
+            "line": 94,
+            "params": [
+                {
+                    "name": "fileInfo",
+                    "description": ""
+                },
+                {
+                    "name": "mode",
+                    "description": ""
+                },
+                {
+                    "name": "offset",
+                    "description": ""
+                },
+                {
+                    "name": "completeFile",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 180,
             "description": "Gets a file via XHR and returns a promise,\nresolve will contain a Blob",
             "access": "private",
             "tagname": "",
@@ -2835,7 +3294,7 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 151,
+            "line": 238,
             "description": "Updates the list by getting the newest info from db",
             "access": "private",
             "tagname": "",
@@ -2850,7 +3309,7 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 166,
+            "line": 253,
             "description": "Converts a base64 String to a Blob",
             "access": "private",
             "tagname": "",
@@ -2881,7 +3340,7 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 204,
+            "line": 291,
             "description": "List of related files in db,\nwill always be updated automatically",
             "itemtype": "property",
             "name": "list",
@@ -2891,7 +3350,7 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 213,
+            "line": 300,
             "description": "Initialize fileStorage",
             "chainable": 1,
             "itemtype": "method",
@@ -2911,13 +3370,13 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 242,
+            "line": 329,
             "description": "Write a file/blob to the local filesystem",
             "itemtype": "method",
             "name": "write",
             "params": [
                 {
-                    "name": "file",
+                    "name": "fileInfo",
                     "description": "",
                     "type": "Object"
                 },
@@ -2942,13 +3401,13 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 308,
+            "line": 395,
             "description": "Get a local url to a file in fileSystem",
             "itemtype": "method",
             "name": "readFileAsLocalUrl",
             "params": [
                 {
-                    "name": "file",
+                    "name": "fileInfo",
                     "description": "",
                     "type": "Object"
                 }
@@ -2962,16 +3421,15 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 326,
-            "description": "Read some chunks from the file, which will resul in a Blob-Instance.\nChunk size is defined globally by CHUNK_SIZE.",
+            "line": 413,
+            "description": "Get an ObjectUrl to a file from FileSystem",
+            "itemtype": "method",
+            "name": "readFileAsObjectUrl",
             "params": [
                 {
-                    "name": "file",
-                    "description": ""
-                },
-                {
-                    "name": "offset",
-                    "description": ""
+                    "name": "fileInfo",
+                    "description": "",
+                    "type": "Object"
                 }
             ],
             "return": {
@@ -2983,8 +3441,10 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 365,
-            "description": "Read some chunks from the file, which will be base64 encodded.\nChunk size is defined globally by CHUNK_SIZE.",
+            "line": 435,
+            "description": "Read some chunks from the file, which will resul in a Blob-Instance.\nChunk size is defined globally by CHUNK_SIZE.\nSlicing can be disabled using completeFile param.",
+            "itemtype": "method",
+            "name": "readFileChunkAsBlob",
             "params": [
                 {
                     "name": "file",
@@ -2995,6 +3455,11 @@
                     "name": "offset",
                     "description": "",
                     "type": "Number"
+                },
+                {
+                    "name": "completeFile",
+                    "description": "",
+                    "type": "Boolean"
                 }
             ],
             "return": {
@@ -3006,13 +3471,73 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 426,
+            "line": 451,
+            "description": "Read some chunks from the file, which will be base64 encodded.\nChunk size is defined globally by CHUNK_SIZE.\nSlicing can be disabled using completeFile param.",
+            "itemtype": "method",
+            "name": "readFileChunkAsDataUrl",
+            "params": [
+                {
+                    "name": "file",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "offset",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "completeFile",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 467,
+            "description": "Read some chunks from the file and return an ArrayBuffer.\nChunk size is defined globally by CHUNK_SIZE.\nSlicing can be disabled using completeFile param.",
+            "itemtype": "method",
+            "name": "readFileChunkAsArrayBuffer",
+            "params": [
+                {
+                    "name": "file",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "offset",
+                    "description": "",
+                    "type": "Number"
+                },
+                {
+                    "name": "completeFile",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Promise"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 483,
             "description": "Add file-entries to the storage database,\nnot to the filesystem.",
             "itemtype": "method",
             "name": "add",
             "params": [
                 {
-                    "name": "uris",
+                    "name": "files",
                     "description": "",
                     "type": "Array|String"
                 }
@@ -3026,7 +3551,7 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 469,
+            "line": 527,
             "description": "Get an array of incomplete files from storage-database",
             "itemtype": "method",
             "name": "getListOfIncompleteFiles",
@@ -3039,7 +3564,7 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 479,
+            "line": 537,
             "description": "Get an array of all files from storage-database",
             "itemtype": "method",
             "name": "getFileList",
@@ -3052,7 +3577,7 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 490,
+            "line": 548,
             "description": "This will download all incomplete files from their urls.\nShould be used if you know, that there are no other peers in you pool,\nthat can deliver the files you need.",
             "itemtype": "method",
             "name": "downloadIncompleteFiles",
@@ -3064,7 +3589,7 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 552,
+            "line": 610,
             "description": "Retrieve a filInfo object from storage (db) by uuid (hash).",
             "itemtype": "method",
             "name": "getFileInfoByUuid",
@@ -3083,7 +3608,7 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 565,
+            "line": 623,
             "description": "Retrieve a fileInfo object from storage by url.",
             "itemtype": "method",
             "name": "getFileInfoByUri",
@@ -3102,7 +3627,24 @@
         },
         {
             "file": "src\\storage\\filesystem.js",
-            "line": 578,
+            "line": 635,
+            "description": "etrieve a fileInfo object from storage by name.",
+            "params": [
+                {
+                    "name": "name",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "class": "FileSystem",
+            "module": "FileSystem"
+        },
+        {
+            "file": "src\\storage\\filesystem.js",
+            "line": 645,
             "description": "Will delete all files/folders inside the project-dir recursively\nas well as the references (fileInfo) in database",
             "itemtype": "method",
             "name": "clear",
@@ -3395,8 +3937,79 @@
             "module": "Logger"
         },
         {
+            "file": "src\\mediator.js",
+            "line": 12,
+            "itemtype": "method",
+            "name": "couple",
+            "class": "Mediator",
+            "module": "Mediator"
+        },
+        {
+            "file": "src\\mediator.js",
+            "line": 17,
+            "description": "Master Broadcast Messages",
+            "class": "Mediator",
+            "module": "Mediator"
+        },
+        {
+            "file": "src\\mediator.js",
+            "line": 24,
+            "class": "Mediator",
+            "module": "Mediator"
+        },
+        {
+            "file": "src\\mediator.js",
+            "line": 34,
+            "description": "Broadcast Messages",
+            "class": "Mediator",
+            "module": "Mediator"
+        },
+        {
+            "file": "src\\mediator.js",
+            "line": 65,
+            "description": "List Requests",
+            "class": "Mediator",
+            "module": "Mediator"
+        },
+        {
+            "file": "src\\mediator.js",
+            "line": 96,
+            "description": "List Answers",
+            "class": "Mediator",
+            "module": "Mediator"
+        },
+        {
+            "file": "src\\mediator.js",
+            "line": 133,
+            "description": "Requests",
+            "class": "Mediator",
+            "module": "Mediator"
+        },
+        {
+            "file": "src\\mediator.js",
+            "line": 162,
+            "description": "Answers",
+            "class": "Mediator",
+            "module": "Mediator"
+        },
+        {
+            "file": "src\\mediator.js",
+            "line": 186,
+            "description": "Computational Events",
+            "class": "Mediator",
+            "module": "Mediator"
+        },
+        {
+            "file": "src\\mediator.js",
+            "line": 205,
+            "itemtype": "method",
+            "name": "decouple",
+            "class": "Mediator",
+            "module": "Mediator"
+        },
+        {
             "file": "src\\muskepeer-client.js",
-            "line": 21,
+            "line": 22,
             "description": "Simple feature testing of the application requirements\nas a lot of the used technologies are still working drafts\nand for from standard",
             "access": "private",
             "tagname": "",
@@ -3411,27 +4024,7 @@
         },
         {
             "file": "src\\muskepeer-client.js",
-            "line": 68,
-            "access": "private",
-            "tagname": "",
-            "itemtype": "method",
-            "name": "coupleModules",
-            "class": "MuskepeerClient",
-            "module": "MuskepeerClient"
-        },
-        {
-            "file": "src\\muskepeer-client.js",
-            "line": 91,
-            "access": "private",
-            "tagname": "",
-            "itemtype": "method",
-            "name": "decoupleModules",
-            "class": "MuskepeerClient",
-            "module": "MuskepeerClient"
-        },
-        {
-            "file": "src\\muskepeer-client.js",
-            "line": 110,
+            "line": 78,
             "description": "Initiate muskepeer",
             "itemtype": "method",
             "name": "init",
@@ -3445,7 +4038,7 @@
         },
         {
             "file": "src\\muskepeer-client.js",
-            "line": 137,
+            "line": 105,
             "description": "Start muskepeer",
             "itemtype": "method",
             "name": "start",
@@ -3465,7 +4058,7 @@
         },
         {
             "file": "src\\muskepeer-client.js",
-            "line": 199,
+            "line": 170,
             "description": "Stop muskepeer",
             "itemtype": "method",
             "name": "stop",
@@ -3493,7 +4086,7 @@
         },
         {
             "file": "src\\project.js",
-            "line": 100,
+            "line": 118,
             "access": "private",
             "tagname": "",
             "itemtype": "method",
@@ -3513,7 +4106,7 @@
         },
         {
             "file": "src\\project.js",
-            "line": 112,
+            "line": 130,
             "access": "private",
             "tagname": "",
             "itemtype": "method",
@@ -3534,7 +4127,7 @@
         },
         {
             "file": "src\\project.js",
-            "line": 146,
+            "line": 164,
             "description": "Combines passed project settings with defaults",
             "access": "private",
             "tagname": "",
@@ -3556,7 +4149,7 @@
         },
         {
             "file": "src\\project.js",
-            "line": 163,
+            "line": 181,
             "description": "Create project from object or url",
             "itemtype": "method",
             "name": "create",
@@ -3637,7 +4230,15 @@
     "warnings": [
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src\\computation\\collection\\jobs.js:75"
+            "line": " src\\computation\\collection\\jobs.js:94"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src\\computation\\index.js:640"
+        },
+        {
+            "message": "unknown tag: date",
+            "line": " src\\examples\\knn-digits\\worker.js:69"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -3649,7 +4250,11 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src\\storage\\database.js:389"
+            "line": " src\\storage\\database.js:388"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src\\storage\\filesystem.js:94"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -3673,15 +4278,47 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src\\muskepeer-client.js:137"
+            "line": " src\\muskepeer-client.js:105"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " src\\project.js:100"
+            "line": " src\\project.js:118"
         },
         {
             "message": "replacing incorrect tag: returns with return",
             "line": " src\\uuid.js:24"
+        },
+        {
+            "message": "Missing item type\nCOMMUNICATION BLOCK START",
+            "line": " src\\examples\\documentation\\worker.js:4"
+        },
+        {
+            "message": "Missing item type\nCOMMUNICATION BLOCK END",
+            "line": " src\\examples\\documentation\\worker.js:38"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src\\examples\\knn-digits\\factory.js:1"
+        },
+        {
+            "message": "Missing item type\nCOMMUNICATION BLOCK START",
+            "line": " src\\examples\\knn-digits\\factory.js:8"
+        },
+        {
+            "message": "Missing item type\nCOMMUNICATION BLOCK END",
+            "line": " src\\examples\\knn-digits\\factory.js:37"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src\\examples\\knn-digits\\worker.js:1"
+        },
+        {
+            "message": "Missing item type\nCOMMUNICATION BLOCK START",
+            "line": " src\\examples\\knn-digits\\worker.js:8"
+        },
+        {
+            "message": "Missing item type\nCOMMUNICATION BLOCK END",
+            "line": " src\\examples\\knn-digits\\worker.js:38"
         },
         {
             "message": "Missing item type\nSimple Brute-Force-Algorithm to solve the\nn-queens problem. It will produce distinct solutions.",
@@ -3693,15 +4330,47 @@
         },
         {
             "message": "Missing item type\nEvent-Handler, gets called when a Peer receives a message.",
-            "line": " src\\network\\index.js:208"
+            "line": " src\\network\\index.js:209"
         },
         {
-            "message": "Missing item type\nRead some chunks from the file, which will resul in a Blob-Instance.\nChunk size is defined globally by CHUNK_SIZE.",
-            "line": " src\\storage\\filesystem.js:326"
+            "message": "Missing item type",
+            "line": " src\\storage\\filesystem.js:94"
         },
         {
-            "message": "Missing item type\nRead some chunks from the file, which will be base64 encodded.\nChunk size is defined globally by CHUNK_SIZE.",
-            "line": " src\\storage\\filesystem.js:365"
+            "message": "Missing item type\netrieve a fileInfo object from storage by name.",
+            "line": " src\\storage\\filesystem.js:635"
+        },
+        {
+            "message": "Missing item type\nMaster Broadcast Messages",
+            "line": " src\\mediator.js:17"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src\\mediator.js:24"
+        },
+        {
+            "message": "Missing item type\nBroadcast Messages",
+            "line": " src\\mediator.js:34"
+        },
+        {
+            "message": "Missing item type\nList Requests",
+            "line": " src\\mediator.js:65"
+        },
+        {
+            "message": "Missing item type\nList Answers",
+            "line": " src\\mediator.js:96"
+        },
+        {
+            "message": "Missing item type\nRequests",
+            "line": " src\\mediator.js:133"
+        },
+        {
+            "message": "Missing item type\nAnswers",
+            "line": " src\\mediator.js:162"
+        },
+        {
+            "message": "Missing item type\nComputational Events",
+            "line": " src\\mediator.js:186"
         },
         {
             "message": "Missing item type",

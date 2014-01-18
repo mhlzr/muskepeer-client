@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -185,7 +193,7 @@ define([&#x27;q&#x27;, &#x27;storage/index&#x27;, &#x27;project&#x27;], function
         };
 
         if (filterFinished) {
-            filter.isFinished = false;
+            filter.isComplete = false;
         }
 
         if (filterLocked) {
@@ -197,8 +205,16 @@ define([&#x27;q&#x27;, &#x27;storage/index&#x27;, &#x27;project&#x27;], function
 
     }
 
+    /**
+     * @property
+     * @type {Number}
+     */
+    module.size = 0;
+
 
     /**
+     * Wiil return true if the job was added, false it wasn&#x27;t.
+     *
      * @method add
      * @param {Job} job
      * @return {Promise}
@@ -208,17 +224,28 @@ define([&#x27;q&#x27;, &#x27;storage/index&#x27;, &#x27;project&#x27;], function
         //Valid job?
         if (!job.uuid) return null;
 
-        return module.getJobByUuid(job.uuid)
-            .then(function (result) {
-                // Already got this one?
-                if (result) return null;
-            })
-            // Save job to storage
-            .then(function () {
+        return storage.db.has(&#x27;jobs&#x27;, job.uuid, {uuidIsHash: true})
+            .then(function (exists) {
+                if (exists) {
+                    // Not new, but finished
+                    if (job.isComplete) {
+                        return module.markJobAsComplete(job)
+                            .then(function () {
+                                return true;
+                            })
+                    }
+                    // Not new, not finished
+                    else {
+                        return false;
+                    }
+
+                }
+                // Store
                 return storage.db.save(&#x27;jobs&#x27;, job, {uuidIsHash: true});
             })
-            // And update list
-            .then(getJobsFromStorage);
+            .then(function () {
+                return true;
+            });
 
 
     };
@@ -228,7 +255,7 @@ define([&#x27;q&#x27;, &#x27;storage/index&#x27;, &#x27;project&#x27;], function
      * @return {Promise}
      */
     module.clear = function () {
-        return storage.db.clear([&#x27;jobs&#x27;]).then(getJobsFromStorage);
+        return storage.db.clear([&#x27;jobs&#x27;]);
     };
 
 
@@ -241,11 +268,13 @@ define([&#x27;q&#x27;, &#x27;storage/index&#x27;, &#x27;project&#x27;], function
             position;
 
         getJobsFromStorage(true, true).then(function (jobs) {
+
             if (jobs.length &gt; 0) {
-                // We do&#x27;nt take the first, but any random one!
+                // We don&#x27;t take the first, but any random one!
                 //deferred.resolve(jobs.shift());
                 position = (Math.random() * jobs.length | 0);
-                deferred.resolve(jobs.splice(position, 1));
+                var job = jobs.splice(position, 1)[0];
+                deferred.resolve(job);
             }
             else {
                 deferred.resolve(null);
@@ -272,10 +301,10 @@ define([&#x27;q&#x27;, &#x27;storage/index&#x27;, &#x27;project&#x27;], function
      * @return {Promise}
      */
     module.lockJob = function (job) {
-        if (project.computation.jobs.lockJobsWhileSolving) {
-            return storage.db.update(&#x27;jobs&#x27;, {uuid: job.uuid, locktime: Date.now(), isLocked: true}, {uuidIsHash: true}).then(getJobsFromStorage);
+        if (project.computation.jobs.lock) {
+            return storage.db.update(&#x27;jobs&#x27;, {uuid: job.uuid, locktime: Date.now(), isLocked: true}, {uuidIsHash: true});
         }
-        else return null;
+        else return Q();
     };
 
     /**
@@ -284,19 +313,19 @@ define([&#x27;q&#x27;, &#x27;storage/index&#x27;, &#x27;project&#x27;], function
      * @return {Promise}
      */
     module.unlockJob = function (job) {
-        if (project.computation.jobs.lockJobsWhileSolving) {
-            return storage.db.update(&#x27;jobs&#x27;, {uuid: job.uuid, locktime: null, isLocked: false}, {uuidIsHash: true}).then(getJobsFromStorage);
+        if (project.computation.jobs.lock) {
+            return storage.db.update(&#x27;jobs&#x27;, {uuid: job.uuid, locktime: null, isLocked: false}, {uuidIsHash: true});
         }
-        else return null;
+        else return Q();
     };
 
     /**
-     * @method markJobAsFinished
+     * @method markJobAsComplete
      * @param {Job} job
      * @return {Promise}
      */
-    module.markJobAsFinished = function (job) {
-        return storage.db.update(&#x27;jobs&#x27;, {uuid: job.uuid, isFinished: true}, {uuidIsHash: true}).then(getJobsFromStorage);
+    module.markJobAsComplete = function (job) {
+        return storage.db.update(&#x27;jobs&#x27;, {uuid: job.uuid, isComplete: true}, {uuidIsHash: true})
     };
 
     /**
@@ -305,12 +334,11 @@ define([&#x27;q&#x27;, &#x27;storage/index&#x27;, &#x27;project&#x27;], function
      * @return {Promise}
      */
     module.remove = function (job) {
-        return storage.db.remove(&#x27;jobs&#x27;, job.uuid).then(getJobsFromStorage);
+        return storage.db.remove(&#x27;jobs&#x27;, job.uuid);
     };
 
 
     return module;
-
 
 });
 

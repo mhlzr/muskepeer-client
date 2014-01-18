@@ -9,6 +9,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "Job",
         "Jobs",
         "Logger",
+        "Mediator",
         "MuskepeerClient",
         "MuskepeerModule",
         "Network",
@@ -16,14 +17,15 @@ YUI.add("yuidoc-meta", function(Y) {
         "Nodes",
         "Peer",
         "Peers",
+        "Pool",
         "Project",
         "Result",
+        "Results",
         "Service",
         "Settings",
         "Storage",
         "Uuid",
-        "Worker",
-        "Workers"
+        "Worker"
     ],
     "modules": [
         "Computation",
@@ -33,13 +35,15 @@ YUI.add("yuidoc-meta", function(Y) {
         "GeoLocation",
         "Jobs",
         "Logger",
+        "Mediator",
         "MuskepeerClient",
         "Network",
+        "Pool",
         "Project",
+        "Results",
         "Settings",
         "Storage",
-        "Uuid",
-        "Workers"
+        "Uuid"
     ],
     "allModules": [
         {
@@ -73,6 +77,10 @@ YUI.add("yuidoc-meta", function(Y) {
             "name": "Logger"
         },
         {
+            "displayName": "Mediator",
+            "name": "Mediator"
+        },
+        {
             "displayName": "MuskepeerClient",
             "name": "MuskepeerClient"
         },
@@ -81,9 +89,17 @@ YUI.add("yuidoc-meta", function(Y) {
             "name": "Network"
         },
         {
+            "displayName": "Pool",
+            "name": "Pool"
+        },
+        {
             "displayName": "Project",
             "name": "Project",
             "description": "Represents the current project"
+        },
+        {
+            "displayName": "Results",
+            "name": "Results"
         },
         {
             "displayName": "Settings",
@@ -99,10 +115,6 @@ YUI.add("yuidoc-meta", function(Y) {
             "displayName": "Uuid",
             "name": "Uuid",
             "description": "Module to generate and test UUIDs"
-        },
-        {
-            "displayName": "Workers",
-            "name": "Workers"
         }
     ]
 } };

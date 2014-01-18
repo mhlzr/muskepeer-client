@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script data-main="main" src="lib/requirejs/require.js"></script>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <style>
+        legend {
+            font-family: sans-serif;
+            font-size: 1em
+        }
+
+        fieldset {
+            border: 1px solid #818181;
+            display: inline;
+        }
+
+        output {
+            font-family: Monospace;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <fieldset>
+        <legend>Local</legend>
+        <button onclick="Muskepeer.computation.start()">Start Computation</button>
+        <button onclick="Muskepeer.computation.stop()">Stop Computation</button>
+        <button onclick="Muskepeer.storage.fs.clear()">Clear FileSystem</button>
+        <button onclick="Muskepeer.storage.db.clear()">Clear Database</button>
+    </fieldset>
+
+
+    <fieldset>
+        <legend>Grid</legend>
+        <button onclick="Muskepeer.network.broadcastMasterMessage('computation:start')">Start Computation</button>
+        <button onclick="Muskepeer.network.broadcastMasterMessage('computation:stop')">Stop Computation</button>
+        <button onclick="Muskepeer.network.broadcastMasterMessage('filesystem:clear')">Clear FileSystem</button>
+        <button onclick="Muskepeer.network.broadcastMasterMessage('database:clear')">Clear Database</button>
+        <button onclick="Muskepeer.network.broadcastMasterMessage('client:reload', {time: 1500})">Reload</button>
+    </fieldset>
+
+</div>
+
+<output>
+
+</output>
+
+</body>
+</html>

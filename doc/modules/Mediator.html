@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\computation\collection\workers.js - muskepeer-client</title>
+    <title>Mediator - muskepeer-client</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -154,129 +162,49 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\computation\collection\workers.js</h1>
+                        <h1>Mediator Module</h1>
+<div class="box clearfix meta">
+    
 
-<div class="file">
-    <pre class="code prettyprint linenums">
-/**
- * @module Workers
- * @class Workers
- */
+    
 
-define([&#x27;eventemitter2&#x27;, &#x27;../model/worker&#x27;, &#x27;settings&#x27;], function (EventEmitter, Worker, settings) {
+    
+        <div class="foundat">
+            Defined in: <a href="../files/src_mediator.js.html#l1"><code>src\mediator.js:1</code></a>
+        </div>
+    
 
-
-    var _self,
-        _workers = [],
-        _ee = new EventEmitter({delimiter: &#x27;:&#x27;});
-
-
-    /**
-     * @private
-     * @method workerEventHandler
-     * @param {Object} e
-     */
-    function workerEventHandler(e) {
-        _self.emit(this.event, e);
-    }
-
-    return {
-
-        emit: _ee.emit,
-        on: _ee.on,
-        off: _ee.off,
-        onAny: _ee.onAny,
-        offAny: _ee.offAny,
-
-        /**
-         * Amount of worker-instances
-         * @property size
-         *
-         */
-        size: 0,
-
-        /**
-         * @method create
-         * @param {String} url Worker-Script
-         */
-        create: function (url) {
-
-            _self = this;
-
-            for (var i = 0; i &lt; settings.maxWorkers; i++) {
-                var worker = new Worker(url);
-                worker.id = i + 1;
-
-                // Pass-through events
-                worker.onAny(workerEventHandler);
-                _workers.push(worker);
-
-            }
-        },
-
-        /**
-         * @method getWorkerById
-         * @param {Number} id
-         * @return {Worker}
-         */
-        getWorkerById: function (id) {
-            return _workers[id - 1];
-        },
-
-        /**
-         * @method start
-         */
-        start: function () {
-
-            logger.log(&#x27;Computation&#x27;, &#x27;Workers started&#x27;);
-
-            _workers.forEach(function (worker) {
-                worker.start();
-            });
-
-            this.size = _workers.length;
-        },
+    
+</div>
 
 
-        /**
-         * @method stop
-         */
-        stop: function () {
-            _workers.forEach(function (worker) {
-                worker.stop();
-                worker.offAny(workerEventHandler);
-            });
 
-            // Destroying
-            _workers = [];
-
-            this.size = 0;
-        },
+<div class="box intro">
+    
+</div>
 
 
-        /**
-         * @method pause
-         */
-        pause: function () {
-            _workers.forEach(function (worker) {
-                worker.pause();
-            });
-        },
 
-        /**
-         * @method resume
-         */
-        resume: function () {
-            _workers.forEach(function (worker) {
-                worker.resume();
-            });
-        }
+<div class="yui3-g">
+    <div class="yui3-u-1-2">
+        
+            <p>This module provides the following classes:</p>
 
+            <ul class="module-classes">
+            
+                <li class="module-class">
+                    <a href="../classes/Mediator.html">
+                        Mediator
+                    </a>
+                </li>
+            
+            </ul>
+        
+    </div>
 
-    };
-})
-;
-    </pre>
+    <div class="yui3-u-1-2">
+        
+    </div>
 </div>
 
                     </div>

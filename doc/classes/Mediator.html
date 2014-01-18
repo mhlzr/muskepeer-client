@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Workers - muskepeer-client</title>
+    <title>Mediator - muskepeer-client</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -154,16 +162,22 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>Workers Module</h1>
-<div class="box clearfix meta">
+                        <h1>Mediator Class</h1>
+<div class="box meta">
     
 
     
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_computation_model_worker.js.html#l1"><code>src\computation\model\worker.js:1</code></a>
+            Defined in: <a href="../files/src_mediator.js.html#l1"><code>src\mediator.js:1</code></a>
         </div>
+    
+
+    
+        
+            Module: <a href="../modules/Mediator.html">Mediator</a>
+        
     
 
     
@@ -177,42 +191,173 @@
 
 
 
-<div class="yui3-g">
-    <div class="yui3-u-1-2">
-        
-            <p>This module provides the following classes:</p>
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
 
-            <ul class="module-classes">
+        
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
+        
+        
+        
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
             
-                <li class="module-class">
-                    <a href="../classes/Job.html">
-                        Job
-                    </a>
-                </li>
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_couple">couple</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_decouple">decouple</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
             
-                <li class="module-class">
-                    <a href="../classes/Result.html">
-                        Result
-                    </a>
-                </li>
+
             
-                <li class="module-class">
-                    <a href="../classes/Worker.html">
-                        Worker
-                    </a>
-                </li>
+
             
-                <li class="module-class">
-                    <a href="../classes/Workers.html">
-                        Workers
-                    </a>
-                </li>
+
             
-            </ul>
+        </div>
+
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_couple" class="method item">
+    <h3 class="name"><code>couple</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_mediator.js.html#l12"><code>src\mediator.js:12</code></a>
+        
+        </p>
+
+
+        
+
         
     </div>
 
-    <div class="yui3-u-1-2">
+    <div class="description">
+        
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_decouple" class="method item">
+    <h3 class="name"><code>decouple</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_mediator.js.html#l205"><code>src\mediator.js:205</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
+        
+
+        
+
+        
+
         
     </div>
 </div>

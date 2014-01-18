@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -167,7 +175,7 @@
 define([&#x27;lodash&#x27;, &#x27;q&#x27;, &#x27;eventemitter2&#x27;, &#x27;../collections/nodes&#x27;, &#x27;settings&#x27;, &#x27;project&#x27;], function (_, Q, EventEmitter2, nodes, settings, project) {
 
     var TIMEOUT_WAIT_TIME = 30000, //30s
-        QUEUE_RETRY_TIME = 150,
+        QUEUE_RETRY_TIME = 5,
         ICE_SERVER_SETTINGS = {
             iceServers: settings.iceServers
         };
@@ -395,8 +403,7 @@ define([&#x27;lodash&#x27;, &#x27;q&#x27;, &#x27;eventemitter2&#x27;, &#x27;../c
             if (!e || !e.candidate) return;
 
             // III. In the handler, Alice sends stringified candidate data to Eve, via their signaling channel.
-            var signal = _self.getSignalChannel();
-            signal.sendPeerCandidate(_self.uuid, e.candidate);
+            _self.getSignalChannel().sendPeerCandidate(_self.uuid, e.candidate);
 
         }
 
@@ -436,6 +443,7 @@ define([&#x27;lodash&#x27;, &#x27;q&#x27;, &#x27;eventemitter2&#x27;, &#x27;../c
         function negotiationNeededHandler(e) {
 
             logger.log(&#x27;Peer &#x27; + _self.id, &#x27;Negotiation needed&#x27;);
+
             //2. Alice creates an offer (an SDP session description) with the RTCPeerConnection createOffer() method.
             _self.connection.createOffer(function (sessionDescription) {
 
@@ -447,7 +455,7 @@ define([&#x27;lodash&#x27;, &#x27;q&#x27;, &#x27;eventemitter2&#x27;, &#x27;../c
 
                 },
                 function (err) {
-                    logger.error(err);
+                    logger.error(&#x27;Peer &#x27; + _self.id, err, &#x27;Was using&#x27;, _self.protocol, &#x27;protocol.&#x27;);
                 },
                 connectionConstraint);
         }
@@ -730,6 +738,7 @@ define([&#x27;lodash&#x27;, &#x27;q&#x27;, &#x27;eventemitter2&#x27;, &#x27;../c
                 _self.send({type: &#x27;file:pull&#x27;, uuid: uuid});
             });
         };
+
 
         this.sendFile = function (uuid, chunk, pos) {
             pos = pos || 0;

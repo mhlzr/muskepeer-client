@@ -1,0 +1,135 @@
+{
+    "uuid": "0016d5da-47e2-4395-8a48-c3947907913a",
+    "title": "jobqueue",
+    "description": "Test for jobqueue",
+    "publicKey": "047d916b0b1466e059ef5d70c23482a33b959b19925b4fecaefdd3d4a31e5bb6b55bd3dac0eae78637bfaa0e2965c98a56a52f3361d9a7551b03167ae7ad8ee514",
+
+    "author": "Matthieu Holzer",
+    "website": "http://muskepeer.net",
+    "version": "0.0.1",
+    "active": true,
+
+    "computation": {
+
+        "offlineAllowed": true,
+        "testIntervalTime": 10000,
+
+        "workers": {
+            "enabled": true,
+            "url": "https://muskepeer.net/examples/documentation/worker.js",
+            "multipleAllowed": true
+        },
+
+        "factories": {
+            "enabled": false,
+            "url": "https://muskepeer.net/examples/documentation/factory.js",
+            "multipleAllowed": true
+        },
+
+        "results": {
+            "groupSize": 1,
+            "validation": {
+                "enabled": true,
+                "iterations": 10
+            },
+            "expected": -1,
+            "testIntervalTime": 5000
+        },
+
+        "jobs": {
+            "lock": true,
+            "maxLockTime": 3600000,
+            "groupSize": 1,
+            "expected": -1,
+            "testIntervalTime": 5000
+        }
+    },
+
+    "network": {
+
+        "broadcast": {
+            "results": {
+                "enabled": true,
+                "groupSize": 1
+            },
+            "jobs": {
+                "enabled": true,
+                "groupSize": 1
+            },
+            "files": {
+                "enabled": false,
+                "groupSize": 1
+            },
+            "peers": {
+                "enabled": true,
+                "groupSize": 1
+            },
+            "nodes": {
+                "enabled": true,
+                "groupSize": 1
+            }
+        },
+
+        "synchronization": {
+            "results": {
+                "enabled": true,
+                "interval": 3600000,
+                "groupSize": 15
+            },
+            "jobs": {
+                "enabled": true,
+                "interval": 3600000,
+                "groupSize": 15
+            },
+            "files": {
+                "enabled": false,
+                "interval": 3600000,
+                "groupSize": 1
+            },
+            "peers": {
+                "enabled": true,
+                "interval": 3600000,
+                "groupSize": 15
+            },
+            "nodes": {
+                "enabled": true,
+                "interval": 3600000,
+                "groupSize": 15
+            }
+        },
+
+        "useGeoLocation": true,
+
+        "services": [
+            {
+                "enabled": false,
+                "url": "https://api.parse.com/1/classes/Results/",
+                "type": "REST",
+                "params": {},
+                "headers": [
+                    {
+                        "key": "X-Parse-Application-Id",
+                        "value": "ZzIHMKfVQmIni0K5fBdYgXxTlXyoovbm4gm0Epdq"
+                    },
+                    {
+                        "key": "X-Parse-REST-API-Key",
+                        "value": "4Izw5bddA34RFUmOuGCYrMHn4zY5dz62ETAVb2g5"
+                    }
+                ]
+            }
+        ]
+    },
+
+    "files": [
+        {
+            "name": "test",
+            "url": "https://dl.dropboxusercontent.com/u/959008/download.pdf",
+            "type": "application/pdf"
+        },
+        {
+            "name": "train",
+            "url": "https://dl.dropboxusercontent.com/u/959008/webstorm.pdf",
+            "type": "application/pdf"
+        }
+    ]
+}

@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -221,6 +229,7 @@ define([&#x27;q&#x27;, &#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;stora
          * @method masterMessageHandler
          */
         function masterMessageHandler(e) {
+
             if (isValidMasterMessage(e.data.message, e.data.signature)) {
 
                 storage.db.has(&#x27;messages&#x27;, e.data.message.uuid)
@@ -251,7 +260,7 @@ define([&#x27;q&#x27;, &#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;stora
         function isValidMasterMessage(message, signature) {
             var now = Date.now();
 
-            if (!message || !signature) return;
+            if (!message || !signature) return false;
 
             // Signature is okay?
             if (!crypto.verify(JSON.stringify(message), signature)) {
@@ -371,139 +380,23 @@ define([&#x27;q&#x27;, &#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;stora
          * @param {Object} e
          */
         function peerMessageHandler(e) {
-            var peer = e.target,
-                externalList = e.list,
-                uuid = e.uuid,
-                list;
 
-            logger.log(&#x27;Peer &#x27; + peer.id, &#x27;Received&#x27;, e.type);
+            logger.log(&#x27;Peer &#x27; + e.target.id, &#x27;Received&#x27;, e.type);
 
             if (!e.type) {
-                logger.log(&#x27;Network&#x27;, &#x27;peer:message without type received&#x27;);
+                logger.log(&#x27;Network&#x27;, &#x27;Peer-message without type received&#x27;);
                 return;
             }
-            switch (e.type.toLowerCase()) {
 
-                case &#x27;node:list:pull&#x27; :
-                    peer.sendNodeList(nodes.getNodeUuidsAsArray());
-                    break;
-                case &#x27;peer:list:pull&#x27; :
-                    peer.sendPeerList(peers.getPeerUuidsAsArray());
-                    break;
-                case &#x27;file:list:pull&#x27; :
-                    storage.getFileUuidsAsArray().then(function (list) {
-                        peer.sendFileList(list);
-                    });
-                    break;
-                case &#x27;job:list:pull&#x27; :
-                    storage.getJobUuidsAsArray().then(function (list) {
-                        peer.sendJobList(list);
-                    });
-                    break;
-                case &#x27;result:list:pull&#x27; :
-                    storage.getResultUuidsAsArray().then(function (list) {
-                        peer.sendResultList(list);
-                    });
-                    break;
-                case &#x27;node:list:push&#x27;:
-                    list = nodes.getMissingNodeUuidsAsArray(externalList);
-                    logger.log(&#x27;Peer &#x27; + peer.id, &#x27;Result of node:sync&#x27;, list.length);
-                    peer.getNodeByUuid(list);
-                    break;
-                case &#x27;peer:list:push&#x27;:
-                    list = peers.getMissingPeerUuidsAsArray(externalList);
-                    logger.log(&#x27;Peer &#x27; + peer.id, &#x27;Result of peer:sync&#x27;, list.length);
-                    peer.getPeerByUuid(list);
-                    break;
-                case &#x27;file:list:push&#x27;:
-                    storage.getMissingFileUuidsAsArray(externalList).then(function (list) {
-                        logger.log(&#x27;Peer &#x27; + peer.id, &#x27;Result of file:sync&#x27;, list.length);
-                        peer.getFileByUuid(list);
-                    });
-                    break;
-                case &#x27;job:list:push&#x27;:
-                    storage.getMissingJobUuidsAsArray(externalList).then(function (list) {
-                        logger.log(&#x27;Peer &#x27; + peer.id, &#x27;Result of job:sync&#x27;, list.length);
-                        peer.getJobByUuid(list);
-                    });
-                    break;
-                case &#x27;result:list:push&#x27;:
-                    storage.getMissingResultUuidsAsArray(externalList).then(function (list) {
-                        logger.log(&#x27;Peer &#x27; + peer.id, &#x27;Result of result:sync&#x27;, list.length);
-                        peer.getResultByUuid(list);
-                    });
-                    break;
-
-                case &#x27;node:pull&#x27;:
-                    peer.sendPeer(nodes.getNodeByUuid(uuid).serialize());
-                    break;
-                case &#x27;peer:pull&#x27;:
-                    peer.sendPeer(peers.getPeerByUuid(uuid).serialize());
-                    break;
-                case &#x27;file:pull&#x27;:
-                    break;
-                case &#x27;job:pull&#x27;:
-                    storage.db.read(&#x27;jobs&#x27;, uuid, {uuidIsHash: true}).then(function (job) {
-                        peer.sendJob(job);
-                    });
-                    break;
-                case &#x27;result:pull&#x27;:
-                    storage.db.read(&#x27;results&#x27;, uuid, {uuidIsHash: true}).then(function (result) {
-                        if (result) peer.sendResult(result);
-                    });
-                    break;
-
-                case &#x27;node:push&#x27;:
-                    nodes.update(e.node);
-                    break;
-                case &#x27;peer:push&#x27;:
-                    peers.update(e.peer);
-                    break;
-                case &#x27;file:push&#x27;:
-                    break;
-                case &#x27;job:push&#x27;:
-                    storage.db.save(&#x27;jobs&#x27;, e.job, {uuidIsHash: true});
-                    break;
-                case &#x27;result:push&#x27;:
-                    storage.db.save(&#x27;results&#x27;, e.result, {uuidIsHash: true});
-                    break;
-
-                case &#x27;broadcast:job&#x27;:
-                    break;
-                case &#x27;broadcast:result:push&#x27;:
-
-                    // Do i already know about this?
-                    storage.db.has(&#x27;results&#x27;, e.data.uuid)
-                        .then(function (exists) {
-
-                            if (!exists) {
-                                // Rebroadcast
-                                peers.broadcast(&#x27;result&#x27;, e.data, peer.uuid);
-
-                                // Store the result
-                                return storage.db.save(&#x27;results&#x27;, e.data, {uuidIsHash: true})
-                                    .then(function () {
-                                        module.emit(&#x27;result:push&#x27;);
-                                    });
-
-                            }
-                            else return Q();
-
-                        });
-
-
-                    break;
-                case &#x27;broadcast:peer&#x27;:
-                    break;
-                case &#x27;broadcast:file&#x27;:
-                    break;
-                case &#x27;broadcast:computation:start&#x27;:
-                    masterMessageHandler(e);
-                    break;
-                case &#x27;broadcast:computation:stop&#x27;:
-                    masterMessageHandler(e);
-                    break;
+            // Seems to be a master-message
+            if (e.data &amp;&amp; e.data.message &amp;&amp; e.data.signature) {
+                masterMessageHandler(e);
+                return;
             }
+
+            // Pass-through events
+            module.emit(e.type, e);
+
         }
 
 

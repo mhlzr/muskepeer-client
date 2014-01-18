@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -291,7 +299,6 @@ define([&#x27;lodash&#x27;, &#x27;q&#x27;, &#x27;uuid&#x27;, &#x27;project&#x27;
 
                 store.count(function (amount) {
                     deferred.resolve(amount);
-
                 }, {});
 
                 return deferred.promise;
@@ -582,11 +589,19 @@ define([&#x27;lodash&#x27;, &#x27;q&#x27;, &#x27;uuid&#x27;, &#x27;project&#x27;
                     return deferred.promise;
                 }
 
-
                 //get data from store
                 this.read(storeName, data.uuid, options)
                     //merge
                     .then(function (existingData) {
+
+                        //compare
+                        /*if (comparisonFunction) {
+                         var hasChanged = comparisonFunction(existingData, data);
+                         // skip the rest
+                         if (!hasChanged) deferred.resolve(false);
+                         return;
+                         }*/
+
                         data = _.extend(existingData, data);
                         store.put(data);
                     })
@@ -611,6 +626,7 @@ define([&#x27;lodash&#x27;, &#x27;q&#x27;, &#x27;uuid&#x27;, &#x27;project&#x27;
              * @param {String} key
              */
             has: function (storeName, key) {
+
                 var deferred = Q.defer(),
                     store = getStoreByName(storeName);
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Workers - muskepeer-client</title>
+    <title>Pool - muskepeer-client</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -154,7 +162,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>Workers Class</h1>
+                        <h1>Pool Class</h1>
 <div class="box meta">
     
 
@@ -162,13 +170,13 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/src_computation_collection_workers.js.html#l1"><code>src\computation\collection\workers.js:1</code></a>
+            Defined in: <a href="../files/src_computation_model_pool.js.html#l1"><code>src\computation\model\pool.js:1</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/Workers.html">Workers</a>
+            Module: <a href="../modules/Pool.html">Pool</a>
         
     
 
@@ -208,14 +216,14 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_create">create</a>
+                                <a href="#method_getIdleThreads">getIdleThreads</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getWorkerById">getWorkerById</a>
+                                <a href="#method_getThreadById">getThreadById</a>
 
                                 
                                 
@@ -287,23 +295,17 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_create" class="method item">
-    <h3 class="name"><code>create</code></h3>
+                    <div id="method_getIdleThreads" class="method item">
+    <h3 class="name"><code>getIdleThreads</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>url</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
+    
+        <span class="returns-inline">
+            <span class="type">Array</span>
+        </span>
     
 
     
@@ -329,7 +331,7 @@
             
         
         
-        <a href="../files/src_computation_collection_workers.js.html#l38"><code>src\computation\collection\workers.js:38</code></a>
+        <a href="../files/src_computation_model_pool.js.html#l122"><code>src\computation\model\pool.js:122</code></a>
         
         </p>
 
@@ -344,39 +346,27 @@
     </div>
 
     
-        <div class="params">
-            <h4>Parameters:</h4>
 
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">url</code>
-                        <span class="type">String</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Worker-Script</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
     
+        <div class="returns">
+            <h4>Returns:</h4>
 
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Array</span>:
+                    
+                
+            </div>
+        </div>
     
 
     
 </div>
 
                 
-                    <div id="method_getWorkerById" class="method item">
-    <h3 class="name"><code>getWorkerById</code></h3>
+                    <div id="method_getThreadById" class="method item">
+    <h3 class="name"><code>getThreadById</code></h3>
 
     
         <div class="args">
@@ -421,7 +411,7 @@
             
         
         
-        <a href="../files/src_computation_collection_workers.js.html#l57"><code>src\computation\collection\workers.js:57</code></a>
+        <a href="../files/src_computation_model_pool.js.html#l59"><code>src\computation\model\pool.js:59</code></a>
         
         </p>
 
@@ -510,7 +500,7 @@
             
         
         
-        <a href="../files/src_computation_collection_workers.js.html#l97"><code>src\computation\collection\workers.js:97</code></a>
+        <a href="../files/src_computation_model_pool.js.html#l102"><code>src\computation\model\pool.js:102</code></a>
         
         </p>
 
@@ -564,7 +554,7 @@
             
         
         
-        <a href="../files/src_computation_collection_workers.js.html#l106"><code>src\computation\collection\workers.js:106</code></a>
+        <a href="../files/src_computation_model_pool.js.html#l112"><code>src\computation\model\pool.js:112</code></a>
         
         </p>
 
@@ -618,7 +608,7 @@
             
         
         
-        <a href="../files/src_computation_collection_workers.js.html#l66"><code>src\computation\collection\workers.js:66</code></a>
+        <a href="../files/src_computation_model_pool.js.html#l68"><code>src\computation\model\pool.js:68</code></a>
         
         </p>
 
@@ -672,7 +662,7 @@
             
         
         
-        <a href="../files/src_computation_collection_workers.js.html#l81"><code>src\computation\collection\workers.js:81</code></a>
+        <a href="../files/src_computation_model_pool.js.html#l83"><code>src\computation\model\pool.js:83</code></a>
         
         </p>
 
@@ -738,7 +728,7 @@
             
         
         
-        <a href="../files/src_computation_collection_workers.js.html#l14"><code>src\computation\collection\workers.js:14</code></a>
+        <a href="../files/src_computation_model_pool.js.html#l26"><code>src\computation\model\pool.js:26</code></a>
         
         </p>
 
@@ -814,7 +804,7 @@
             
         
         
-        <a href="../files/src_computation_collection_workers.js.html#l31"><code>src\computation\collection\workers.js:31</code></a>
+        <a href="../files/src_computation_model_pool.js.html#l35"><code>src\computation\model\pool.js:35</code></a>
         
         </p>
 

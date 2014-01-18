@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>src\computation\model\worker.js - muskepeer-client</title>
+    <title>src\computation\collection\results.js - muskepeer-client</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -154,92 +162,172 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: src\computation\model\worker.js</h1>
+                        <h1 class="file-heading">File: src\computation\collection\results.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
 /**
- * @class Worker
+ * @class Results
+ * @module Results
  */
 
-define([&#x27;eventemitter2&#x27;], function (EventEmitter) {
 
-    var WebWorker = window.Worker;
+define([&#x27;q&#x27;, &#x27;storage/index&#x27;, &#x27;project&#x27;], function (Q, storage, project) {
 
-    return function Worker(url) {
+        var module = {};
 
-        var _self = this,
-            _webworker,
-            _ee = new EventEmitter({delimiter: &#x27;:&#x27;});
+        /**
+         * @private
+         * @method getResultsFromStorage
+         * @param {Boolean} filterValidated
+         * @return {Promise}
+         */
+        function getResultsFromStorage(filterValidated) {
 
-        this.id = null;
+            filterValidated = filterValidated || false;
 
-        this.emit = _ee.emit;
-        this.on = _ee.on;
-        this.off = _ee.off;
-        this.onAny = _ee.onAny;
-        this.offAny = _ee.onAny;
+            var filter = {
+                projectUuid: project.uuid
+            };
 
-        this.isRunning = false;
-        this.isPaused = false;
+            if (filterValidated) {
+                filter.isValid = true;
+            }
 
-        function workerMessageHandler(e) {
-            _self.emit(e.data.type.toLowerCase(), {id: self.id, data: e.data });
+            return storage.db.findAndReduceByObject(&#x27;results&#x27;, {filterDuplicates: false}, filter);
+
+
         }
 
-        function workerErrorHandler(e) {
-            logger.log(&#x27;Worker&#x27;, &#x27;error occured&#x27;, e);
-        }
 
-        this.start = function () {
+        /**
+         * @property
+         * @type {Number}
+         */
+        module.size = 0;
 
-            _webworker = new WebWorker(url);
-            _webworker.addEventListener(&#x27;message&#x27;, workerMessageHandler, false);
-            _webworker.addEventListener(&#x27;error&#x27;, workerErrorHandler, false);
 
-            this.isRunning = true;
-            this.isPaused = false;
+        /**
+         * Adds a result to the storage. If its new will return true,
+         * if it&#x27;s an update it will return false;
+         *
+         * @method add
+         * @param {Result} result
+         * @return {Promise}
+         */
+        module.add = function (result) {
 
-            _webworker.postMessage({cmd: &#x27;start&#x27;});
+            // Already existent?
+            return storage.db.has(&#x27;results&#x27;, result.uuid, {uuidIsHash: true})
+                .then(function (exists) {
+                    if (!exists) {
+                        // Is new
+                        return storage.db.save(&#x27;results&#x27;, result, {uuidIsHash: true})
+                            .then(function () {
+                                return true;
+                            });
+                    }
+                    // Is an update
+                    else return module.update(result);
+
+                })
+        };
+
+        /**
+         * Update a result, will return true, if the result really changed.
+         *
+         * @method update
+         * @param result
+         * @return {Boolean}
+         */
+        module.update = function (result) {
+
+            // Without enabled validation, there updating a result is not allowed
+            // If it&#x27;s already valid, there is no need, for the whole process
+            if (!project.computation.results.validation.enabled || result.isValid) {
+                return false;
+            }
+
+            // Read stored result
+            return storage.db.read(&#x27;results&#x27;, result.uuid, {uuidIsHash: true})
+
+                .then(function (resultFromStorage) {
+
+                    // No need to update
+                    if (resultFromStorage.isValid || resultFromStorage.iteration &gt;= project.computation.results.validation.iterations) {
+                        return false;
+                    }
+
+                    // Increase iterations, then Update,
+                    result.iteration = resultFromStorage.iteration + 1;
+
+                    // Already did enough iterations, result is now valid
+                    if (result.iteration &gt;= project.computation.results.validation.iterations) {
+                        result.isValid = true;
+                    }
+
+                    // Update result
+                    return storage.db.update(&#x27;results&#x27;, result, {uuidIsHash: true});
+
+
+                }).then(function () {
+                    // We made changes!
+                    return true;
+                })
+
 
         };
 
-        this.stop = function () {
-            _webworker.postMessage({cmd: &#x27;stop&#x27;});
-            _webworker.removeEventListener(&#x27;message&#x27;, workerMessageHandler);
-            _webworker.removeEventListener(&#x27;error&#x27;, workerErrorHandler);
-            _webworker.terminate();
-            _webworker = null;
-            this.isRunning = false;
-            this.isPaused = true;
+        /**
+         * @method clear
+         * @return {Promise}
+         */
+        module.clear = function () {
+            return storage.db.clear([&#x27;results&#x27;]);
         };
 
-        this.pause = function () {
-            _webworker.postMessage({cmd: &#x27;pause&#x27;});
-            this.isPaused = true;
-            this.isRunning = false;
+
+        /**
+         * @method getResultByUuid
+         * @param {String} uuid
+         * @return {Promise}
+         */
+        module.getResultByUuid = function (uuid) {
+            return storage.db.read(&#x27;results&#x27;, uuid, {uuidIsHash: true});
         };
 
-        this.resume = function () {
-            _webworker.postMessage({cmd: &#x27;resume&#x27;});
-            this.isPaused = false;
-            this.isRunning = true;
+
+        /**
+         * @method isValid
+         * @param result
+         * @return {Promise}
+         */
+        module.isValid = function (result) {
+            return storage.db.read(&#x27;results&#x27;, result.uuid, {uuidIsHash: true})
+                .then(function (resultFromStorage) {
+                    return resultFromStorage &amp;&amp; resultFromStorage.isValid === true;
+                });
         };
 
-        this.pushJob = function (job) {
-            _webworker.postMessage({cmd: &#x27;job&#x27;, job: job});
+
+        /**
+         * @method allValid
+         * @return {Promise}
+         */
+        module.allValid = function () {
+            return getResultsFromStorage(true)
+                .then(function (results) {
+                    return results.length === project.computation.results.expected;
+                });
+
         };
 
-        this.pushFile = function (fileInfo, file) {
-            _webworker.postMessage({cmd: &#x27;file&#x27;, fileInfo: fileInfo, file: file});
-        };
 
-        this.pushResult = function (result) {
-            _webworker.postMessage({cmd: &#x27;result&#x27;, result: result});
-        };
+        return module;
 
-    };
-});
+    }
+);
+
     </pre>
 </div>
 

@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -168,13 +176,14 @@
 define([
     &#x27;q&#x27;,
     &#x27;lodash&#x27;,
-    &#x27;./computation/index&#x27;,
-    &#x27;./crypto/index&#x27;,
-    &#x27;./network/index&#x27;,
-    &#x27;./project&#x27;,
-    &#x27;./settings&#x27;,
-    &#x27;./storage/index&#x27;
-], function (Q, _, computation, crypto, network, project, settings, storage) {
+    &#x27;computation/index&#x27;,
+    &#x27;crypto/index&#x27;,
+    &#x27;network/index&#x27;,
+    &#x27;project&#x27;,
+    &#x27;settings&#x27;,
+    &#x27;storage/index&#x27;,
+    &#x27;mediator&#x27;
+], function (Q, _, computation, crypto, network, project, settings, storage, mediator) {
 
     &#x27;use strict&#x27;;
 
@@ -224,44 +233,11 @@ define([
 
     }
 
-
-    /**
-     * @private
-     * @method coupleModules
-     */
-    function coupleModules() {
-
-        //network.on(&#x27;result:push&#x27;, function () {});
-
-        network.on(&#x27;broadcast:computation:start&#x27;, computation.start);
-        network.on(&#x27;broadcast:computation:stop&#x27;, computation.stop);
-
-        computation.on(&#x27;job:lock&#x27;, function (e) {
-            network.publish(&#x27;job:lock&#x27;, e);
-        });
-        computation.on(&#x27;job:finished&#x27;, function (e) {
-            network.publish(&#x27;job:finished&#x27;, e);
-        });
-        computation.on(&#x27;result:push&#x27;, function (e) {
-            network.publish(&#x27;result:push&#x27;, e);
-        });
-
-    }
-
-    /**
-     * @private
-     * @method decoupleModules
-     */
-    function decoupleModules() {
-        network.removeAllListeners();
-        computation.removeAllListeners();
-    }
-
-
     return {
 
         computation: computation,
         crypto: crypto,
+        mediator: mediator,
         network: network,
         project: project,
         settings: settings,
@@ -328,29 +304,32 @@ define([
                     var requiredFiles = [];
 
                     // Add workerFile
-                    if (project.computation.solving.enabled &amp;&amp; project.computation.solving.workerUrl) {
-                        requiredFiles.push(project.computation.solving.workerUrl);
+                    if (project.computation.workers.enabled &amp;&amp; project.computation.workers.url) {
+                        requiredFiles.push({ url: project.computation.workers.url, type: &#x27;text/javascript&#x27;});
                     }
 
                     // Add factoryFile
-                    if (project.computation.jobs.enabled &amp;&amp; project.computation.jobs.factoryUrl) {
-                        requiredFiles.push(project.computation.jobs.factoryUrl);
+                    if (project.computation.factories.enabled &amp;&amp; project.computation.factories.url) {
+                        requiredFiles.push({ url: project.computation.factories.url, type: &#x27;text/javascript&#x27;});
                     }
 
                     // Store fileInfo to fileSystem
                     return storage.fs.add(_.union(project.files, requiredFiles))
                 })
                 .then(function () {
-                    //TODO Currently all files get downloaded not loaded from other peers
+                    //TODO Currently all files get downloaded not loaded from other peers as
+                    // Blob is not yet supported via DataChannel
                     return storage.fs.downloadIncompleteFiles();
                 })
                 .done(function () {
 
+
+                    mediator.couple();
+
                     // Finallly initialize the network and computation module
-                    coupleModules();
 
                     network.start();
-                    // computation.start();
+                    //computation.start();
                 });
 
             return this;
@@ -363,7 +342,7 @@ define([
          */
         stop: function () {
 
-            decoupleModules();
+            mediator.decouple();
 
             this.computation.stop();
             this.network.stop();

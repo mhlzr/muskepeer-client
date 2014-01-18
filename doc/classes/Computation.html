@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -208,21 +216,35 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method private">
-                                <a href="#method_addJobFactoryListeners">addJobFactoryListeners</a>
+                                <a href="#method_addEventListenersToPool">addEventListenersToPool</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method private">
-                                <a href="#method_addWorkerEventListeners">addWorkerEventListeners</a>
+                                <a href="#method_allFound">allFound</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method private">
-                                <a href="#method_createJobFactory">createJobFactory</a>
+                                <a href="#method_counterCompleteHandler">counterCompleteHandler</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method_createFactories">createFactories</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method_createThreadPool">createThreadPool</a>
 
                                 
                                 
@@ -243,14 +265,7 @@
                             </li>
                         
                             <li class="index-item method private">
-                                <a href="#method_jobFactoryErrorHandler">jobFactoryErrorHandler</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method private">
-                                <a href="#method_jobFactoryMessageHandler">jobFactoryMessageHandler</a>
+                                <a href="#method_jobCounterCompleteHandler">jobCounterCompleteHandler</a>
 
                                 
                                 
@@ -264,21 +279,63 @@
                             </li>
                         
                             <li class="index-item method private">
-                                <a href="#method_removeJobFactoryListeners">removeJobFactoryListeners</a>
+                                <a href="#method_poolFileFoundHandler">poolFileFoundHandler</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method private">
-                                <a href="#method_removeWorkerEventListeners">removeWorkerEventListeners</a>
+                                <a href="#method_poolFileRequiredHandler">poolFileRequiredHandler</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method private">
-                                <a href="#method_resultCountIntervalCompleteHandler">resultCountIntervalCompleteHandler</a>
+                                <a href="#method_poolJobFoundHandler">poolJobFoundHandler</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method_poolJobRequiredHandler">poolJobRequiredHandler</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method_poolResultFoundHandler">poolResultFoundHandler</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method_poolResultRequiredHandler">poolResultRequiredHandler</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_pushJobToAwaitingWorker">pushJobToAwaitingWorker</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method_removeEventListenersFromPool">removeEventListenersFromPool</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method private">
+                                <a href="#method_resultCounterCompleteHandler">resultCounterCompleteHandler</a>
 
                                 
                                 
@@ -305,29 +362,15 @@
                                 
                             </li>
                         
-                            <li class="index-item method private">
-                                <a href="#method_workerFileFoundHandler">workerFileFoundHandler</a>
+                            <li class="index-item method">
+                                <a href="#method_stopFactories">stopFactories</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method private">
-                                <a href="#method_workerJobRequiredHandler">workerJobRequiredHandler</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method private">
-                                <a href="#method_workerResultFoundHandler">workerResultFoundHandler</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method private">
-                                <a href="#method_workerResultRequiredHandler">workerResultRequiredHandler</a>
+                            <li class="index-item method">
+                                <a href="#method_stopWorkers">stopWorkers</a>
 
                                 
                                 
@@ -358,14 +401,14 @@
                             </li>
                         
                             <li class="index-item property">
-                                <a href="#property_jobFactory">jobFactory</a>
+                                <a href="#property_jobs">jobs</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item property">
-                                <a href="#property_jobs">jobs</a>
+                                <a href="#property_results">results</a>
 
                                 
                                 
@@ -385,8 +428,8 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_addJobFactoryListeners" class="method item private">
-    <h3 class="name"><code>addJobFactoryListeners</code></h3>
+                    <div id="method_addEventListenersToPool" class="method item private">
+    <h3 class="name"><code>addEventListenersToPool</code></h3>
 
     
         <span class="paren">()</span>
@@ -419,7 +462,7 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l109"><code>src\computation\index.js:109</code></a>
+        <a href="../files/src_computation_index.js.html#l200"><code>src\computation\index.js:200</code></a>
         
         </p>
 
@@ -441,11 +484,147 @@
 </div>
 
                 
-                    <div id="method_addWorkerEventListeners" class="method item private">
-    <h3 class="name"><code>addWorkerEventListeners</code></h3>
+                    <div id="method_allFound" class="method item private">
+    <h3 class="name"><code>allFound</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>type</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>expected</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Promise</span>
+        </span>
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l19"><code>src\computation\index.js:19</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">type</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">expected</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Promise</span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_counterCompleteHandler" class="method item private">
+    <h3 class="name"><code>counterCompleteHandler</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>e</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -475,7 +654,7 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l80"><code>src\computation\index.js:80</code></a>
+        <a href="../files/src_computation_index.js.html#l482"><code>src\computation\index.js:482</code></a>
         
         </p>
 
@@ -490,6 +669,29 @@
     </div>
 
     
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">e</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
 
     
 
@@ -497,8 +699,8 @@
 </div>
 
                 
-                    <div id="method_createJobFactory" class="method item private">
-    <h3 class="name"><code>createJobFactory</code></h3>
+                    <div id="method_createFactories" class="method item private">
+    <h3 class="name"><code>createFactories</code></h3>
 
     
         <span class="paren">()</span>
@@ -535,7 +737,7 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l50"><code>src\computation\index.js:50</code></a>
+        <a href="../files/src_computation_index.js.html#l169"><code>src\computation\index.js:169</code></a>
         
         </p>
 
@@ -550,6 +752,132 @@
 
     </div>
 
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Promise</span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_createThreadPool" class="method item private">
+    <h3 class="name"><code>createThreadPool</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>type</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>url</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Promise</span>
+        </span>
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l76"><code>src\computation\index.js:76</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">type</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">url</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
     
 
     
@@ -608,7 +936,7 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l14"><code>src\computation\index.js:14</code></a>
+        <a href="../files/src_computation_index.js.html#l137"><code>src\computation\index.js:137</code></a>
         
         </p>
 
@@ -679,7 +1007,7 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l389"><code>src\computation\index.js:389</code></a>
+        <a href="../files/src_computation_index.js.html#l621"><code>src\computation\index.js:621</code></a>
         
         </p>
 
@@ -713,286 +1041,8 @@
 </div>
 
                 
-                    <div id="method_jobFactoryErrorHandler" class="method item private">
-    <h3 class="name"><code>jobFactoryErrorHandler</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_computation_index.js.html#l138"><code>src\computation\index.js:138</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_jobFactoryMessageHandler" class="method item private">
-    <h3 class="name"><code>jobFactoryMessageHandler</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_computation_index.js.html#l128"><code>src\computation\index.js:128</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_pause" class="method item">
-    <h3 class="name"><code>pause</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_computation_index.js.html#l349"><code>src\computation\index.js:349</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_removeJobFactoryListeners" class="method item private">
-    <h3 class="name"><code>removeJobFactoryListeners</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_computation_index.js.html#l118"><code>src\computation\index.js:118</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_removeWorkerEventListeners" class="method item private">
-    <h3 class="name"><code>removeWorkerEventListeners</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_computation_index.js.html#l96"><code>src\computation\index.js:96</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_resultCountIntervalCompleteHandler" class="method item private">
-    <h3 class="name"><code>resultCountIntervalCompleteHandler</code></h3>
+                    <div id="method_jobCounterCompleteHandler" class="method item private">
+    <h3 class="name"><code>jobCounterCompleteHandler</code></h3>
 
     
         <div class="args">
@@ -1035,7 +1085,624 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l280"><code>src\computation\index.js:280</code></a>
+        <a href="../files/src_computation_index.js.html#l469"><code>src\computation\index.js:469</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">e</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_pause" class="method item">
+    <h3 class="name"><code>pause</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l556"><code>src\computation\index.js:556</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_poolFileFoundHandler" class="method item private">
+    <h3 class="name"><code>poolFileFoundHandler</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l373"><code>src\computation\index.js:373</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Event-Listener, listens for
+file:push from Thread-Pool</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_poolFileRequiredHandler" class="method item private">
+    <h3 class="name"><code>poolFileRequiredHandler</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l385"><code>src\computation\index.js:385</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Event-Listener, listens for
+file:pull from Thread-Pool</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_poolJobFoundHandler" class="method item private">
+    <h3 class="name"><code>poolJobFoundHandler</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l224"><code>src\computation\index.js:224</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Event-Listener, listens for
+job:push from Thread-Pool</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_poolJobRequiredHandler" class="method item private">
+    <h3 class="name"><code>poolJobRequiredHandler</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l249"><code>src\computation\index.js:249</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Event-Listener, listens for
+job:pull from Thread-Pool</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_poolResultFoundHandler" class="method item private">
+    <h3 class="name"><code>poolResultFoundHandler</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l302"><code>src\computation\index.js:302</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Event-Listener, listens for
+result:push from Thread-Pool</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_poolResultRequiredHandler" class="method item private">
+    <h3 class="name"><code>poolResultRequiredHandler</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l351"><code>src\computation\index.js:351</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Event-Listener, listens for
+result:pull from Thread-Pool</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_pushJobToAwaitingWorker" class="method item">
+    <h3 class="name"><code>pushJobToAwaitingWorker</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">Array</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l640"><code>src\computation\index.js:640</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">Array</span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_removeEventListenersFromPool" class="method item private">
+    <h3 class="name"><code>removeEventListenersFromPool</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l216"><code>src\computation\index.js:216</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_resultCounterCompleteHandler" class="method item private">
+    <h3 class="name"><code>resultCounterCompleteHandler</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>e</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+
+    
+
+    
+        <span class="flag private">private</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l456"><code>src\computation\index.js:456</code></a>
         
         </p>
 
@@ -1112,7 +1779,7 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l357"><code>src\computation\index.js:357</code></a>
+        <a href="../files/src_computation_index.js.html#l565"><code>src\computation\index.js:565</code></a>
         
         </p>
 
@@ -1166,7 +1833,7 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l321"><code>src\computation\index.js:321</code></a>
+        <a href="../files/src_computation_index.js.html#l525"><code>src\computation\index.js:525</code></a>
         
         </p>
 
@@ -1220,7 +1887,7 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l365"><code>src\computation\index.js:365</code></a>
+        <a href="../files/src_computation_index.js.html#l574"><code>src\computation\index.js:574</code></a>
         
         </p>
 
@@ -1242,8 +1909,8 @@
 </div>
 
                 
-                    <div id="method_workerFileFoundHandler" class="method item private">
-    <h3 class="name"><code>workerFileFoundHandler</code></h3>
+                    <div id="method_stopFactories" class="method item">
+    <h3 class="name"><code>stopFactories</code></h3>
 
     
         <span class="paren">()</span>
@@ -1253,8 +1920,6 @@
 
     
 
-    
-        <span class="flag private">private</span>
     
 
     
@@ -1276,7 +1941,7 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l271"><code>src\computation\index.js:271</code></a>
+        <a href="../files/src_computation_index.js.html#l607"><code>src\computation\index.js:607</code></a>
         
         </p>
 
@@ -1298,8 +1963,8 @@
 </div>
 
                 
-                    <div id="method_workerJobRequiredHandler" class="method item private">
-    <h3 class="name"><code>workerJobRequiredHandler</code></h3>
+                    <div id="method_stopWorkers" class="method item">
+    <h3 class="name"><code>stopWorkers</code></h3>
 
     
         <span class="paren">()</span>
@@ -1309,8 +1974,6 @@
 
     
 
-    
-        <span class="flag private">private</span>
     
 
     
@@ -1332,119 +1995,7 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l165"><code>src\computation\index.js:165</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_workerResultFoundHandler" class="method item private">
-    <h3 class="name"><code>workerResultFoundHandler</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_computation_index.js.html#l213"><code>src\computation\index.js:213</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_workerResultRequiredHandler" class="method item private">
-    <h3 class="name"><code>workerResultRequiredHandler</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_computation_index.js.html#l146"><code>src\computation\index.js:146</code></a>
+        <a href="../files/src_computation_index.js.html#l594"><code>src\computation\index.js:594</code></a>
         
         </p>
 
@@ -1497,7 +2048,7 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l305"><code>src\computation\index.js:305</code></a>
+        <a href="../files/src_computation_index.js.html#l502"><code>src\computation\index.js:502</code></a>
         
         </p>
 
@@ -1543,7 +2094,7 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l300"><code>src\computation\index.js:300</code></a>
+        <a href="../files/src_computation_index.js.html#l497"><code>src\computation\index.js:497</code></a>
         
         </p>
 
@@ -1558,50 +2109,6 @@
 
     
         <p><strong>Default:</strong> false</p>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="property_jobFactory" class="property item">
-    <h3 class="name"><code>jobFactory</code></h3>
-    <span class="type"><a href="..\classes\Worker.html" class="crosslink">Worker</a></span>
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/src_computation_index.js.html#l316"><code>src\computation\index.js:316</code></a>
-        
-        </p>
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        
-    </div>
-
     
 
     
@@ -1633,7 +2140,51 @@
             
         
         
-        <a href="../files/src_computation_index.js.html#l311"><code>src\computation\index.js:311</code></a>
+        <a href="../files/src_computation_index.js.html#l508"><code>src\computation\index.js:508</code></a>
+        
+        </p>
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="property_results" class="property item">
+    <h3 class="name"><code>results</code></h3>
+    <span class="type">Object</span>
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/src_computation_index.js.html#l513"><code>src\computation\index.js:513</code></a>
         
         </p>
 

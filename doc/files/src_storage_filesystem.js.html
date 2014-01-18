@@ -57,6 +57,8 @@
             
                 <li><a href="../classes/Logger.html">Logger</a></li>
             
+                <li><a href="../classes/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../classes/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../classes/MuskepeerModule.html">MuskepeerModule</a></li>
@@ -71,9 +73,13 @@
             
                 <li><a href="../classes/Peers.html">Peers</a></li>
             
+                <li><a href="../classes/Pool.html">Pool</a></li>
+            
                 <li><a href="../classes/Project.html">Project</a></li>
             
                 <li><a href="../classes/Result.html">Result</a></li>
+            
+                <li><a href="../classes/Results.html">Results</a></li>
             
                 <li><a href="../classes/Service.html">Service</a></li>
             
@@ -84,8 +90,6 @@
                 <li><a href="../classes/Uuid.html">Uuid</a></li>
             
                 <li><a href="../classes/Worker.html">Worker</a></li>
-            
-                <li><a href="../classes/Workers.html">Workers</a></li>
             
             </ul>
 
@@ -105,19 +109,23 @@
             
                 <li><a href="../modules/Logger.html">Logger</a></li>
             
+                <li><a href="../modules/Mediator.html">Mediator</a></li>
+            
                 <li><a href="../modules/MuskepeerClient.html">MuskepeerClient</a></li>
             
                 <li><a href="../modules/Network.html">Network</a></li>
             
+                <li><a href="../modules/Pool.html">Pool</a></li>
+            
                 <li><a href="../modules/Project.html">Project</a></li>
+            
+                <li><a href="../modules/Results.html">Results</a></li>
             
                 <li><a href="../modules/Settings.html">Settings</a></li>
             
                 <li><a href="../modules/Storage.html">Storage</a></li>
             
                 <li><a href="../modules/Uuid.html">Uuid</a></li>
-            
-                <li><a href="../modules/Workers.html">Workers</a></li>
             
             </ul>
         </div>
@@ -250,6 +258,93 @@ define([&#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;q&#x27;, &#x27;proje
         return deferred.promise;
     }
 
+
+    /**
+     *
+     * @param fileInfo
+     * @param mode
+     * @param offset
+     * @param completeFile
+     * @returns {Promise}
+     */
+    function readFile(fileInfo, mode, offset, completeFile) {
+
+        var deferred = Q.defer();
+
+        mode = mode || &#x27;blob&#x27;;
+        completeFile = completeFile || false;
+
+        _fs.root.getFile(project.uuid + &#x27;/&#x27; + fileInfo.uuid, {}, function (fileEntry) {
+
+            fileEntry.file(function (file) {
+
+                var start = offset || 0,
+                    end = start + CHUNK_SIZE,
+                    blob;
+
+                // Every file has an end
+                if (start + CHUNK_SIZE &gt; file.size) {
+                    end = file.size;
+                }
+
+                // Slice that file
+                if (!completeFile) {
+                    blob = file.slice(start, end);
+                } else {
+                    blob = file;
+                }
+
+                // Blob Mode, no need for FileReader
+                if (mode === &#x27;blob&#x27;) {
+                    deferred.resolve(blob);
+                }
+
+                // Using FileReader
+                else {
+                    var reader = new FileReader();
+
+                    reader.onloadend = function (e) {
+
+                        if (e.target.readyState === FileReader.DONE) {
+
+                            if (mode === &#x27;dataUrl&#x27;) {
+                                // Remove data attribute prefix
+                                var chunk = reader.result.match(/,(.*)$/);
+                                if (chunk) {
+                                    deferred.resolve(chunk[1]);
+                                } else {
+                                    deferred.reject();
+                                }
+                            } else {
+                                deferred.resolve(reader.result);
+                            }
+                            reader = null;
+
+                        } else {
+                            deferred.reject();
+                        }
+
+                    };
+
+                    // DataUrl Mode
+                    if (mode === &#x27;dataUrl&#x27;) {
+                        reader.readAsDataURL(blob);
+                        // ArrayBuffer Mode
+                    } else if (mode === &#x27;arrayBuffer&#x27;) {
+                        reader.readAsArrayBuffer(blob);
+                    }
+
+                }
+
+
+            }, deferred.reject);
+
+
+        }, deferred.reject);
+
+        return deferred.promise;
+    }
+
     /**
      * Gets a file via XHR and returns a promise,
      * resolve will contain a Blob
@@ -335,7 +430,7 @@ define([&#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;q&#x27;, &#x27;proje
      *
      * @return {Blob}
      */
-    function base64oBlob(base64, contentType) {
+    function base64toBlob(base64, contentType) {
         contentType = contentType || &#x27;&#x27;;
 
         var byteCharacters = atob(base64);
@@ -404,33 +499,33 @@ define([&#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;q&#x27;, &#x27;proje
          *
          * @method write
          *
-         * @param {Object} file
+         * @param {Object} fileInfo
          * @param {Blob|String} blob or base64-String
          * @param {Number} [pos]
          *
          * @return {Promise}
          */
-        write: function (file, blob, pos) {
+        write: function (fileInfo, blob, pos) {
             var deferred = Q.defer(),
                 writtenBytes = 0,
                 isNewFile = true;
 
             // Test if we need to convert from base64
             if (!blob instanceof Blob) {
-                blob = base64oBlob(blob);
+                blob = base64toBlob(blob);
             }
 
             // Does the file exist in database?
-            _db.read(&#x27;files&#x27;, file.uuid, {uuidIsHash: true})
-                .then(function (fileInfo) {
+            _db.read(&#x27;files&#x27;, fileInfo.uuid, {uuidIsHash: true})
+                .then(function (info) {
                     // Just to make sure, we have data that is up to date
-                    file = fileInfo;
+                    fileInfo = info;
                     //Is it marked as complete?)
-                    if (!file || file.isComplete) {
+                    if (!fileInfo || fileInfo.isComplete) {
                         deferred.reject(&#x27;File does not exist, or is already complete&#x27;);
                     }
 
-                    writtenBytes = file.position;
+                    writtenBytes = fileInfo.position;
                     isNewFile = writtenBytes === 0;
 
                     // We won&#x27;t overwrite fileDate
@@ -440,7 +535,7 @@ define([&#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;q&#x27;, &#x27;proje
                 })
                 .then(function () {
                     // Append bytes
-                    _fs.root.getFile(project.uuid + &#x27;/&#x27; + file.uuid, {create: isNewFile }, function (fileEntry) {
+                    _fs.root.getFile(project.uuid + &#x27;/&#x27; + fileInfo.uuid, {create: isNewFile }, function (fileEntry) {
 
                         fileEntry.createWriter(function (writer) {
 
@@ -456,8 +551,8 @@ define([&#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;q&#x27;, &#x27;proje
                 })
                 .then(function () {
                     // Update fileInfo in database
-                    var currentPosition = file.position + blob.size;
-                    return _db.update(&#x27;files&#x27;, {uuid: file.uuid, isComplete: currentPosition &gt;= file.size, position: currentPosition}, {uuidIsHash: true});
+                    var currentPosition = fileInfo.position + blob.size;
+                    return _db.update(&#x27;files&#x27;, {uuid: fileInfo.uuid, isComplete: currentPosition &gt;= fileInfo.size, position: currentPosition}, {uuidIsHash: true});
                 })
                 .then(updateFileList);
 
@@ -469,14 +564,36 @@ define([&#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;q&#x27;, &#x27;proje
          * Get a local url to a file in fileSystem
          *
          * @method readFileAsLocalUrl
-         * @param {Object} file
+         * @param {Object} fileInfo
          * @return {Promise}
          */
-        readFileAsLocalUrl: function (file) {
+        readFileAsLocalUrl: function (fileInfo) {
             var deferred = Q.defer();
 
-            _fs.root.getFile(project.uuid + &#x27;/&#x27; + file.uuid, {}, function (fileEntry) {
+            _fs.root.getFile(project.uuid + &#x27;/&#x27; + fileInfo.uuid, {}, function (fileEntry) {
                 deferred.resolve(fileEntry.toURL());
+            }, deferred.reject);
+
+            return deferred.promise;
+        },
+
+
+        /**
+         * Get an ObjectUrl to a file from FileSystem
+         *
+         * @method readFileAsObjectUrl
+         * @param {Object} fileInfo
+         * @return {Promise}
+         */
+        readFileAsObjectUrl: function (fileInfo) {
+            var deferred = Q.defer();
+
+            _fs.root.getFile(project.uuid + &#x27;/&#x27; + fileInfo.uuid, {}, function (fileEntry) {
+
+                fileEntry.file(function (file) {
+                    deferred.resolve(URL.createObjectURL(file));
+                }, deferred.reject);
+
             }, deferred.reject);
 
             return deferred.promise;
@@ -486,100 +603,48 @@ define([&#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;q&#x27;, &#x27;proje
         /**
          * Read some chunks from the file, which will resul in a Blob-Instance.
          * Chunk size is defined globally by CHUNK_SIZE.
+         * Slicing can be disabled using completeFile param.
          *
-         * @param file
-         * @param offset
-         *
+         * @method readFileChunkAsBlob
+         * @param {Object} file
+         * @param {Number} offset
+         * @param {Boolean} completeFile
          * @return {Promise}
          */
-        readFileChunkAsBlob: function (file, offset) {
-            var deferred = Q.defer();
+        readFileChunkAsBlob: function (file, offset, completeFile) {
+            return readFile(file, &#x27;blob&#x27;, offset, completeFile);
 
-            _fs.root.getFile(project.uuid + &#x27;/&#x27; + file.uuid, {}, function (fileEntry) {
-
-                fileEntry.file(function (file) {
-
-                    var start = offset || 0,
-                        end = start + CHUNK_SIZE,
-                        blob;
-
-                    // Every file has an end
-                    if (start + CHUNK_SIZE &gt; file.size) {
-                        end = file.size;
-                    }
-
-                    // Slice that file
-                    blob = file.slice(start, end);
-
-                    deferred.resolve(blob);
-
-
-                }, deferred.reject);
-
-
-            }, deferred.reject);
-
-            return deferred.promise;
         },
 
         /**
          * Read some chunks from the file, which will be base64 encodded.
          * Chunk size is defined globally by CHUNK_SIZE.
+         * Slicing can be disabled using completeFile param.
          *
+         * @method readFileChunkAsDataUrl
          * @param {Object} file
          * @param {Number} offset
+         * @param {Boolean} completeFile
          * @return {Promise}
          */
-        readFileChunkAsDataUrl: function (file, offset) {
-            var deferred = Q.defer();
-
-            _fs.root.getFile(project.uuid + &#x27;/&#x27; + file.uuid, {}, function (fileEntry) {
-
-                // Get a File object representing the file,
-                // then use FileReader to read its contents.
-                fileEntry.file(function (file) {
-
-                    var reader = new FileReader(),
-                        start = offset || 0,
-                        end = start + CHUNK_SIZE,
-                        blob, chunk;
-
-                    // Every file has an end
-                    if (start + CHUNK_SIZE &gt; file.size) {
-                        end = file.size;
-                    }
-
-                    // Slice that file
-                    blob = file.slice(start, end);
-
-                    reader.onloadend = function (e) {
-
-                        if (e.target.readyState === FileReader.DONE) {
-
-                            // Remove data attribute prefix
-                            chunk = reader.result.match(/,(.*)$/);
-
-                            if (chunk) {
-                                deferred.resolve(chunk[1]);
-                                reader = null;
-                            } else {
-                                deferred.reject();
-                            }
-
-                        } else {
-                            deferred.reject();
-                        }
-
-                    };
-
-                    reader.readAsDataURL(blob);
-
-                }, deferred.reject);
+        readFileChunkAsDataUrl: function (file, offset, completeFile) {
+            return readFile(file, &#x27;dataUrl&#x27;, offset, completeFile);
+        },
 
 
-            }, deferred.reject);
-
-            return deferred.promise;
+        /**
+         * Read some chunks from the file and return an ArrayBuffer.
+         * Chunk size is defined globally by CHUNK_SIZE.
+         * Slicing can be disabled using completeFile param.
+         *
+         * @method readFileChunkAsArrayBuffer
+         * @param {Object} file
+         * @param {Number} offset
+         * @param {Boolean} completeFile
+         * @return {Promise}
+         */
+        readFileChunkAsArrayBuffer: function (file, offset, completeFile) {
+            return readFile(file, &#x27;arrayBuffer&#x27;, offset, completeFile);
         },
 
 
@@ -588,33 +653,34 @@ define([&#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;q&#x27;, &#x27;proje
          * not to the filesystem.
          *
          * @method add
-         * @param {Array|String} uris
+         * @param {Array|String} files
          * @return {Promise}
          */
-        add: function (uris) {
+        add: function (files) {
 
             var promises = [];
 
             //just a single uri?
-            if (!_.isArray(uris)) {
-                uris = [uris];
+            if (!_.isArray(files)) {
+                files = [files];
             }
 
-            uris.forEach(function (uri) {
+            files.forEach(function (file) {
 
-                var file = {
-                    name: getFileNameFromUri(uri),
-                    uri: uri,
+                var fileInfo = {
+                    name: file.name || getFileNameFromUri(file.url),
+                    uri: file.url,
                     size: 0,
                     position: 0,
+                    type: file.type || &#x27;text/plain&#x27;,
                     isComplete: false,
-                    uuid: crypto.hash(uri)
+                    uuid: crypto.hash(file.url)
                 };
 
-                var promise = _db.read(&#x27;files&#x27;, file.uuid, {uuidIsHash: true})
+                var promise = _db.read(&#x27;files&#x27;, fileInfo.uuid, {uuidIsHash: true})
                     .then(function (result) {
                         if (!result) {
-                            return _db.save(&#x27;files&#x27;, file, {allowDuplicates: false, uuidIsHash: true});
+                            return _db.save(&#x27;files&#x27;, fileInfo, {allowDuplicates: false, uuidIsHash: true});
                         }
 
                     });
@@ -734,6 +800,15 @@ define([&#x27;lodash&#x27;, &#x27;crypto/index&#x27;, &#x27;q&#x27;, &#x27;proje
             return _db.findAndReduceByObject(&#x27;files&#x27;, {}, {uri: uri});
         },
 
+        /**
+         * etrieve a fileInfo object from storage by name.
+         *
+         * @param name
+         * @return {Array}
+         */
+        getFileInfoByName: function (name) {
+            return _db.findAndReduceByObject(&#x27;files&#x27;, {}, {name: name});
+        },
 
         /**
          * Will delete all files/folders inside the project-dir recursively

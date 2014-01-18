@@ -1,0 +1,43 @@
+{
+    "uuid": "d34ebd37-927a-426a-b762-87fb73c04159",
+    "title": "n-Queens solver",
+    "description": "Will find distinct solutions for the n-queens problem.",
+    "publicKey": "047d916b0b1466e059ef5d70c23482a33b959b19925b4fecaefdd3d4a31e5bb6b55bd3dac0eae78637bfaa0e2965c98a56a52f3361d9a7551b03167ae7ad8ee514",
+
+    "author": "Matthieu Holzer",
+    "website": "",
+    "version": "0.0.1",
+    "active": true,
+
+    "computation": {
+
+        "offlineAllowed": true,
+
+        "solving": {
+            "workerUrl": "https://www.muskepeer.net/examples/n-queens/worker.js",
+            "expectedAmount": 92
+        }
+    },
+
+    "network": {
+        "services": [
+            {
+                "enabled": false,
+                "url": "https://api.parse.com/1/classes/Queens/",
+                "type": "REST",
+                "params": {},
+                "headers": [
+                    {
+                        "key": "X-Parse-Application-Id",
+                        "value": "ZzIHMKfVQmIni0K5fBdYgXxTlXyoovbm4gm0Epdq"
+                    },
+                    {
+                        "key": "X-Parse-REST-API-Key",
+                        "value": "4Izw5bddA34RFUmOuGCYrMHn4zY5dz62ETAVb2g5"
+                    }
+                ]
+            }
+
+        ]
+    }
+}
