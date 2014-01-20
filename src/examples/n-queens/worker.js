@@ -27,7 +27,7 @@ self.addEventListener('message', function (e) {
  **********************************************/
 
 
-var BOARDSIZE = 11;
+var BOARDSIZE = 8;
 
 function test(positions) {
 
@@ -108,7 +108,7 @@ function start() {
 
     while (true) {
         if (test(solution = createPossibleSolution())) {
-            self.postMessage({type: 'result:push', data: solution });
+            self.postMessage({type: 'result:push', data: {result: solution} });
 
         }
     }

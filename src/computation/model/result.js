@@ -8,7 +8,7 @@ define(['crypto/index', 'settings'], function (crypto, settings) {
     return function Result(data) {
 
         this.data = data.result;
-        this.uuid = crypto.hash(data);
+        this.uuid = crypto.hash(data.result);
 
         this.peerUuid = settings.uuid;
 

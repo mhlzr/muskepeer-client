@@ -56,7 +56,6 @@ function start(job) {
         {
             type: 'result:push',
             data: {
-                id: job.parameters.id,
                 job: { uuid: job.uuid },
                 result: knn(trainingData, job.parameters.dataset, 20, 40, 'rect', 'euclid', false, 16)
             }

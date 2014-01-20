@@ -47,6 +47,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                         jobs.size = amount;
                     }
 
+
                     // We don't know how much to expect, so we can't say
                     if (!expected || expected < 0 || !_.isFinite(expected)) {
                         deferred.resolve(false);

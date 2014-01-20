@@ -48,7 +48,11 @@ function start() {
 
     //Testing
 
-    self.postMessage({ type: 'result:push', data: { a: 10, b: 'Foo'}});
+    self.postMessage({ type: 'result:push', data: {
+        job: { uuid: job.uuid },
+        result: {a: 10, b: 'Foo'}
+    }});
+
     self.postMessage({ type: 'result:pull', data: {uuid: '2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3'}});
 
     self.postMessage({ type: 'job:push', data: { a: 10, b: 20, c: 50} });

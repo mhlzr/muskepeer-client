@@ -98,7 +98,8 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
                 var promises = [],
                     stores = _stores;
 
-                if (storeNames) {
+
+                if (storeNames && _.isArray(storeNames)) {
                     stores = [];
                     _stores.forEach(function (storeName) {
                         stores.push(getStoreByName(storeName));
@@ -108,6 +109,7 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
                 stores.forEach(function (store) {
                     var deferred = Q.defer();
                     promises.push(deferred.promise);
+
 
                     store.clear(deferred.resolve);
 

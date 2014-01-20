@@ -24,18 +24,18 @@ define(['network/index', 'computation/index', 'storage/index'], function (networ
     };
 
     module.storage.fs.clear = function () {
-        storage.fs.clear();
         network.broadcastMasterMessage('filesystem:clear');
+        return storage.fs.clear();
     };
 
     module.storage.db.clear = function () {
-        storage.db.clear();
         network.broadcastMasterMessage('database:clear');
+        return storage.db.clear();
     };
 
     module.storage.clear = function () {
-        module.storage.fs.clear();
-        module.storage.db.clear();
+        return module.storage.fs.clear()
+            .then(module.storage.db.clear);
     };
 
 

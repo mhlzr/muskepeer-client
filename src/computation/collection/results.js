@@ -22,13 +22,11 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
                 projectUuid: project.uuid
             };
 
-            if (filterValidated) {
+            if (filterValidated && project.computation.results.validation.enabled) {
                 filter.isValid = true;
             }
 
             return storage.db.findAndReduceByObject('results', {filterDuplicates: false}, filter);
-
-
         }
 
 
@@ -61,7 +59,6 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
                     }
                     // Is an update
                     else return module.update(result);
-
                 })
         };
 
