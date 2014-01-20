@@ -6,10 +6,8 @@
 
 define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
-        var MAX_HASH_SIZE = 10000;
-
         var module = {},
-            hashs = [];
+            cacheIsInSync = false;
 
         /**
          * @private
@@ -34,11 +32,43 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
 
         /**
-         * @property
+         * @property size
          * @type {Number}
          */
         module.size = 0;
 
+        /**
+         * @property cache
+         * @type {Array}
+         */
+        module.cache = [];
+
+
+        /**
+         * Read all results from storage and save hashs to cache
+         *
+         * @method fillCache
+         * @return {Promise}
+         */
+        module.fillCache = function () {
+            var deferred = Q.defer();
+
+            if (cacheIsInSync) {
+                deferred.resolve(true);
+            }
+            else {
+                getResultsFromStorage().then(function (results) {
+
+                    results.forEach(function (result) {
+                        module.cache.push(result.uuid);
+                    });
+
+                    module.size = results.length;
+                    cacheIsInSync = true;
+                })
+            }
+            return deferred.promise;
+        };
 
         /**
          * Adds a result to the storage. If its new will return true,
@@ -52,7 +82,7 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
             // We need some buffer db i/o
             // is quite slow
-            if (hashs.indexOf(result.uuid) >= 0) {
+            if (module.cache.indexOf(result.uuid) >= 0) {
                 var deferred = Q.defer();
                 deferred.resolve(false);
                 return deferred.promise;
@@ -61,10 +91,10 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
             else {
 
-                hashs.push(result.uuid);
+                module.cache.push(result.uuid);
 
-                if (hashs.length > MAX_HASH_SIZE) {
-                    hashs = [];
+                if (module.cache.length > project.computation.results.cacheSize) {
+                    module.cache = [];
                 }
 
                 // Already existent?

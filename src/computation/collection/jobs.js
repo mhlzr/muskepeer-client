@@ -6,10 +6,9 @@
 
 define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
-    var MAX_HASH_SIZE = 10000;
 
     var module = {},
-        hashs = [];
+        cacheIsInSync = false;
 
     /**
      * @private
@@ -41,10 +40,44 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
     }
 
     /**
-     * @property
+     * @property size
      * @type {Number}
      */
     module.size = 0;
+
+
+    /**
+     * @property cache
+     * @type {Number}
+     */
+    module.cache = [];
+
+
+    /**
+     * Read all results from storage and save hashs to cache
+     *
+     * @method fillCache
+     * @return {Promise}
+     */
+    module.fillCache = function () {
+        var deferred = Q.defer();
+
+        if (cacheIsInSync) {
+            deferred.resolve(true);
+        }
+        else {
+            getJobsFromStorage().then(function (results) {
+
+                results.forEach(function (result) {
+                    module.cache.push(result.uuid);
+                });
+
+                module.size = results.length;
+                cacheIsInSync = true;
+            })
+        }
+        return deferred.promise;
+    };
 
 
     /**
@@ -68,10 +101,10 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
         else {
 
-            hashs.push(job.uuid);
+            module.cache.push(job.uuid);
 
-            if (hashs.length > MAX_HASH_SIZE) {
-                hashs = [];
+            if (module.cache.length > project.computation.jobs.cacheSize) {
+                module.cache = [];
             }
 
             return storage.db.has('jobs', job.uuid, {uuidIsHash: true})

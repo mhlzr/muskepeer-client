@@ -25,7 +25,9 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
          * @return {Promise}
          */
         function allFound(type, expected) {
-            var deferred = Q.defer();
+            var deferred = Q.defer(),
+                collection = results,
+                maxCacheSize = project.computation.results.cacheSize;
 
             // Function is locked?
             if (isCounting) {
@@ -38,6 +40,23 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                 (type === 'jobs' && !project.computation.factories.enabled)) {
                 deferred.resolve(true);
                 return deferred.promise;
+            }
+
+            // Switch to jobs if needed
+            if (type === 'jobs') {
+                collection = jobs;
+                maxCacheSize = project.computation.jobs.cacheSize;
+            }
+
+            // Cache size might be enough,
+            // but must make sure that the cache gets never cleared
+            if (expected > 0 && expected <= maxCacheSize) {
+                collection.fillCache().then(function () {
+                    logger.log('Computation', collection.cache.length, type);
+                    deferred.resolve(collection.cache.length >= expected);
+                    return deferred.promise;
+                })
+
             }
 
             // Lock function
