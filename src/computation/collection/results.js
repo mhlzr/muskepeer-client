@@ -6,7 +6,10 @@
 
 define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
-        var module = {};
+        var MAX_HASH_SIZE = 10000;
+
+        var module = {},
+            hashs = [];
 
         /**
          * @private
@@ -47,19 +50,40 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
          */
         module.add = function (result) {
 
-            // Already existent?
-            return storage.db.has('results', result.uuid, {uuidIsHash: true})
-                .then(function (exists) {
-                    if (!exists) {
-                        // Is new
-                        return storage.db.save('results', result, {uuidIsHash: true})
-                            .then(function () {
-                                return true;
-                            });
-                    }
-                    // Is an update
-                    else return module.update(result);
-                })
+            // We need some buffer db i/o
+            // is quite slow
+            if (hashs.indexOf(result.uuid) >= 0) {
+                var deferred = Q.defer();
+                deferred.resolve(false);
+                return deferred.promise;
+            }
+
+
+            else {
+
+                hashs.push(result.uuid);
+
+                if (hashs.length > MAX_HASH_SIZE) {
+                    hashs = [];
+                }
+
+                // Already existent?
+                return storage.db.has('results', result.uuid, {uuidIsHash: true})
+                    .then(function (exists) {
+                        if (!exists) {
+                            // Is new
+
+                            return storage.db.save('results', result, {uuidIsHash: true})
+                                .then(function () {
+                                    return true;
+                                });
+                        }
+                        // Is an update
+                        else {
+                            return module.update(result);
+                        }
+                    })
+            }
         };
 
         /**
@@ -71,20 +95,24 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
          */
         module.update = function (result) {
 
+            var deferred = Q.defer();
+
+
             // Without enabled validation, there updating a result is not allowed
             // If it's already valid, there is no need, for the whole process
             if (!project.computation.results.validation.enabled || result.isValid) {
-                return false;
+                deferred.resolve(false);
+
             }
 
             // Read stored result
-            return storage.db.read('results', result.uuid, {uuidIsHash: true})
+            storage.db.read('results', result.uuid, {uuidIsHash: true})
 
                 .then(function (resultFromStorage) {
 
                     // No need to update
                     if (resultFromStorage.isValid || resultFromStorage.iteration >= project.computation.results.validation.iterations) {
-                        return false;
+                        deferred.resolve(false);
                     }
 
                     // Increase iterations, then Update,
@@ -101,9 +129,10 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
                 }).then(function () {
                     // We made changes!
-                    return true;
-                })
+                    deferred.resolve(true);
+                });
 
+            return deferred.promise;
 
         };
 
@@ -155,4 +184,5 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
         return module;
 
     }
-);
+)
+;

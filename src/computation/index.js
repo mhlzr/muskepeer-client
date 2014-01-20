@@ -11,6 +11,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
     function (Q, MuskepeerModule, storage, settings, project, crypto, jobs, results, Pool, Job, Result) {
 
         var module = new MuskepeerModule(),
+            isCounting = false,
             countTimer,
             resultCountTimer,
             jobCountTimer;
@@ -26,6 +27,12 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
         function allFound(type, expected) {
             var deferred = Q.defer();
 
+            // Function is locked?
+            if (isCounting) {
+                deferred.resolve(false);
+                return deferred.promise;
+            }
+
             // If not enabled no need to check the module
             if ((type === 'results' && !project.computation.workers.enabled) ||
                 (type === 'jobs' && !project.computation.factories.enabled)) {
@@ -33,6 +40,8 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                 return deferred.promise;
             }
 
+            // Lock function
+            isCounting = true;
 
             storage.db.count(type)
                 .then(function (amount) {
@@ -47,9 +56,9 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                         jobs.size = amount;
                     }
 
-
                     // We don't know how much to expect, so we can't say
                     if (!expected || expected < 0 || !_.isFinite(expected)) {
+                        isCounting = false;
                         deferred.resolve(false);
                     }
 
@@ -66,15 +75,18 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                                     else {
                                         logger.log('Computation', 'Results are not all valid!');
                                     }
+                                    isCounting = false;
                                     deferred.resolve(answer);
                                 });
                         }
                         else {
                             logger.log('Computation', 'All', type, 'found!');
+                            isCounting = false;
                             deferred.resolve(true);
                         }
                     }
                     else {
+                        isCounting = false;
                         deferred.resolve(false);
                     }
 
@@ -320,26 +332,21 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
          */
         function poolResultFoundHandler(e) {
 
-            var result = new Result(e.data),
-                promise = Q();
+            var result = new Result(e.data);
 
             // Using Jobs-Locking?
             if (project.computation.jobs.lock && result.jobUuid) {
                 // Unlock the job
-                promise = jobs.unlockJob({uuid: result.jobUuid})
+                jobs.unlockJob({uuid: result.jobUuid})
                     .then(function () {
                         module.emit('job:unlock', {uuid: result.jobUuid});
                     });
             }
 
-            return promise
-                .then(function () {
-                    return results.add(result)
-                })
+            results.add(result)
                 .then(function (hasChanged) {
 
                     if (hasChanged) {
-
                         //logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a new result');
 
                         // Inform about new or changed result
@@ -349,7 +356,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                         if (project.computation.factories.enabled && result.jobUuid) {
 
                             if (results.isValid(result)) {
-                                return jobs.markJobAsComplete({uuid: result.jobUuid})
+                                jobs.markJobAsComplete({uuid: result.jobUuid})
                                     .then(function () {
                                         module.emit('job:push', {job: jobs.getJobByUuid(result.jobUuid)});
                                     });
@@ -471,7 +478,6 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
          * @param e
          */
         function resultCounterCompleteHandler(e) {
-
             return allFound('results', project.computation.results.expected)
                 .then(function (isComplete) {
                     if (isComplete) module.stopWorkers();
@@ -605,10 +611,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
              */
             stop: function () {
 
-                if (!this.isRunning) return;
-
                 logger.log('Computation', 'Stopping');
-
 
                 module.stopWorkers();
                 module.stopFactories();

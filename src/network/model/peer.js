@@ -150,16 +150,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
 
 
         /**
-         * Amount of queuedmessages that could not be sent
-         *
-         * @property queuedMessageAmount
-         * @default 0
-         * @type {Number}
-         */
-        this.queuedMessageAmount = 0;
-
-
-        /**
          * Indicator to tell which protocol is currently used
          * SCTP or SRTP
          *
@@ -508,14 +498,9 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
                 }
                 try {
                     _self.channel.send(jsonString);
-
-                    if (_self.queuedMessageAmount > 0) {
-                        _self.queuedMessageAmount--;
-                    }
                 }
                 catch (e) {
                     // We will be back after the break! :)
-                    _self.queuedMessageAmount++;
                     _.delay(_self.send, QUEUE_RETRY_TIME, data);
                 }
             }

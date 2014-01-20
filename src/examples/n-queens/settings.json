@@ -12,7 +12,7 @@
     "computation": {
 
         "offlineAllowed": true,
-        "testIntervalTime": 1000,
+        "testIntervalTime": 1500,
 
         "workers": {
             "enabled": true,
@@ -20,7 +20,8 @@
         },
 
         "results": {
-            "expected": 92
+            "expected": 2680,
+            "testIntervalTime": 60000
         }
     },
 

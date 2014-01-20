@@ -22,7 +22,7 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
         "computation": {
 
             "offlineAllowed": true,
-            "testIntervalTime": 10000,
+            "testIntervalTime": 30000,
 
             "workers": {
                 "enabled": false,
@@ -41,7 +41,7 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
                     "iterations": 1
                 },
                 "expected": -1,
-                "testIntervalTime": 5000
+                "testIntervalTime": 10000
             },
 
             "jobs": {
@@ -49,7 +49,7 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
                 "maxLockTime": 3600000,
                 "groupSize": 1,
                 "expected": -1,
-                "testIntervalTime": 5000
+                "testIntervalTime": 10000
             }
         },
 

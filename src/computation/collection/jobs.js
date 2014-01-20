@@ -6,7 +6,10 @@
 
 define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
-    var module = {};
+    var MAX_HASH_SIZE = 10000;
+
+    var module = {},
+        hashs = [];
 
     /**
      * @private
@@ -53,32 +56,47 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
      */
     module.add = function (job) {
 
-        //Valid job?
-        if (!job.uuid) return null;
+        // Valid job?
+        // We need some buffer db i/o
+        // is quite slow
+        if (!job.uuid || hashs.indexOf(job.uuid) >= 0) {
+            var deferred = Q.defer();
+            deferred.resolve(false);
+            return deferred.promise;
+        }
 
-        return storage.db.has('jobs', job.uuid, {uuidIsHash: true})
-            .then(function (exists) {
-                if (exists) {
-                    // Not new, but finished
-                    if (job.isComplete) {
-                        return module.markJobAsComplete(job)
-                            .then(function () {
-                                return true;
-                            })
+
+        else {
+
+            hashs.push(job.uuid);
+
+            if (hashs.length > MAX_HASH_SIZE) {
+                hashs = [];
+            }
+
+            return storage.db.has('jobs', job.uuid, {uuidIsHash: true})
+                .then(function (exists) {
+                    if (exists) {
+                        // Not new, but finished
+                        if (job.isComplete) {
+                            return module.markJobAsComplete(job)
+                                .then(function () {
+                                    return true;
+                                })
+                        }
+                        // Not new, not finished
+                        else {
+                            return false;
+                        }
+
                     }
-                    // Not new, not finished
-                    else {
-                        return false;
-                    }
-
-                }
-                // Store
-                return storage.db.save('jobs', job, {uuidIsHash: true});
-            })
-            .then(function () {
-                return true;
-            });
-
+                    // Store
+                    return storage.db.save('jobs', job, {uuidIsHash: true});
+                })
+                .then(function () {
+                    return true;
+                });
+        }
 
     };
 

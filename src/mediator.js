@@ -7,6 +7,7 @@ define(['computation/index', 'network/index', 'storage/index'],
 
     function (computation, network, storage) {
 
+        var index = 0;
         return {
 
             /**
