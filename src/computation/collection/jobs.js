@@ -66,14 +66,15 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
             deferred.resolve(true);
         }
         else {
-            getJobsFromStorage().then(function (results) {
+            getJobsFromStorage().then(function (jobs) {
 
-                results.forEach(function (result) {
-                    module.cache.push(result.uuid);
+                jobs.forEach(function (job) {
+                    module.cache.push(job.uuid);
                 });
 
-                module.size = results.length;
+                module.size = jobs.length;
                 cacheIsInSync = true;
+                deferred.resolve(true);
             })
         }
         return deferred.promise;

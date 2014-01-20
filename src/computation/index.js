@@ -57,61 +57,62 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                     return deferred.promise;
                 })
 
-            }
+            } else {
+                // Read everything from storage
 
-            // Lock function
-            isCounting = true;
+                // Lock function
+                isCounting = true;
 
-            storage.db.count(type)
-                .then(function (amount) {
+                storage.db.count(type)
+                    .then(function (amount) {
 
-                    logger.log('Computation', amount, type);
+                        logger.log('Computation', amount, type);
 
-                    // Update the size
-                    if (type === 'results') {
-                        results.size = amount;
-                    }
-                    else {
-                        jobs.size = amount;
-                    }
-
-                    // We don't know how much to expect, so we can't say
-                    if (!expected || expected < 0 || !_.isFinite(expected)) {
-                        isCounting = false;
-                        deferred.resolve(false);
-                    }
-
-                    // We already found all?
-                    else if (amount >= expected) {
-                        // Need to check validity?
-                        if (type === 'results' && project.computation.results.validation.enabled) {
-
-                            results.allValid()
-                                .then(function (answer) {
-                                    if (answer) {
-                                        logger.log('Computation', 'All results are valid!');
-                                    }
-                                    else {
-                                        logger.log('Computation', 'Results are not all valid!');
-                                    }
-                                    isCounting = false;
-                                    deferred.resolve(answer);
-                                });
+                        // Update the size
+                        if (type === 'results') {
+                            results.size = amount;
                         }
                         else {
-                            logger.log('Computation', 'All', type, 'found!');
-                            isCounting = false;
-                            deferred.resolve(true);
+                            jobs.size = amount;
                         }
-                    }
-                    else {
-                        isCounting = false;
-                        deferred.resolve(false);
-                    }
 
-                }
-            );
+                        // We don't know how much to expect, so we can't say
+                        if (!expected || expected < 0 || !_.isFinite(expected)) {
+                            isCounting = false;
+                            deferred.resolve(false);
+                        }
 
+                        // We already found all?
+                        else if (amount >= expected) {
+                            // Need to check validity?
+                            if (type === 'results' && project.computation.results.validation.enabled) {
+
+                                results.allValid()
+                                    .then(function (answer) {
+                                        if (answer) {
+                                            logger.log('Computation', 'All results are valid!');
+                                        }
+                                        else {
+                                            logger.log('Computation', 'Results are not all valid!');
+                                        }
+                                        isCounting = false;
+                                        deferred.resolve(answer);
+                                    });
+                            }
+                            else {
+                                logger.log('Computation', 'All', type, 'found!');
+                                isCounting = false;
+                                deferred.resolve(true);
+                            }
+                        }
+                        else {
+                            isCounting = false;
+                            deferred.resolve(false);
+                        }
+
+                    }
+                );
+            }
             return deferred.promise;
         }
 

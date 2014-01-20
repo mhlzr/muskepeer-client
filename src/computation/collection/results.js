@@ -65,6 +65,8 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
                     module.size = results.length;
                     cacheIsInSync = true;
+
+                    deferred.resolve(true);
                 })
             }
             return deferred.promise;
