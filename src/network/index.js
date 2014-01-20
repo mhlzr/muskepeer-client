@@ -62,6 +62,7 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
          */
         function masterMessageHandler(e) {
 
+
             if (isValidMasterMessage(e.data.message, e.data.signature)) {
 
                 storage.db.has('messages', e.data.message.uuid)
@@ -69,8 +70,8 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
 
                         if (!exists) {
 
-                            // Inform
-                            module.emit(e.type, e.data.message);
+                            // Inform and overwrite event-type
+                            module.emit(e.type.replace('broadcast:', 'grid:'), e.data.message);
 
                             // Save
                             storage.db.save('messages', e.data.message)
@@ -213,21 +214,22 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
          */
         function peerMessageHandler(e) {
 
-            logger.log('Peer ' + e.target.id, 'Received', e.type);
+            //logger.log('Peer ' + e.target.id, 'Received', e.type);
 
             if (!e.type) {
                 logger.log('Network', 'Peer-message without type received');
                 return;
             }
 
+
             // Seems to be a master-message
             if (e.data && e.data.message && e.data.signature) {
                 masterMessageHandler(e);
-                return;
+            } else {
+                // Pass-through events
+                module.emit(e.type, e);
             }
 
-            // Pass-through events
-            module.emit(e.type, e);
 
         }
 
@@ -332,17 +334,27 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
                 data = data || {};
 
                 var msg = _.extend(data, {
-                        uuid: uuid.generate(),
-                        type: type,
-                        timestamp: Date.now()
-                    }),
-                    signature = crypto.sign(JSON.stringify(msg));
+                    uuid: uuid.generate(),
+                    type: type,
+                    timestamp: Date.now()
+                });
 
-                peers.broadcast(type, {
-                        'message': msg,
-                        'signature': signature
-                    }
-                );
+                var signature = crypto.sign(JSON.stringify(msg));
+
+                if (!signature) return;
+
+                // Save
+                storage.db.save('messages', msg)
+                    .then(function () {
+
+                        // Broadcast
+                        peers.broadcast(type, {
+                                'message': msg,
+                                'signature': signature
+                            }
+                        );
+                    });
+
 
             }
         });

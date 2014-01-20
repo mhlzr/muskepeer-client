@@ -10,12 +10,13 @@ define([
     'lodash',
     'computation/index',
     'crypto/index',
+    'grid',
     'network/index',
     'project',
     'settings',
     'storage/index',
     'mediator'
-], function (Q, _, computation, crypto, network, project, settings, storage, mediator) {
+], function (Q, _, computation, crypto, grid, network, project, settings, storage, mediator) {
 
     'use strict';
 
@@ -69,6 +70,7 @@ define([
 
         computation: computation,
         crypto: crypto,
+        grid: grid,
         mediator: mediator,
         network: network,
         project: project,
@@ -187,4 +189,5 @@ define([
     };
 
 
-});
+})
+;

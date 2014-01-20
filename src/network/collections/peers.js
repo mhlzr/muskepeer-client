@@ -194,7 +194,6 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
 
                 var peers = module.getConnectedPeers();
 
-
                 // Remove own uuid from list and
                 // the peer we received the message from
                 peers = _.reject(peers, function (peer) {
@@ -207,10 +206,10 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
                 }
 
                 if (!originPeerUuid) {
-                    logger.log('Peers', 'Broadcasting', type, 'to', peers.length, 'peer(s)');
+                    //logger.log('Peers', 'Broadcasting', type, 'to', peers.length, 'peer(s)');
                 }
                 else {
-                    logger.log('Peers', 'Rebroadcasting', type, 'to', peers.length, 'peer(s)');
+                    // logger.log('Peers', 'Rebroadcasting', type, 'to', peers.length, 'peer(s)');
                 }
 
 

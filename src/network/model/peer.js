@@ -244,8 +244,6 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
 
             _self.channel = e.channel;
 
-            _self.channel = _self.channel;
-
             _self.channel.onclose = channelCloseHandler;
             _self.channel.onerror = channelErrorHandler;
             _self.channel.onmessage = channelMessageHandler;
@@ -310,7 +308,13 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
                 msg = {blob: e.data};
             }
             else {
-                msg = JSON.parse(e.data);
+                try {
+                    msg = JSON.parse(e.data);
+                }
+                catch (err) {
+                    logger.error('Peer ' + _self.id, err, 'Error parsing msg.');
+                }
+
             }
 
             _self.emit('peer:message', _.extend(msg, {target: _self}));

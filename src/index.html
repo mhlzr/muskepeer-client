@@ -33,11 +33,12 @@
 
     <fieldset>
         <legend>Grid</legend>
-        <button onclick="Muskepeer.network.broadcastMasterMessage('computation:start')">Start Computation</button>
-        <button onclick="Muskepeer.network.broadcastMasterMessage('computation:stop')">Stop Computation</button>
-        <button onclick="Muskepeer.network.broadcastMasterMessage('filesystem:clear')">Clear FileSystem</button>
-        <button onclick="Muskepeer.network.broadcastMasterMessage('database:clear')">Clear Database</button>
-        <button onclick="Muskepeer.network.broadcastMasterMessage('client:reload', {time: 1500})">Reload</button>
+        <button onclick="Muskepeer.grid.computation.start();">Start Computation</button>
+        <button onclick="Muskepeer.grid.computation.stop();">Stop Computation</button>
+        <button onclick="Muskepeer.grid.storage.fs.clear()">Clear FileSystem</button>
+        <button onclick="Muskepeer.grid.storage.db.clear()">Clear Database</button>
+        <button onclick="Muskepeer.grid.storage.clear()">Clear Storage</button>
+        <button onclick="Muskepeer.grid.client.reload(1500)">Reload</button>
     </fieldset>
 
 </div>

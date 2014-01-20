@@ -59,6 +59,14 @@ define(['q', './database', './filesystem', 'project', 'muskepeer-module'], funct
         return module.extend({
 
             /**
+             * @property isReady
+             * @type {Boolean}
+             */
+            isReady: false,
+            db: null,
+            fs: null,
+
+            /**
              * Initialize Storage Module
              *
              * @method init
@@ -80,12 +88,16 @@ define(['q', './database', './filesystem', 'project', 'muskepeer-module'], funct
             },
 
             /**
-             * @property isReady
-             * @type {Boolean}
+             * Empty FileSystem and Database
+             *
+             * @method clear
              */
-            isReady: false,
-            db: null,
-            fs: null,
+            clear: function () {
+                if (!module.isReady) return Q();
+
+                return module.fs.clear()
+                    .then(module.db.clear);
+            },
 
 
             /**

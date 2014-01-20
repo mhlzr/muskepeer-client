@@ -276,6 +276,9 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
 
                 options = options || {};
 
+                // Don't transform the passed data
+                data = _.clone(data);
+
                 var deferred = Q.defer(),
                     store;
 

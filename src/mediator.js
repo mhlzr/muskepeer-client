@@ -18,13 +18,13 @@ define(['computation/index', 'network/index', 'storage/index'],
                  * Master Broadcast Messages
                  */
 
-                network.on('broadcast:computation:start', computation.start);
-                network.on('broadcast:computation:stop', computation.stop);
+                network.on('grid:computation:start', computation.start);
+                network.on('grid:computation:stop', computation.stop);
 
                 /** DEBUGGING **/
-                network.on('broadcast:db:clear', storage.db.clear);
-                network.on('broadcast:filesystem:clear', storage.fs.clear);
-                network.on('broadcast:client:reload', function (e) {
+                network.on('grid:database:clear', storage.db.clear);
+                network.on('grid:filesystem:clear', storage.fs.clear);
+                network.on('grid:client:reload', function (e) {
                     setTimeout(function () {
                         location.reload()
                     }, e.time);
