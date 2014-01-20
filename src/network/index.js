@@ -189,6 +189,10 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
          * @param {Object} e
          */
         function peerDisconnectHandler(e) {
+
+            logger.log('Peer ' + e.id, 'Disconnect!');
+
+            // Need for more connected peers?
             if (peers.getConnectedPeers().length < settings.maxPeers) {
                 peers.connectToNeighbourPeers();
             }
@@ -203,6 +207,7 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
          * @param {Object} e
          */
         function peerTimeoutHandler(e) {
+            logger.log('Peer ' + e.id, 'Time-out occured trying to connect!');
             peerDisconnectHandler(e);
         }
 
