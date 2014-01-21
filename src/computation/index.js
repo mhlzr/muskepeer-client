@@ -279,7 +279,7 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
             // Add job to queue (if redundant it will be ignored)
             jobs.add(job).then(function (isNew) {
                 if (isNew) {
-                    logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a new job');
+                    //logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a new job');
                     module.emit('job:push', job);
 
                     // Throw the job in the pool
@@ -319,23 +319,24 @@ define(['q', 'muskepeer-module', 'storage/index', 'settings', 'project', 'crypto
                     .then(function (job) {
 
                         if (!job) {
-                            logger.log('Computation', 'No more jobs left!');
+                            logger.log('Computation', 'No jobs left currently!');
                             // Mark the thread as idle
                             e.target.isIdle = true;
                             return;
                         }
 
-                        //Lock job
-                        jobs.lockJob(job)
-                            .then(function () {
+                        // Send job to thread
+                        e.target.pushJob(job);
 
-                                // Need to publish lock?
-                                if (project.computation.jobs.lock) {
+                        // Need to lock job?
+                        if (project.computation.jobs.lock) {
+                            //Lock job
+                            jobs.lockJob(job)
+                                .then(function () {
                                     module.emit('job:lock', {uuid: job.uuid})
-                                }
+                                });
 
-                                e.target.pushJob(job);
-                            });
+                        }
 
                     }
                 );

@@ -47,10 +47,30 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
 
 
     /**
+     * Cache-list of all jobs
+     *
      * @property cache
      * @type {Number}
      */
     module.cache = [];
+
+
+    /**
+     * Cache-list of locked jobs
+     *
+     * @property lockList
+     * @type {Array}
+     */
+    module.lockList = [];
+
+
+    /**
+     * Cache-list of complete jobs
+     *
+     * @property completeList
+     * @type {Array}
+     */
+    module.completeList = [];
 
 
     /**
@@ -69,7 +89,17 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
             getJobsFromStorage().then(function (jobs) {
 
                 jobs.forEach(function (job) {
+
                     module.cache.push(job.uuid);
+
+                    if (job.isComplete) {
+                        module.completeList.push(job.uuid);
+                    }
+
+                    if (job.isLocked) {
+                        module.lockList.push(job.uuid);
+                    }
+
                 });
 
                 module.size = jobs.length;
@@ -93,7 +123,7 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
         // Valid job?
         // We need some buffer db i/o
         // is quite slow
-        if (!job.uuid || hashs.indexOf(job.uuid) >= 0) {
+        if (!job.uuid || module.cache.indexOf(job.uuid) >= 0) {
             var deferred = Q.defer();
             deferred.resolve(false);
             return deferred.promise;
@@ -151,20 +181,36 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
         var deferred = Q.defer(),
             position;
 
-        getJobsFromStorage(true, true).then(function (jobs) {
+        // Use cache, remove locked and solved from list
+        var jobs = _.difference(module.cache, module.lockList, module.completeList);
 
-            if (jobs.length > 0) {
-                // We don't take the first, but any random one!
-                //deferred.resolve(jobs.shift());
-                position = (Math.random() * jobs.length | 0);
-                var job = jobs.splice(position, 1)[0];
+        // Jobs left?
+        if (jobs.length > 0) {
+            position = (Math.random() * jobs.length) | 0;
+
+            module.getJobByUuid(jobs[position]).then(function (job) {
                 deferred.resolve(job);
-            }
-            else {
-                deferred.resolve(null);
-            }
-        });
+            });
 
+        }
+
+        // Use storage
+        else {
+
+            getJobsFromStorage(true, true).then(function (jobs) {
+
+                if (jobs.length > 0) {
+                    // We don't take the first, but any random one!
+                    position = (Math.random() * jobs.length) | 0;
+                    deferred.resolve(jobs[position]);
+                }
+                else {
+                    deferred.resolve(null);
+                }
+            });
+
+
+        }
         return deferred.promise;
 
     };
@@ -186,6 +232,7 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
      */
     module.lockJob = function (job) {
         if (project.computation.jobs.lock) {
+            module.lockList.push(job.uuid);
             return storage.db.update('jobs', {uuid: job.uuid, locktime: Date.now(), isLocked: true}, {uuidIsHash: true});
         }
         else return Q();
@@ -198,6 +245,9 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
      */
     module.unlockJob = function (job) {
         if (project.computation.jobs.lock) {
+            // Removwe from list
+            module.lockList.splice(module.lockList.indexOf(job.uuid), 1);
+
             return storage.db.update('jobs', {uuid: job.uuid, locktime: null, isLocked: false}, {uuidIsHash: true});
         }
         else return Q();
@@ -209,6 +259,7 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
      * @return {Promise}
      */
     module.markJobAsComplete = function (job) {
+        module.completeList.push(job.uuid);
         return storage.db.update('jobs', {uuid: job.uuid, isComplete: true}, {uuidIsHash: true})
     };
 

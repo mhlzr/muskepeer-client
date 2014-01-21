@@ -31,7 +31,7 @@ require(['muskepeer-client', 'util/logger'], function (Muskepeer, Logger) {
     window.Muskepeer = Muskepeer.init();
 
     Muskepeer.start({
-        project: 'https://muskepeer.net/examples/n-queens/settings.json',
+        project: 'https://muskepeer.net/examples/knn-digits/settings.json',
         nodes: [
             {
                 host: 'node01-muskepeer.rhcloud.com',

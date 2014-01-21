@@ -22,7 +22,7 @@
         },
 
         "jobs": {
-            "lock": false,
+            "lock": true,
             "expected": 3498
         },
 

@@ -41,17 +41,33 @@ self.addEventListener('message', function (e) {
 
 function start() {
 
-    /*interval = setInterval(function () {
-     self.postMessage({type: 'result:push', data: parseInt(Math.random() * 1000)});
-     }, (Math.random() * 1000) | 0);
-     isRunning = true;*/
 
-    //Testing
+    // Post a result with a related job
+    self.postMessage({
+            type: 'result:push',
+            data: {
+                job: {
+                    uuid: job.uuid
+                },
+                result: {
+                    a: 10,
+                    b: 'Foo'
+                }
+            }
+        }
+    );
 
-    self.postMessage({ type: 'result:push', data: {
-        job: { uuid: job.uuid },
-        result: {a: 10, b: 'Foo'}
-    }});
+    // Post a result without a related job
+    self.postMessage({
+            type: 'result:push',
+            data: {
+                result: {
+                    a: 10,
+                    b: 'Foo'
+                }
+            }
+        }
+    );
 
     self.postMessage({ type: 'result:pull', data: {uuid: '2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3'}});
 
@@ -75,6 +91,5 @@ function start() {
 
 
 function stop() {
-    if (interval) clearInterval(interval);
-    isRunning = false;
+    self.close();
 }
