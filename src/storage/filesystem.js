@@ -569,7 +569,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                         downloadViaXHR(file)
                             .progress(function (data) {
 
-                                // We gort some chunks
+                                // We got some chunks
                                 if (data.blob && data.position) {
                                     _db.update('files', {uuid: file.uuid, size: data.totalSize, position: data.position}, {uuidIsHash: true})
                                         .then(function () {
@@ -592,7 +592,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
                                 _db.update('files', {uuid: file.uuid, isComplete: true, position: data.blob.size, size: data.blob.size}, {uuidIsHash: true});
 
-                                _self.write(file, data.blob).then(updateFileList);
+                                _self.write(file, data.blob, 0).then(updateFileList);
 
                                 deferred.resolve();
 
