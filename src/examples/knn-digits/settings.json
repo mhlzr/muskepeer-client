@@ -1,15 +1,17 @@
 {
     "uuid": "5ce7facb-30a1-446e-8dd4-8f9b01f685e6",
     "title": "knn-digits",
-    "description": "Test for jobqueue",
+    "description": "knn example",
     "publicKey": "047d916b0b1466e059ef5d70c23482a33b959b19925b4fecaefdd3d4a31e5bb6b55bd3dac0eae78637bfaa0e2965c98a56a52f3361d9a7551b03167ae7ad8ee514",
 
     "author": "Matthieu Holzer",
-    "website": "",
+    "website": "http://matthieuholzer.de",
     "version": "0.0.1",
     "active": true,
 
     "computation": {
+
+        "testIntervalTime": 3000,
 
         "workers": {
             "enabled": true,
@@ -23,11 +25,14 @@
 
         "jobs": {
             "lock": true,
-            "expected": 3498
+            "expected": 3498,
+            "testIntervalTime": 60000
         },
 
         "results": {
-            "expected": 3498
+            "expected": 3498,
+            "noJobRetryTime": 3000,
+            "testIntervalTime": 60000
         }
     },
 

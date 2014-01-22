@@ -338,9 +338,12 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
          * @return {Promise}
          */
         write: function (fileInfo, blob, pos) {
+
+            pos = pos || 0;
+
             var deferred = Q.defer(),
                 writtenBytes = 0,
-                isNewFile = true;
+                isNewFile = pos === 0;
 
             // Test if we need to convert from base64
             if (!blob instanceof Blob) {
@@ -567,22 +570,22 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                         promises.push(deferred.promise);
 
                         downloadViaXHR(file)
-                            .progress(function (data) {
+                            /*.progress(function (data) {
 
-                                // We got some chunks
-                                if (data.blob && data.position) {
-                                    _db.update('files', {uuid: file.uuid, size: data.totalSize, position: data.position}, {uuidIsHash: true})
-                                        .then(function () {
-                                            _self.write(file, data.blob, data.position);
-                                        });
-                                }
+                             // We got some chunks
+                             if (data.blob && data.position) {
+                             _db.update('files', {uuid: file.uuid, size: data.totalSize, position: data.position}, {uuidIsHash: true})
+                             .then(function () {
+                             _self.write(file, data.blob, data.position);
+                             });
+                             }
 
-                                // We only got some info
-                                else {
-                                    _db.update('files', {uuid: file.uuid, size: data.totalSize}, {uuidIsHash: true})
-                                }
+                             // We only got some info
+                             else {
+                             _db.update('files', {uuid: file.uuid, size: data.totalSize}, {uuidIsHash: true})
+                             }
 
-                            })
+                             })*/
                             .catch(function (err) {
                                 logger.error('FileSystem', file.uri, 'error during download!');
                             })
@@ -658,6 +661,7 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                 dirEntry.removeRecursively(function () {
 
                     deferred.resolve();
+
                 }, deferred.reject);
 
             }, deferred.reject);

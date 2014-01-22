@@ -4,73 +4,19 @@
  */
 
 
-define(['q', 'storage/index', 'project'], function (Q, storage, project) {
+define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, storage, project, Cache) {
 
-        var module = {},
-            cacheIsInSync = false;
+        var module = {};
 
-        /**
-         * @private
-         * @method getResultsFromStorage
-         * @param {Boolean} filterValidated
-         * @return {Promise}
-         */
-        function getResultsFromStorage(filterValidated) {
-
-            filterValidated = filterValidated || false;
-
-            var filter = {
-                projectUuid: project.uuid
-            };
-
-            if (filterValidated && project.computation.results.validation.enabled) {
-                filter.isValid = true;
-            }
-
-            return storage.db.findAndReduceByObject('results', {filterDuplicates: false}, filter);
-        }
-
-
-        /**
-         * @property size
-         * @type {Number}
-         */
-        module.size = 0;
 
         /**
          * @property cache
          * @type {Array}
          */
-        module.cache = [];
+        module.cache = new Cache('results', function (a, b) {
+            return (a && b) && (a.isValid !== b.isValid || a.iteration !== b.iteration);
+        });
 
-
-        /**
-         * Read all results from storage and save hashs to cache
-         *
-         * @method fillCache
-         * @return {Promise}
-         */
-        module.fillCache = function () {
-            var deferred = Q.defer();
-
-            if (cacheIsInSync) {
-                deferred.resolve(true);
-            }
-            else {
-                getResultsFromStorage().then(function (results) {
-
-                    results.forEach(function (result) {
-                        module.cache.push(result.uuid);
-                    });
-
-                    module.size = results.length;
-                    cacheIsInSync = true;
-
-                    deferred.resolve(true);
-                })
-            }
-            return deferred.promise;
-        };
 
         /**
          * Adds a result to the storage. If its new will return true,
@@ -80,99 +26,40 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
          * @param {Result} result
          * @return {Promise}
          */
-        module.add = function (result) {
-
-            // We need some buffer db i/o
-            // is quite slow
-            if (module.cache.indexOf(result.uuid) >= 0) {
-                var deferred = Q.defer();
-                deferred.resolve(false);
-                return deferred.promise;
-            }
-
-
-            else {
-
-                module.cache.push(result.uuid);
-
-                if (module.cache.length > project.computation.results.cacheSize) {
-                    module.cache = [];
-                }
-
-                // Already existent?
-                return storage.db.has('results', result.uuid, {uuidIsHash: true})
-                    .then(function (exists) {
-                        if (!exists) {
-                            // Is new
-
-                            return storage.db.save('results', result, {uuidIsHash: true})
-                                .then(function () {
-                                    return true;
-                                });
-                        }
-                        // Is an update
-                        else {
-                            return module.update(result);
-                        }
-                    })
-            }
-        };
-
-        /**
-         * Update a result, will return true, if the result really changed.
-         *
-         * @method update
-         * @param result
-         * @return {Boolean}
-         */
         module.update = function (result) {
 
-            var deferred = Q.defer();
+            // Read stored result
+            var storedResult = module.cache.get(result);
 
+            // Have seen this before
+            if (storedResult) {
 
-            // Without enabled validation, there updating a result is not allowed
-            // If it's already valid, there is no need, for the whole process
-            if (!project.computation.results.validation.enabled || result.isValid) {
-                deferred.resolve(false);
+                // No need to update
+                if (storedResult.isValid || storedResult.iteration >= project.computation.results.validation.iterations) {
+                    return false;
+                }
 
+                // Increase iterations, then Update,
+                result.iteration = storedResult.iteration + 1;
+
+                // Already did enough iterations, result is now valid
+                if (result.iteration >= project.computation.results.validation.iterations) {
+                    result.isValid = true;
+                }
             }
 
-            // Read stored result
-            storage.db.read('results', result.uuid, {uuidIsHash: true})
-
-                .then(function (resultFromStorage) {
-
-                    // No need to update
-                    if (resultFromStorage.isValid || resultFromStorage.iteration >= project.computation.results.validation.iterations) {
-                        deferred.resolve(false);
-                    }
-
-                    // Increase iterations, then Update,
-                    result.iteration = resultFromStorage.iteration + 1;
-
-                    // Already did enough iterations, result is now valid
-                    if (result.iteration >= project.computation.results.validation.iterations) {
-                        result.isValid = true;
-                    }
-
-                    // Update result
-                    return storage.db.update('results', result, {uuidIsHash: true});
-
-
-                }).then(function () {
-                    // We made changes!
-                    deferred.resolve(true);
-                });
-
-            return deferred.promise;
+            // Update result
+            return module.cache.set(result);
 
         };
+
 
         /**
          * @method clear
          * @return {Promise}
          */
         module.clear = function () {
+            module.cache.flush();
             return storage.db.clear(['results']);
         };
 
@@ -183,32 +70,36 @@ define(['q', 'storage/index', 'project'], function (Q, storage, project) {
          * @return {Promise}
          */
         module.getResultByUuid = function (uuid) {
-            return storage.db.read('results', uuid, {uuidIsHash: true});
+            return module.cache.get({uuid: uuid});
         };
 
 
         /**
          * @method isValid
          * @param result
-         * @return {Promise}
+         * @return {Boolean}
          */
         module.isValid = function (result) {
-            return storage.db.read('results', result.uuid, {uuidIsHash: true})
-                .then(function (resultFromStorage) {
-                    return resultFromStorage && resultFromStorage.isValid === true;
-                });
+
+            // Need to query database?
+            if (result.isValid) {
+                return true;
+            }
+            // Query cache
+            else {
+                var storedResult = module.cache.get(result);
+                return storedResult && storedResult.isValid;
+            }
         };
 
 
         /**
          * @method allValid
-         * @return {Promise}
+         * @return {Boolean}
          */
         module.allValid = function () {
-            return getResultsFromStorage(true)
-                .then(function (results) {
-                    return results.length === project.computation.results.expected;
-                });
+            var results = module.cache.filter();
+            return results.length === project.computation.results.expected;
 
         };
 

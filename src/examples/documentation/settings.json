@@ -34,6 +34,7 @@
                 "iterations": 10
             },
             "expected": -1,
+            "noJobRetryTime": 10000,
             "testIntervalTime": 5000
         },
 

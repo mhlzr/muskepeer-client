@@ -36,30 +36,27 @@ define(['computation/index', 'network/index', 'storage/index'],
                  * Broadcast Messages
                  */
                 network.on('broadcast:result:push', function (e) {
-                    computation.results.add(e.data)
-                        .then(function (hasChanged) {
-                            if (hasChanged) {
-                                network.peers.broadcast('result:push', e.data, e.target.uuid);
-                            }
-                        });
+                    var hasChanged = computation.results.update(e.data);
+                    if (hasChanged) {
+                        network.peers.broadcast('result:push', e.data, e.target.uuid);
+                    }
                 });
 
+
                 network.on('broadcast:job:push', function (e) {
-                    computation.jobs.add(e.data)
-                        .then(function (hasChanged) {
-                            if (hasChanged) {
-                                computation.pushJobToAwaitingWorker(e.data);
-                                network.peers.broadcast('job:push', e.data, e.target.uuid);
-                            }
-                        });
+                    var hasChanged = computation.jobs.update(e.data);
+                    if (hasChanged) {
+                        computation.pushJobToAwaitingWorker(e.data);
+                        network.peers.broadcast('job:push', e.data, e.target.uuid);
+                    }
                 });
 
                 network.on('broadcast:job:lock', function (e) {
-
+                    computation.jobs.lockJob(e.data);
                 });
 
                 network.on('broadcast:job:unlock', function (e) {
-
+                    computation.jobs.unlockJob(e.data);
                 });
 
 
@@ -176,11 +173,11 @@ define(['computation/index', 'network/index', 'storage/index'],
                 });
 
                 network.on('job:push', function (e) {
-                    storage.db.save('jobs', e.job, {uuidIsHash: true});
+                    computation.jobs.add(e.job);
                 });
 
                 network.on('result:push', function (e) {
-                    storage.db.save('results', e.result, {uuidIsHash: true});
+                    computation.results.add(e.result);
                 });
 
 

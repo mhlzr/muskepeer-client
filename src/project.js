@@ -41,6 +41,7 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
                     "enabled": false,
                     "iterations": 1
                 },
+                "noJobRetryTime": 10000,
                 "expected": -1,
                 "testIntervalTime": 10000
             },
