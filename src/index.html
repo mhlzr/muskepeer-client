@@ -12,7 +12,6 @@
 
         fieldset {
             border: 1px solid #818181;
-            display: inline;
         }
 
         output {
@@ -21,13 +20,15 @@
     </style>
 </head>
 <body>
-<div>
+<header>
     <fieldset>
         <legend>Local</legend>
         <button onclick="Muskepeer.computation.start()">Start Computation</button>
         <button onclick="Muskepeer.computation.stop()">Stop Computation</button>
         <button onclick="Muskepeer.storage.fs.clear()">Clear FileSystem</button>
         <button onclick="Muskepeer.storage.db.clear()">Clear Database</button>
+        <button onclick="logger.disableHTMLLog()">Logger:disabeHTML</button>
+        <button onclick="logger.disableConsoleLog()">Logger:disableConsoleLog</button>
     </fieldset>
 
 
@@ -41,7 +42,7 @@
         <button onclick="Muskepeer.grid.client.reload(1500)">Reload</button>
     </fieldset>
 
-</div>
+</header>
 
 <output>
 

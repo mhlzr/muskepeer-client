@@ -5,7 +5,9 @@
  */
 
 
-
+/**********************************************
+ * COMMUNICATION BLOCK START
+ **********************************************/
 self.addEventListener('message', function (e) {
 
     if (!e.data.cmd) {
@@ -16,14 +18,16 @@ self.addEventListener('message', function (e) {
         case 'start':
             start();
             break;
-        case 'stop' :
-            self.close();
+        default:
             break;
     }
 });
+/**********************************************
+ * COMMUNICATION BLOCK END
+ **********************************************/
 
 
-var BOARDSIZE = 8;
+var BOARDSIZE = 11;
 
 function test(positions) {
 
@@ -104,8 +108,7 @@ function start() {
 
     while (true) {
         if (test(solution = createPossibleSolution())) {
-            // Inform the listener
-            self.postMessage({type: 'result:found', result: solution});
+            self.postMessage({type: 'result:push', data: {result: solution} });
 
         }
     }

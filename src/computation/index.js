@@ -544,6 +544,9 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
 
                 logger.log('Computation', 'Starting');
 
+                jobs.init();
+                results.init();
+
                 results.cache.syncWithStorage()
                     .then(jobs.cache.syncWithStorage)
                     .then(createFactories)
@@ -557,12 +560,14 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
 
                         // Start the factories if disabled, won't do anyhting
                         if (module.factories) {
+                            jobs.cache.enableAutoSave();
                             module.factories.start();
                             jobCountTimer = window.setInterval(jobCounterCompleteHandler, project.computation.jobs.testIntervalTime);
                         }
 
                         // Start the workers, same as factories
                         if (module.workers) {
+                            results.cache.enableAutoSave();
                             module.workers.start();
                             resultCountTimer = window.setInterval(resultCounterCompleteHandler, project.computation.results.testIntervalTime);
                         }
@@ -626,6 +631,10 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
              */
             stopWorkers: function () {
                 if (module.workers) {
+                    // Save and clear cache
+                    results.cache.disableAutoSave();
+                    results.cache.save().then(results.cache.flush);
+
                     removeEventListenersFromPool(module.workers);
                     module.workers.stop();
                     module.workers = null;
@@ -639,6 +648,9 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
              */
             stopFactories: function () {
                 if (module.factories) {
+                    // Save and clear cache
+                    jobs.cache.disableAutoSave();
+                    jobs.cache.save().then(jobs.cache.flush);
                     removeEventListenersFromPool(module.factories);
                     module.factories.stop();
                     module.factories = null;

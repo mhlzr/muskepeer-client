@@ -39,30 +39,39 @@ self.addEventListener('message', function (e) {
  * COMMUNICATION BLOCK END
  **********************************************/
 
+var K = 20,
+    SIGMA = 40,
+    KERNEL = 'rect',
+    DISTANCE = 'euclid',
+    SIGMA_AUTO_INCREASE = false;
+
+
 function start(job) {
 
+    // Get trainingFile
     if (!trainingFile) {
         self.postMessage({ type: 'file:pull', data: {name: 'training', type: 'arrayBuffer'} });
         return;
     }
 
+    // Get a job
     if (!job) {
         self.postMessage({ type: 'job:pull' });
         return;
     }
 
-
+    // Post result
     self.postMessage(
         {
             type: 'result:push',
             data: {
-                id: job.parameters.id,
                 job: { uuid: job.uuid },
-                result: knn(trainingData, job.parameters.dataset, 20, 40, 'rect', 'euclid', false, 16)
+                result: knn(trainingData, job.parameters.dataset[0], K, SIGMA, KERNEL, DISTANCE, SIGMA_AUTO_INCREASE, 16)
             }
         });
 
-    self.postMessage({ type: 'job:pull' });
+    // Recursion
+    start();
 }
 
 

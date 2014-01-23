@@ -404,6 +404,7 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
                 var store = getStoreByName(storeName),
                     deferred = Q.defer();
 
+
                 options = options || {};
 
                 //store found?
@@ -430,15 +431,6 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
                 this.read(storeName, data.uuid, options)
                     //merge
                     .then(function (existingData) {
-
-                        //compare
-                        /*if (comparisonFunction) {
-                         var hasChanged = comparisonFunction(existingData, data);
-                         // skip the rest
-                         if (!hasChanged) deferred.resolve(false);
-                         return;
-                         }*/
-
                         data = _.extend(existingData, data);
                         store.put(data);
                     })
@@ -475,6 +467,25 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
                 store.get(key, function (result) {
                     if (result) deferred.resolve(true);
                     else  deferred.resolve(false);
+                }, deferred.reject);
+
+                return deferred.promise;
+            },
+
+
+            /**
+             * Overwrite a whole store
+             *
+             * @method overwrite
+             * @param storeName
+             * @param dataset
+             */
+            overwrite: function (storeName, dataset) {
+                var deferred = Q.defer(),
+                    store = getStoreByName(storeName);
+
+                store.clear(function () {
+                    store.putBatch(dataset, deferred.resolve, deferred.reject);
                 }, deferred.reject);
 
                 return deferred.promise;

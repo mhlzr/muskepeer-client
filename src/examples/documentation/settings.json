@@ -27,7 +27,6 @@
         },
 
         "results": {
-            "cacheSize": 10000,
             "groupSize": 1,
             "validation": {
                 "enabled": true,
@@ -35,16 +34,17 @@
             },
             "expected": -1,
             "noJobRetryTime": 10000,
-            "testIntervalTime": 5000
+            "testIntervalTime": 5000,
+            "autoSaveIntervalTime": 10000
         },
 
         "jobs": {
-            "cacheSize": 10000,
             "lock": true,
             "maxLockTime": 3600000,
             "groupSize": 1,
             "expected": -1,
-            "testIntervalTime": 5000
+            "testIntervalTime": 5000,
+            "autoSaveIntervalTime": 10000
         }
     },
 

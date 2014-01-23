@@ -10,12 +10,19 @@ define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, st
 
 
         /**
+         * @method init
+         */
+        module.init = function () {
+            module.cache = new Cache('results', project.computation.results.autoSaveIntervalTime, function (a, b) {
+                return (a && b) && (a.isValid !== b.isValid || a.iteration !== b.iteration);
+            });
+        };
+
+        /**
          * @property cache
          * @type {Array}
          */
-        module.cache = new Cache('results', function (a, b) {
-            return (a && b) && (a.isValid !== b.isValid || a.iteration !== b.iteration);
-        });
+        module.cache = null;
 
 
         /**

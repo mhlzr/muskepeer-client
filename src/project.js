@@ -35,7 +35,6 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
             },
 
             "results": {
-                "cacheSize": 10000,
                 "groupSize": 1,
                 "validation": {
                     "enabled": false,
@@ -43,16 +42,18 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
                 },
                 "noJobRetryTime": 10000,
                 "expected": -1,
-                "testIntervalTime": 10000
+                "testIntervalTime": 10000,
+                "autoSaveIntervalTime": 10000
+
             },
 
             "jobs": {
-                "cacheSize": 10000,
                 "lock": true,
                 "maxLockTime": 3600000,
                 "groupSize": 1,
                 "expected": -1,
-                "testIntervalTime": 10000
+                "testIntervalTime": 10000,
+                "autoSaveIntervalTime": 10000
             }
         },
 

@@ -1,20 +1,24 @@
 /**
- *
+ * Uses an object to cache datasets from storage.
+ * As Object.hasownProperty seems to be faster than Array.indexOf
+ * http://jsperf.com/array-hasownproperty-vs-array-indexof
  *
  * @module Cache
  * @class Cache
+ *
  */
 
 define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixing) {
 
 
-    return function Cache(storeName, comparisonFunction) {
+    return function Cache(storeName, autoSaveIntervalTime, comparisonFunction) {
 
-
+        autoSaveIntervalTime = autoSaveIntervalTime || 60000;
         comparisonFunction = comparisonFunction || _.isEqual;
 
         var initialSync = false,
-            datasets = {};
+            datasets = {},
+            autoSaveInterval;
 
 
         /**
@@ -91,7 +95,7 @@ define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixin
             if (this.has(hash)) {
 
                 // Detect if it is a real update
-                hasChanged = !comparisonFunction.apply(this, [this.get(hash), dataset]);
+                hasChanged = !comparisonFunction.apply(this, [this.get(dataset), dataset]);
 
                 // Update
                 if (hasChanged) {
@@ -106,7 +110,7 @@ define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixin
                     datasets[hash] = dataset;
 
                     // Database Update
-                    database.update(storeName, dataset, {uuidIsHash: true});
+                    //database.update(storeName, dataset, {uuidIsHash: true});
                 }
 
             }
@@ -114,7 +118,7 @@ define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixin
             else {
                 datasets[hash] = dataset;
                 // Database Insert
-                database.save(storeName, dataset, {uuidIsHash: true});
+                //database.save(storeName, dataset, {uuidIsHash: true});
                 hasChanged = true;
             }
 
@@ -155,6 +159,30 @@ define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixin
         this.size = function () {
             return _.size(datasets);
         };
+
+
+        /**
+         * @method save
+         */
+        this.save = function () {
+            logger.log('Cache', 'Saving', storeName, 'to storage');
+            return database.overwrite(storeName, _.toArray(datasets));
+        };
+
+        /*
+         * @method enableAutoSave
+         */
+        this.enableAutoSave = function () {
+            autoSaveInterval = setInterval(this.save, autoSaveIntervalTime);
+        };
+
+        /**
+         * @method disableAutoSave
+         */
+        this.disableAutoSave = function () {
+            clearInterval(autoSaveInterval);
+            autoSaveInterval = null;
+        }
 
     };
 });
