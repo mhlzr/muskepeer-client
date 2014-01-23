@@ -60,8 +60,6 @@ define([], function () {
 
             xhr.send(JSON.stringify(data));
 
-            logger.log('Service ' + this.id, 'sending.');
-
         };
 
     };

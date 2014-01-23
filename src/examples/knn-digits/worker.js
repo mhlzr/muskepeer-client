@@ -40,10 +40,10 @@ self.addEventListener('message', function (e) {
  **********************************************/
 
 var K = 20,
-    SIGMA = 40,
+    SIGMA = 50,
     KERNEL = 'rect',
     DISTANCE = 'euclid',
-    SIGMA_AUTO_INCREASE = false;
+    SIGMA_AUTO_INCREASE = true;
 
 
 function start(job) {
@@ -66,7 +66,7 @@ function start(job) {
             type: 'result:push',
             data: {
                 job: { uuid: job.uuid },
-                result: knn(trainingData, job.parameters.dataset[0], K, SIGMA, KERNEL, DISTANCE, SIGMA_AUTO_INCREASE, 16)
+                result: knn(trainingData, job.parameters.dataset, K, SIGMA, KERNEL, DISTANCE, SIGMA_AUTO_INCREASE, 16)
             }
         });
 

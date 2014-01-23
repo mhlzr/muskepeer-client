@@ -322,6 +322,10 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
                 // Broadcast to peers
                 peers.broadcast(type, data);
 
+
+                // Only results get publishedto services
+                if (type !== 'result:push') return;
+
                 // Broadcast to services
                 module.services.forEach(function (service) {
                     service.save(data);

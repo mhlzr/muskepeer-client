@@ -17,7 +17,6 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
         comparisonFunction = comparisonFunction || _.isEqual;
 
         var initialSync = false,
-            needsSync = false,
             datasets = {},
             autoSaveInterval;
 
@@ -28,7 +27,7 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
          * @property isSync
          * @type {boolean}
          */
-        this.isSync = initialSync && !needsSync;
+        this.isSync = initialSync;
 
 
         /**
@@ -107,12 +106,9 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
                         recursive: true
                     });
 
-
                     // Update cache
                     datasets[hash] = dataset;
 
-
-                    needsSync = true;
                     // Database Update
                     //database.update(storeName, dataset, {uuidIsHash: true});
                 }
@@ -124,7 +120,6 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
                 // Database Insert
                 //database.save(storeName, dataset, {uuidIsHash: true});
 
-                needsSync = true;
                 hasChanged = true;
             }
 
@@ -172,21 +167,16 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
          */
         this.save = function () {
 
-            if (!needsSync) {
-                return Q();
-            }
-            else {
-                needsSync = false;
-                var sets = _.toArray(datasets);
+            var sets = _.toArray(datasets);
 
-                sets.forEach(function (dataset) {
-                    dataset.projectUuid = project.uuid;
-                });
+            sets.forEach(function (dataset) {
+                dataset.projectUuid = project.uuid;
+            });
 
-                logger.log('Cache', 'Saving', this.size(), storeName, 'to storage');
+            logger.log('Cache', 'Saving', this.size(), storeName, 'to storage');
 
-                return database.overwrite(storeName, sets);
-            }
+            return database.overwrite(storeName, sets);
+
 
         }.bind(this);
 

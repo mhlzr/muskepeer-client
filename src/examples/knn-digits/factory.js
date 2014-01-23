@@ -49,7 +49,7 @@ function start(job) {
         var index = (testData.length * Math.random()) | 0,
             dataset = testData.splice(index, 1);
 
-        postMessage({ type: 'job:push', data: {id: index, dataset: dataset}});
+        postMessage({ type: 'job:push', data: {dataset: dataset[0]}});
     }
 
 }

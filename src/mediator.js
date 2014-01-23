@@ -27,7 +27,7 @@ define(['computation/index', 'network/index', 'storage/index'],
                 network.on('grid:filesystem:clear', storage.fs.clear);
                 network.on('grid:client:reload', function (e) {
                     setTimeout(function () {
-                        location.reload()
+                        location.reload(true);
                     }, e.time);
                 });
 

@@ -30,7 +30,7 @@
         },
 
         "results": {
-            "expected": 3306,
+            "expected": 3498,
             "noJobRetryTime": 3000,
             "testIntervalTime": 60000
         }
