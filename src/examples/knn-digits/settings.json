@@ -30,7 +30,7 @@
         },
 
         "results": {
-            "expected": 3498,
+            "expected": 3306,
             "noJobRetryTime": 3000,
             "testIntervalTime": 60000
         }
@@ -48,5 +48,27 @@
             "type": "application/json"
         }
 
-    ]
+    ],
+
+    "network": {
+        "services": [
+            {
+                "enabled": false,
+                "url": "https://api.parse.com/1/classes/knn_digits/",
+                "type": "REST",
+                "params": {},
+                "headers": [
+                    {
+                        "key": "X-Parse-Application-Id",
+                        "value": "ZzIHMKfVQmIni0K5fBdYgXxTlXyoovbm4gm0Epdq"
+                    },
+                    {
+                        "key": "X-Parse-REST-API-Key",
+                        "value": "4Izw5bddA34RFUmOuGCYrMHn4zY5dz62ETAVb2g5"
+                    }
+                ]
+            }
+        ]
+    }
+
 }

@@ -205,6 +205,7 @@ define(['lodash', 'q', 'uuid', 'project', 'idbwrapper'], function (_, Q, uuid, p
                 //merge with defaults
                 options = _.defaults(options, defaultOptions);
 
+
                 //add keyRange if passed
                 if (keyRangeOptions) {
                     options.keyRange = store.makeKeyRange(keyRangeOptions);

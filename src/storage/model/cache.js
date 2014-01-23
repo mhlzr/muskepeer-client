@@ -8,7 +8,7 @@
  *
  */
 
-define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixing) {
+define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, database, mixing, project) {
 
 
     return function Cache(storeName, autoSaveIntervalTime, comparisonFunction) {
@@ -17,6 +17,7 @@ define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixin
         comparisonFunction = comparisonFunction || _.isEqual;
 
         var initialSync = false,
+            needsSync = false,
             datasets = {},
             autoSaveInterval;
 
@@ -27,7 +28,7 @@ define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixin
          * @property isSync
          * @type {boolean}
          */
-        this.isSync = initialSync;
+        this.isSync = initialSync && !needsSync;
 
 
         /**
@@ -40,7 +41,7 @@ define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixin
             return database.list(storeName)
                 .progress(function (dataset) {
                     datasets[dataset.uuid] = dataset;
-                }).then(function () {
+                }).then(function (all) {
                     initialSync = true;
                 });
         };
@@ -106,9 +107,12 @@ define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixin
                         recursive: true
                     });
 
+
                     // Update cache
                     datasets[hash] = dataset;
 
+
+                    needsSync = true;
                     // Database Update
                     //database.update(storeName, dataset, {uuidIsHash: true});
                 }
@@ -119,6 +123,8 @@ define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixin
                 datasets[hash] = dataset;
                 // Database Insert
                 //database.save(storeName, dataset, {uuidIsHash: true});
+
+                needsSync = true;
                 hasChanged = true;
             }
 
@@ -165,9 +171,24 @@ define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixin
          * @method save
          */
         this.save = function () {
-            logger.log('Cache', 'Saving', storeName, 'to storage');
-            return database.overwrite(storeName, _.toArray(datasets));
-        };
+
+            if (!needsSync) {
+                return Q();
+            }
+            else {
+                needsSync = false;
+                var sets = _.toArray(datasets);
+
+                sets.forEach(function (dataset) {
+                    dataset.projectUuid = project.uuid;
+                });
+
+                logger.log('Cache', 'Saving', this.size(), storeName, 'to storage');
+
+                return database.overwrite(storeName, sets);
+            }
+
+        }.bind(this);
 
         /*
          * @method enableAutoSave
@@ -182,7 +203,7 @@ define(['lodash', 'q', '../database', 'mixing'], function (_, Q, database, mixin
         this.disableAutoSave = function () {
             clearInterval(autoSaveInterval);
             autoSaveInterval = null;
-        }
+        };
 
     };
 });

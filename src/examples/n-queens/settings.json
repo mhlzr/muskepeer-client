@@ -20,7 +20,7 @@
         },
 
         "results": {
-            "expected": 2680,
+            "expected": 352,
             "testIntervalTime": 60000
         }
     },
@@ -29,7 +29,7 @@
         "services": [
             {
                 "enabled": false,
-                "url": "https://api.parse.com/1/classes/Queens/",
+                "url": "https://api.parse.com/1/classes/queens/",
                 "type": "REST",
                 "params": {},
                 "headers": [

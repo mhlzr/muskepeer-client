@@ -87,16 +87,7 @@ define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, st
          * @return {Boolean}
          */
         module.isValid = function (result) {
-
-            // Need to query database?
-            if (result.isValid) {
-                return true;
-            }
-            // Query cache
-            else {
-                var storedResult = module.cache.get(result);
-                return storedResult && storedResult.isValid;
-            }
+            return module.cache.get(result).isValid;
         };
 
 

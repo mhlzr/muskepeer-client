@@ -15,9 +15,7 @@ define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, st
      */
     module.init = function () {
 
-        module.cache = new Cache('jobs', project.computation.jobs.autoSaveIntervalTime, function (a, b) {
-            return (a && b) && (a.isComplete !== b.isComplete || a.isLocked !== b.isLocked);
-        });
+        module.cache = new Cache('jobs', project.computation.jobs.autoSaveIntervalTime);
 
     };
 
@@ -68,6 +66,8 @@ define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, st
             return jobs[(Math.random() * jobs.length) | 0];
         }
 
+        return null;
+
     };
 
     /**
@@ -87,7 +87,9 @@ define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, st
     module.lockJob = function (job) {
 
         if (project.computation.jobs.lock) {
-            module.cache.set({uuid: job.uuid, locktime: Date.now(), isLocked: true});
+            job.locktime = Date.now();
+            job.isLocked = true;
+            module.cache.set(job);
         }
 
     };
@@ -99,7 +101,9 @@ define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, st
     module.unlockJob = function (job) {
 
         if (project.computation.jobs.lock) {
-            module.cache.set({uuid: job.uuid, locktime: null, isLocked: false});
+            job.locktime = null;
+            job.isLocked = false;
+            module.cache.set(job);
         }
 
     };
@@ -109,7 +113,10 @@ define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, st
      * @param {Job} job
      */
     module.markJobAsComplete = function (job) {
-        module.cache.set({uuid: job.uuid, isComplete: true, isLocked: false});
+
+        job.isComplete = true;
+        job.isLocked = false;
+        module.cache.set(job);
     };
 
 

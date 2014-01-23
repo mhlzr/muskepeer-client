@@ -106,7 +106,7 @@
         "services": [
             {
                 "enabled": false,
-                "url": "https://api.parse.com/1/classes/Results/",
+                "url": "https://api.parse.com/1/classes/example/",
                 "type": "REST",
                 "params": {},
                 "headers": [
@@ -126,12 +126,12 @@
     "files": [
         {
             "name": "test",
-            "url": "https://dl.dropboxusercontent.com/u/959008/download.pdf",
+            "url": "https://example.org/some/file.pdf",
             "type": "application/pdf"
         },
         {
-            "name": "train",
-            "url": "https://dl.dropboxusercontent.com/u/959008/webstorm.pdf",
+            "name": "test2",
+            "url": "https://example.org/some/file2.pdf",
             "type": "application/pdf"
         }
     ]

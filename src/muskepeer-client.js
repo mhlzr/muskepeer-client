@@ -157,11 +157,14 @@ define([
                 })
                 .done(function () {
 
+                    // Initialize caches
+                    computation.jobs.init();
+                    computation.results.init();
 
+                    // Couple computation & network
                     mediator.couple();
 
                     // Finallly initialize the network and computation module
-
                     network.start();
                     //computation.start();
                 });

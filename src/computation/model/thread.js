@@ -70,15 +70,18 @@ define(['eventemitter2'], function (EventEmitter) {
 
         this.pushJob = function (job) {
             this.isIdle = false;
+            if (!_webworker) return;
             _webworker.postMessage({cmd: 'job', job: job});
         };
 
         this.pushFileAsClone = function (fileInfo, file) {
+            if (!_webworker) return;
             _webworker.postMessage({cmd: 'file', fileInfo: fileInfo, file: file});
         };
 
 
         this.pushFileAsTransferableObject = function (fileInfo, file) {
+            if (!_webworker) return;
             var transfer = {
                 cmd: 'file',
                 fileInfo: fileInfo,
@@ -88,6 +91,7 @@ define(['eventemitter2'], function (EventEmitter) {
         };
 
         this.pushResult = function (result) {
+            if (!_webworker) return;
             _webworker.postMessage({cmd: 'result', result: result});
         };
 

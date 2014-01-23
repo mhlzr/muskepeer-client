@@ -22,9 +22,13 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
          * @method allFound
          * @param type
          * @param expected
+         * @param {Boolean} silent Pirnt the current status?
          * @return {Promise}
          */
-        function allFound(type, expected) {
+        function allFound(type, expected, silent) {
+
+            silent = silent || false;
+
             var collection = results,
                 amount;
 
@@ -48,27 +52,39 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
             amount = collection.cache.size();
 
 
-            logger.log('Computation', amount, type);
+            if (!silent) {
+                logger.log('Computation', amount, type);
+            }
 
 
             // We already found all?
             if (amount >= expected) {
 
-                logger.log('Computation', 'All', type, 'found!');
+                if (!silent) {
+                    logger.log('Computation', 'All', type, 'found!');
+                }
 
                 // Need to check validity?
                 if (type === 'results' && project.computation.results.validation.enabled) {
 
                     if (results.allValid()) {
-                        logger.log('Computation', 'All results are valid!');
+                        if (!silent) {
+                            logger.log('Computation', 'All results are valid!');
+                        }
                         return true;
                     }
                     else {
-                        logger.log('Computation', 'Results are not all valid!');
+                        if (!silent) {
+                            logger.log('Computation', 'Results are not all valid!');
+                        }
                         return false;
                     }
 
                 }
+                else {
+                    return true;
+                }
+
 
             }
 
@@ -288,7 +304,7 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
                     return;
                 }
 
-                // logger.log('Computation', 'Pushing job!', job);
+                //logger.log('Computation', 'Pushing job!', job);
 
                 // Send job to thread
                 e.target.pushJob(job);
@@ -495,6 +511,18 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
             if (module.isComplete()) {
                 module.stop();
             }
+            else {
+                if (module.workers) {
+                    if (allFound('results', project.computation.results.expected, true)) {
+                        module.stopWorkers();
+                    }
+                }
+                if (module.factories) {
+                    if (allFound('jobs', project.computation.jobs.expected, true)) {
+                        module.stopFactories();
+                    }
+                }
+            }
 
         }
 
@@ -543,9 +571,6 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
                 if (this.isRunning) return;
 
                 logger.log('Computation', 'Starting');
-
-                jobs.init();
-                results.init();
 
                 results.cache.syncWithStorage()
                     .then(jobs.cache.syncWithStorage)
@@ -648,9 +673,8 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
              */
             stopFactories: function () {
                 if (module.factories) {
-                    // Save and clear cache
-                    jobs.cache.disableAutoSave();
-                    jobs.cache.save().then(jobs.cache.flush);
+                    // Save, cache and autosaving must be kept!
+                    jobs.cache.save();
                     removeEventListenersFromPool(module.factories);
                     module.factories.stop();
                     module.factories = null;
