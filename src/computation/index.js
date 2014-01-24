@@ -514,6 +514,7 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
             else {
                 if (module.workers) {
                     if (allFound('results', project.computation.results.expected, true)) {
+                        module.stopFactories();
                         module.stopWorkers();
                     }
                 }
@@ -659,6 +660,10 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
                     // Save and clear cache
                     results.cache.disableAutoSave();
                     results.cache.save().then(results.cache.flush);
+
+                    // Stop autosaving of jobs
+                    jobs.cache.disableAutoSave();
+                    jobs.cache.save().then(jobs.cache.flush);
 
                     removeEventListenersFromPool(module.workers);
                     module.workers.stop();

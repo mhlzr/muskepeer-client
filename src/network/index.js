@@ -221,7 +221,7 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
 
             //logger.log('Peer ' + e.target.id, 'Received', e.type);
 
-            if (!e.type) {
+            if (!e || !e.type) {
                 logger.log('Network', 'Peer-message without type received');
                 return;
             }

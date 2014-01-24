@@ -41,7 +41,7 @@ self.addEventListener('message', function (e) {
 
 var K = 20,
     SIGMA = 50,
-    KERNEL = 'rect',
+    KERNEL = 'tricubic',
     DISTANCE = 'euclid',
     SIGMA_AUTO_INCREASE = true;
 
