@@ -293,9 +293,20 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
                 job = jobs.getNextAvailableJob();
 
                 if (!job) {
-                    //logger.log('Computation', 'No jobs left currently!');
+                    logger.log('Computation', 'No jobs left currently!');
                     // Mark the thread as idle
                     e.target.isIdle = true;
+
+                    // Unlock the jobs that might have been locked long enough
+                    var expiredJobs = jobs.getExpiredJobs();
+
+                    logger.log('Computation', 'Searching for expired jobs...');
+
+                    expiredJobs.forEach(function (job) {
+                        jobs.unlockJob(job);
+                        module.emit('job:unlock', {uuid: job.uuid});
+                    });
+                    logger.log('Computation', 'Found', expiredJobs.length, 'expired jobs');
 
                     // There might no new jobs be added, or the workers pull for a new job
                     // so the workers would wait forever
@@ -573,7 +584,10 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
 
                 logger.log('Computation', 'Starting');
 
-                results.cache.syncWithStorage()
+                this.isRunning = true;
+                this.isPaused = false;
+
+                return results.cache.syncWithStorage()
                     .then(jobs.cache.syncWithStorage)
                     .then(createFactories)
                     .then(createWorkers)
@@ -606,8 +620,6 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
 
                     });
 
-                this.isRunning = true;
-                this.isPaused = false;
 
             },
             /**
@@ -632,6 +644,8 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
              * @method stop
              */
             stop: function () {
+
+                if (!this.isRunning) return;
 
                 logger.log('Computation', 'Stopping');
 
