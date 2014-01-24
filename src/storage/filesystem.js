@@ -549,6 +549,25 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
 
         /**
+         * Will always return true, even if an error occured
+         *
+         * @method deleteFile
+         * @param fileInfo
+         * @return {Promise}
+         */
+        deleteFile: function (fileInfo) {
+            var deferred = Q.defer();
+
+            _fs.root.getFile(project.uuid + '/' + fileInfo.uuid, {create: false }, function (fileEntry) {
+
+                fileEntry.remove(deferred.resolve, deferred.resolve);
+
+            }, deferred.resolve);
+
+            return deferred.promise;
+        },
+
+        /**
          * This will download all incomplete files from their urls.
          * Should be used if you know, that there are no other peers in you pool,
          * that can deliver the files you need.
@@ -564,12 +583,16 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
                     var promises = [];
 
-                    files.forEach(function (file) {
+                    files.forEach(function (fileInfo) {
 
                         var deferred = Q.defer();
                         promises.push(deferred.promise);
 
-                        downloadViaXHR(file)
+                        _self.deleteFile(fileInfo)
+                            .then(function () {
+                                return downloadViaXHR(fileInfo)
+                            }
+                        )
                             /*.progress(function (data) {
 
                              // We got some chunks
@@ -587,15 +610,17 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
 
                              })*/
                             .catch(function (err) {
-                                logger.error('FileSystem', file.uri, 'error during download!');
+                                logger.error('FileSystem', fileInfo.uri, 'error during download!');
                             })
                             .done(function (data) {
 
-                                logger.log('FileSystem', file.uri, 'download complete!');
+                                logger.log('FileSystem', fileInfo.uri, 'download complete!');
 
-                                _db.update('files', {uuid: file.uuid, isComplete: true, position: data.blob.size, size: data.blob.size}, {uuidIsHash: true});
-
-                                _self.write(file, data.blob, 0).then(updateFileList);
+                                _db.update('files', {uuid: fileInfo.uuid, isComplete: true, position: data.blob.size, size: data.blob.size}, {uuidIsHash: true})
+                                    .then(function () {
+                                        return _self.write(fileInfo, data.blob, 0);
+                                    })
+                                    .then(updateFileList);
 
                                 deferred.resolve();
 
