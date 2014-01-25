@@ -13,9 +13,13 @@ define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, st
          * @method init
          */
         module.init = function () {
+            logger.log('Results', 'init');
+
             module.cache = new Cache('results', project.computation.results.autoSaveIntervalTime, function (a, b) {
                 return (a && b) && (a.isValid !== b.isValid || a.iteration !== b.iteration);
             });
+
+            return module.cache.syncWithStorage();
         };
 
         /**

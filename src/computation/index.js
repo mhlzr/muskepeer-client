@@ -159,26 +159,33 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
          * @return {Promise}
          */
         function createWorkers() {
+            var deferred = Q.defer();
+
 
             // No need for Workers
             if (!project.computation.workers.enabled) {
                 logger.log('Computation', 'Not using Workers');
-                return Q();
+                deferred.resolve();
             }
             // Already initiated?
             else if (module.workers) {
-                return Q();
+                deferred.resolve();
             }
 
             // Instantiate workers
             else {
                 logger.log('Computation', 'Creating Workers');
 
-                return createThreadPool(module.WORKER, project.computation.workers.url)
+                createThreadPool(module.WORKER, project.computation.workers.url)
                     .then(function () {
-                        if (module.workers) addEventListenersToPool(module.workers);
+                        if (module.workers) {
+                            addEventListenersToPool(module.workers);
+                        }
+                        deferred.resolve();
                     })
             }
+
+            return deferred.promise;
 
         }
 
@@ -191,25 +198,31 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
          * @return {Promise}
          */
         function createFactories() {
+            var deferred = Q.defer();
+
 
             // No need for Workers
             if (!project.computation.factories.enabled) {
                 logger.log('Computation', 'Not using Factories');
-                return Q();
+                deferred.resolve();
             }
             // Already initiated?
             else if (module.factories) {
-                return Q();
+                deferred.resolve();
             }
 
             // Instantiate workers
             else {
-
-                return createThreadPool(module.FACTORY, project.computation.factories.url)
+                createThreadPool(module.FACTORY, project.computation.factories.url)
                     .then(function () {
-                        if (module.factories)  addEventListenersToPool(module.factories);
+                        if (module.factories) {
+                            addEventListenersToPool(module.factories);
+                        }
+                        deferred.resolve();
                     })
             }
+
+            return deferred.promise;
 
         }
 
@@ -270,6 +283,8 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
          * @method poolJobRequiredHandler
          */
         function poolJobRequiredHandler(e) {
+
+            if (!module.isRunning) return;
 
             var job;
 
@@ -342,6 +357,8 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
          */
         function poolResultFoundHandler(e) {
 
+            if (!module.isRunning) return;
+
             var result = new Result(e.data);
 
             //logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a new result', result);
@@ -396,6 +413,8 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
          */
         function poolResultRequiredHandler(e) {
 
+            if (!module.isRunning) return;
+
             if (!e.data.uuid) return;
 
             logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'needs a specific result');
@@ -414,6 +433,9 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
          * @method poolFileFoundHandler
          */
         function poolFileFoundHandler(e) {
+
+            if (!module.isRunning) return;
+
             //TODO pass a url or name, actually name would be better
             logger.log('Thread (' + e.target.type + ' ' + e.target.id + ')', 'found a file');
         }
@@ -426,6 +448,8 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
          * @method poolFileRequiredHandler
          */
         function poolFileRequiredHandler(e) {
+
+            if (!module.isRunning) return;
 
             var promise,
                 fileInfo;
@@ -495,6 +519,7 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
          * @param e
          */
         function resultCounterCompleteHandler(e) {
+            if (!module.isRunning) return;
             if (allFound('results', project.computation.results.expected)) {
                 module.stopWorkers();
             }
@@ -506,6 +531,7 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
          * @param e
          */
         function jobCounterCompleteHandler(e) {
+            if (!module.isRunning) return;
             if (allFound('jobs', project.computation.jobs.expected)) {
                 module.stopFactories();
             }
@@ -519,23 +545,13 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
          * @param e
          */
         function counterCompleteHandler(e) {
-            if (module.isComplete()) {
+            if (!module.isRunning) return;
+            if (module.isComplete() || module.worker && allFound('results', project.computation.results.expected, true)) {
                 module.stop();
             }
-            else {
-                if (module.workers) {
-                    if (allFound('results', project.computation.results.expected, true)) {
-                        module.stopFactories();
-                        module.stopWorkers();
-                    }
-                }
-                if (module.factories) {
-                    if (allFound('jobs', project.computation.jobs.expected, true)) {
-                        module.stopFactories();
-                    }
-                }
+            else if (module.factories && allFound('jobs', project.computation.jobs.expected, true)) {
+                module.stopFactories();
             }
-
         }
 
 
@@ -580,16 +596,14 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
              */
             start: function () {
 
-                if (this.isRunning) return;
+                if (module.isRunning) return;
+
+                module.isRunning = true;
+                module.isPaused = false;
 
                 logger.log('Computation', 'Starting');
 
-                this.isRunning = true;
-                this.isPaused = false;
-
-                return results.cache.syncWithStorage()
-                    .then(jobs.cache.syncWithStorage)
-                    .then(createFactories)
+                return createFactories()
                     .then(createWorkers)
                     .then(function () {
 
@@ -645,7 +659,7 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
              */
             stop: function () {
 
-                if (!this.isRunning) return;
+                module.isRunning = false;
 
                 logger.log('Computation', 'Stopping');
 
@@ -663,7 +677,6 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
                 countTimer = null;
 
 
-                this.isRunning = false;
             },
 
             /**
@@ -682,9 +695,10 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
                     removeEventListenersFromPool(module.workers);
                     module.workers.stop();
                     module.workers = null;
-                    window.clearInterval(resultCountTimer);
-                    resultCountTimer = null;
                 }
+
+                window.clearInterval(resultCountTimer);
+                resultCountTimer = null;
             },
 
             /**
@@ -697,10 +711,10 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
                     removeEventListenersFromPool(module.factories);
                     module.factories.stop();
                     module.factories = null;
-                    window.clearInterval(jobCountTimer);
-
-                    jobCountTimer = null;
                 }
+
+                window.clearInterval(jobCountTimer);
+                jobCountTimer = null;
             },
 
             /**

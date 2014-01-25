@@ -36,6 +36,7 @@ define(['computation/index', 'network/index', 'storage/index'],
                  * Broadcast Messages
                  */
                 network.on('broadcast:result:push', function (e) {
+                    //logger.log('Mediator', 'result:push', e.data.uuid);
                     var hasChanged = computation.results.update(e.data);
                     if (hasChanged) {
                         network.peers.broadcast('result:push', e.data, e.target.uuid);
@@ -44,6 +45,7 @@ define(['computation/index', 'network/index', 'storage/index'],
 
 
                 network.on('broadcast:job:push', function (e) {
+                    //logger.log('Mediator', 'job:push', e.data.uuid);
                     var hasChanged = computation.jobs.update(e.data);
                     if (hasChanged) {
                         computation.pushJobToAwaitingWorker(e.data);
@@ -52,11 +54,17 @@ define(['computation/index', 'network/index', 'storage/index'],
                 });
 
                 network.on('broadcast:job:lock', function (e) {
-                    computation.jobs.lockJob(e.data);
+                    var hasChanged = computation.jobs.lockJob(e.data);
+                    if (hasChanged) {
+                        network.peers.broadcast('job:lock', e.data, e.target.uuid);
+                    }
                 });
 
                 network.on('broadcast:job:unlock', function (e) {
-                    computation.jobs.unlockJob(e.data);
+                    var hasChanged = computation.jobs.unlockJob(e.data);
+                    if (hasChanged) {
+                        network.peers.broadcast('job:unlock', e.data, e.target.uuid);
+                    }
                 });
 
 

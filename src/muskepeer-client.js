@@ -158,8 +158,12 @@ define([
                 .done(function () {
 
                     // Initialize caches
-                    computation.jobs.init();
-                    computation.results.init();
+                    if (project.computation.factories.enabled) {
+                        computation.jobs.init();
+                    }
+                    if (project.computation.workers.enabled) {
+                        computation.results.init();
+                    }
 
                     // Couple computation & network
                     mediator.couple();

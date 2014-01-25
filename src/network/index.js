@@ -70,6 +70,8 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
 
                         if (!exists) {
 
+                            logger.log('Network', 'MasterMessage of type: ', e.type);
+
                             // Inform and overwrite event-type
                             module.emit(e.type.replace('broadcast:', 'grid:'), e.data.message);
 
@@ -82,6 +84,10 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
 
                         }
                     })
+            }
+
+            else {
+                logger.log('Peer', 'received invalid Master-message!');
             }
         }
 
@@ -230,11 +236,11 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
             // Seems to be a master-message
             if (e.data && e.data.message && e.data.signature) {
                 masterMessageHandler(e);
-            } else {
-                // Pass-through events
+            }
+            else {
+                // Pass-through events, that will be caught by mediator
                 module.emit(e.type, e);
             }
-
 
         }
 

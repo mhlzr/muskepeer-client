@@ -14,8 +14,9 @@ define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, st
      * @method init
      */
     module.init = function () {
-
+        logger.log('Jobs', 'init');
         module.cache = new Cache('jobs', project.computation.jobs.autoSaveIntervalTime);
+        return module.cache.syncWithStorage();
 
     };
 
@@ -89,8 +90,10 @@ define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, st
         if (project.computation.jobs.lock) {
             job.locktime = Date.now();
             job.isLocked = true;
-            module.cache.set(job);
+            return module.cache.set(job);
         }
+
+        return false;
 
     };
 
@@ -103,8 +106,10 @@ define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, st
         if (project.computation.jobs.lock) {
             job.locktime = null;
             job.isLocked = false;
-            module.cache.set(job);
+            return module.cache.set(job);
         }
+
+        return false;
 
     };
 
@@ -113,10 +118,45 @@ define(['q', 'storage/index', 'project', 'storage/model/cache'], function (Q, st
      * @param {Job} job
      */
     module.markJobAsComplete = function (job) {
-
         job.isComplete = true;
         job.isLocked = false;
-        module.cache.set(job);
+        return module.cache.set(job);
+    };
+
+
+    /**
+     * @method getExpiredJobs
+     * @return {Array}
+     */
+    module.getExpiredJobs = function () {
+        var now = Date.now();
+        return module.cache.filter(function (job) {
+            return job.isLocked
+                && job.locktime
+                && job.locktime + project.computation.jobs.maxLockTime < now;
+        })
+    };
+
+
+    /**
+     * @method getCompleteJobs
+     * @return {Array}
+     */
+    module.getCompleteJobs = function () {
+        return module.cache.filter(function (job) {
+            return job.isComplete;
+        })
+    };
+
+
+    /**
+     * @method getLockedJobs
+     * @return {Array}
+     */
+    module.getLockedJobs = function () {
+        return module.cache.filter(function (job) {
+            return job.isLocked;
+        })
     };
 
 

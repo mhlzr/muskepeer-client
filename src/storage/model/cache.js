@@ -17,6 +17,7 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
         comparisonFunction = comparisonFunction || _.isEqual;
 
         var initialSync = false,
+            hasUnsynchedChanges = false,
             datasets = {},
             autoSaveInterval;
 
@@ -36,6 +37,8 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
          * @method syncWithStorage
          */
         this.syncWithStorage = function () {
+
+            logger.log('Cache', 'Syncing', storeName);
 
             return database.list(storeName)
                 .progress(function (dataset) {
@@ -111,6 +114,7 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
 
                     // Database Update
                     //database.update(storeName, dataset, {uuidIsHash: true});
+                    hasUnsynchedChanges = true;
                 }
 
             }
@@ -121,6 +125,7 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
                 //database.save(storeName, dataset, {uuidIsHash: true});
 
                 hasChanged = true;
+                hasUnsynchedChanges = true;
             }
 
             return hasChanged;
@@ -137,7 +142,7 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
         this.filter = function (filter) {
 
             // No filter applied
-            if (!filter) return datasets;
+            if (!filter) return _.toArray(datasets);
 
             return _.filter(datasets, filter);
         };
@@ -167,6 +172,9 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
          */
         this.save = function () {
 
+            if (!hasUnsynchedChanges) return;
+
+
             var sets = _.toArray(datasets);
 
             sets.forEach(function (dataset) {
@@ -175,7 +183,9 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
 
             logger.log('Cache', 'Saving', this.size(), storeName, 'to storage');
 
-            return database.overwrite(storeName, sets);
+            return database.overwrite(storeName, sets).then(function () {
+                hasUnsynchedChanges = false;
+            });
 
 
         }.bind(this);

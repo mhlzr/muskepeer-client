@@ -14,13 +14,13 @@ define(['network/index', 'computation/index', 'storage/index'], function (networ
     };
 
     module.computation.start = function () {
-        network.broadcastMasterMessage('computation:start');
         computation.start();
+        network.broadcastMasterMessage('computation:start');
     };
 
     module.computation.stop = function () {
-        network.broadcastMasterMessage('computation:stop');
         computation.stop();
+        network.broadcastMasterMessage('computation:stop');
     };
 
     module.storage.fs.clear = function () {

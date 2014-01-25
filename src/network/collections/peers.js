@@ -10,7 +10,7 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
 
 
         var TIMEOUT_RETRY_TIME = 60000, //60s
-            MAX_RANDOM_ASSESSMENT_DELAY_TIME = 50;
+            MAX_RANDOM_ASSESSMENT_DELAY_TIME = 150;
 
         var module = new MuskepeerModule(),
             _peers = [];
@@ -216,9 +216,8 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
                 // Broadcast to all connected peers
                 peers.forEach(function (peer) {
                     // Get a RAD before broadcasting
-                    //var rad = Math.random() * MAX_RANDOM_ASSESSMENT_DELAY_TIME;
-                    //_.delay(peer.broadcast, rad, type, data);
-                    peer.broadcast(type, data);
+                    var rad = Math.random() * MAX_RANDOM_ASSESSMENT_DELAY_TIME;
+                    _.delay(peer.broadcast, rad, type, data);
                 });
             },
 

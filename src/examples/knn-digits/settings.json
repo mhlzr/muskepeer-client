@@ -25,6 +25,7 @@
 
         "jobs": {
             "lock": true,
+            "maxLockTime": 2500,
             "expected": 3498,
             "testIntervalTime": 60000
         },

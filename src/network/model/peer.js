@@ -7,7 +7,7 @@
 define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'project'], function (_, Q, EventEmitter2, nodes, settings, project) {
 
     var TIMEOUT_WAIT_TIME = 10000, //10s
-        QUEUE_RETRY_TIME = 5,
+        QUEUE_RETRY_TIME = 75,
         ICE_SERVER_SETTINGS = {
             iceServers: settings.iceServers
         };
@@ -300,7 +300,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
                     msg = JSON.parse(e.data);
                 }
                 catch (err) {
-                    logger.error('Peer ' + _self.id, err, 'Error parsing msg.');
+                    logger.error('Peer ' + _self.id, 'Error parsing msg:', e.data);
                 }
 
             }
@@ -500,8 +500,9 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
                     _self.channel.send(jsonString);
                 }
                 catch (e) {
+                    //logger.error('Peer ' + _self.id, 'Error while sending msg, queuing data');
                     // We will be back after the break! :)
-                    _.delay(_self.send, QUEUE_RETRY_TIME, data);
+                    //_.delay(_self.send, QUEUE_RETRY_TIME, data);
                 }
             }
 
@@ -721,7 +722,13 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
          * @method broadcast
          */
         this.broadcast = function (type, data) {
-            _self.send({type: 'broadcast:' + type, data: data});
+
+            // Add broadcast prefix?
+            if (type.indexOf('broadcast:') < 0) {
+                type = 'broadcast:' + type;
+            }
+
+            _self.send({type: type, data: data});
         };
 
 
