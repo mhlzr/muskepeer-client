@@ -177,7 +177,8 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             };
 
             channelConstraint = {
-                reliable: true
+                reliable: false,
+                maxRetransmits: 0
             };
         } else {
             this.protocol = 'srtp';
@@ -471,8 +472,11 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
          *
          * @method send
          * @param data
+         * @param {Boolean} reliable Should a retry occur if the transmission fails?
          */
-        this.send = function (data) {
+        this.send = function (data, reliable) {
+
+            reliable = reliable || false;
 
             var jsonString;
 
@@ -500,9 +504,11 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
                     _self.channel.send(jsonString);
                 }
                 catch (e) {
-                    //logger.error('Peer ' + _self.id, 'Error while sending msg, queuing data');
-                    // We will be back after the break! :)
-                    //_.delay(_self.send, QUEUE_RETRY_TIME, data);
+                    if (reliable) {
+                        logger.error('Peer ' + _self.id, 'Error while sending reliable msg, queuing data');
+                        // Retry again
+                        _.delay(_self.send, QUEUE_RETRY_TIME, data);
+                    }
                 }
             }
 

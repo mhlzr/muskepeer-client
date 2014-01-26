@@ -389,7 +389,10 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                     var currentPosition = fileInfo.position + blob.size;
                     return _db.update('files', {uuid: fileInfo.uuid, isComplete: currentPosition >= fileInfo.size, position: currentPosition}, {uuidIsHash: true});
                 })
-                .then(updateFileList);
+                .then(updateFileList)
+                .then(function () {
+                    deferred.resolve();
+                });
 
 
             return deferred.promise;
@@ -613,16 +616,17 @@ define(['lodash', 'crypto/index', 'q', 'project', 'settings'], function (_, cryp
                                 logger.error('FileSystem', fileInfo.uri, 'error during download!');
                             })
                             .done(function (data) {
-
-                                logger.log('FileSystem', fileInfo.uri, 'download complete!');
-
-                                _db.update('files', {uuid: fileInfo.uuid, isComplete: true, position: data.blob.size, size: data.blob.size}, {uuidIsHash: true})
+                                _self.write(fileInfo, data.blob, 0)
                                     .then(function () {
-                                        return _self.write(fileInfo, data.blob, 0);
+                                        return _db.update('files', {uuid: fileInfo.uuid, isComplete: true, position: data.blob.size, size: data.blob.size}, {uuidIsHash: true})
                                     })
-                                    .then(updateFileList);
-
-                                deferred.resolve();
+                                    .then(function () {
+                                        return updateFileList();
+                                    })
+                                    .then(function () {
+                                        logger.log('FileSystem', fileInfo.uri, 'download complete!');
+                                        deferred.resolve();
+                                    });
 
                             });
 

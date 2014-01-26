@@ -189,8 +189,11 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
              * @param type
              * @param data
              * @param {String} [originPeerUuid]
+             * @param {Boolean} reliable
              */
-            broadcast: function (type, data, originPeerUuid) {
+            broadcast: function (type, data, originPeerUuid, reliable) {
+
+                reliable = reliable || false;
 
                 var peers = module.getConnectedPeers();
 
@@ -217,7 +220,7 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
                 peers.forEach(function (peer) {
                     // Get a RAD before broadcasting
                     var rad = Math.random() * MAX_RANDOM_ASSESSMENT_DELAY_TIME;
-                    _.delay(peer.broadcast, rad, type, data);
+                    _.delay(peer.broadcast, rad, type, data, reliable);
                 });
             },
 

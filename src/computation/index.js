@@ -104,7 +104,8 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
          */
         function createThreadPool(type, url) {
 
-            var expected = project.computation.jobs.expected,
+            var deferred = Q.defer(),
+                expected = project.computation.jobs.expected,
                 storeName = 'jobs';
 
             if (type === module.WORKER) {
@@ -115,7 +116,8 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
             if (allFound(storeName, expected)) {
                 // No need to create a pool if it's already complete
                 logger.log('Computation', 'Already finished, not creating a ' + type + '-Pool!');
-                return Q();
+                deferred.resolve();
+                return deferred.promise;
             }
 
             else {
@@ -689,8 +691,10 @@ define(['lodash', 'q', 'muskepeer-module', 'storage/index', 'settings', 'project
                     results.cache.save().then(results.cache.flush);
 
                     // Stop autosaving of jobs
-                    jobs.cache.disableAutoSave();
-                    jobs.cache.save().then(jobs.cache.flush);
+                    if (jobs && jobs.cache) {
+                        jobs.cache.disableAutoSave();
+                        jobs.cache.save().then(jobs.cache.flush);
+                    }
 
                     removeEventListenersFromPool(module.workers);
                     module.workers.stop();

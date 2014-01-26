@@ -27,7 +27,7 @@ self.addEventListener('message', function (e) {
  **********************************************/
 
 
-var BOARDSIZE = 9;
+var BOARDSIZE = 11;
 
 function test(positions) {
 

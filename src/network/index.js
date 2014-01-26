@@ -79,7 +79,7 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
                             storage.db.save('messages', e.data.message)
                                 .then(function () {
                                     // Broadcast
-                                    peers.broadcast(e.type, e.data, e.target.uuid);
+                                    peers.broadcast(e.type, e.data, e.target.uuid, true);
                                 });
 
                         }
@@ -367,7 +367,7 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
                                 'message': msg,
                                 'signature': signature
                             }
-                        );
+                        ), null, true;
                     });
 
 
