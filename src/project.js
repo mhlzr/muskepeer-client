@@ -60,6 +60,7 @@ define(['q', 'lodash', 'mixing'], function (Q, _, mixing) {
         "network": {
 
             "broadcast": {
+                "messageTtl": 10000,
                 "results": {
                     "enabled": true,
                     "groupSize": 1

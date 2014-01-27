@@ -171,9 +171,11 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
          * @method save
          */
         this.save = function () {
+            var deferred = Q.defer();
 
-            if (!hasUnsynchedChanges) return;
-
+            if (!hasUnsynchedChanges) {
+                deferred.resolve();
+            }
 
             var sets = _.toArray(datasets);
 
@@ -183,9 +185,12 @@ define(['lodash', 'q', '../database', 'mixing', 'project'], function (_, Q, data
 
             logger.log('Cache', 'Saving', this.size(), storeName, 'to storage');
 
-            return database.overwrite(storeName, sets).then(function () {
+            database.overwrite(storeName, sets).then(function () {
                 hasUnsynchedChanges = false;
+                deferred.resolve();
             });
+
+            return deferred.promise;
 
 
         }.bind(this);

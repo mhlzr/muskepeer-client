@@ -27,13 +27,15 @@
             "lock": true,
             "maxLockTime": 2500,
             "expected": 3498,
-            "testIntervalTime": 60000
+            "testIntervalTime": 60000,
+            "autoSaveIntervalTime": 20000
         },
 
         "results": {
             "expected": 3498,
             "noJobRetryTime": 3000,
-            "testIntervalTime": 60000
+            "testIntervalTime": 60000,
+            "autoSaveIntervalTime": 20000
         }
     },
 
@@ -52,6 +54,9 @@
     ],
 
     "network": {
+        "broadcast": {
+            "messageTtl": 10000
+        },
         "services": [
             {
                 "enabled": false,

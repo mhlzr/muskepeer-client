@@ -232,14 +232,17 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
                 return;
             }
 
-
             // Seems to be a master-message
             if (e.data && e.data.message && e.data.signature) {
                 masterMessageHandler(e);
             }
             else {
-                // Pass-through events, that will be caught by mediator
-                module.emit(e.type, e);
+                // Message is still valid? Or has expired? Without data will always be valid
+                if (!e.data || e.data.timestamp + project.network.broadcast.messageTtl < Date.now()) {
+                    // Pass-through events, that will be caught by mediator
+                    module.emit(e.type, e);
+                }
+
             }
 
         }
@@ -328,7 +331,6 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
                 // Broadcast to peers
                 peers.broadcast(type, data);
 
-
                 // Only results get publishedto services
                 if (type !== 'result:push') return;
 
@@ -363,11 +365,12 @@ define(['q', 'lodash', 'crypto/index', 'storage/index', 'project', 'settings', '
                     .then(function () {
 
                         // Broadcast
-                        peers.broadcast(type, {
+                        peers.broadcast(type,
+                            {
                                 'message': msg,
                                 'signature': signature
-                            }
-                        ), null, true;
+                            },
+                            null, true);
                     });
 
 

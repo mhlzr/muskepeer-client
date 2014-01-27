@@ -177,6 +177,7 @@ define(['lodash', 'q', 'eventemitter2', '../collections/nodes', 'settings', 'pro
             };
 
             channelConstraint = {
+                ordered: false,
                 reliable: false,
                 maxRetransmits: 0
             };

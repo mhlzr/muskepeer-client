@@ -210,6 +210,7 @@ define(['q', 'lodash', 'settings', '../geolocation', '../../muskepeer-module', '
 
                 if (!originPeerUuid) {
                     //logger.log('Peers', 'Broadcasting', type, 'to', peers.length, 'peer(s)');
+                    data.timestamp = Date.now();
                 }
                 else {
                     //logger.log('Peers', 'Rebroadcasting', type, 'to', peers.length, 'peer(s)');

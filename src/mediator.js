@@ -48,8 +48,8 @@ define(['computation/index', 'network/index', 'storage/index'],
                     //logger.log('Mediator', 'job:push', e.data.uuid);
                     var hasChanged = computation.jobs.update(e.data);
                     if (hasChanged) {
-                        computation.pushJobToAwaitingWorker(e.data);
                         network.peers.broadcast('job:push', e.data, e.target.uuid);
+                        computation.pushJobToAwaitingWorker(e.data);
                     }
                 });
 
