@@ -42,13 +42,7 @@ require(['muskepeer-client', 'util/logger'], function (Muskepeer, Logger) {
                 host: 'node02-muskepeer.rhcloud.com',
                 isSecure: true,
                 port: 8443
-            }/*,
-             {
-             host: '127.0.0.1',
-             isSecure: false,
-             port: 8080
-             }*/
-
+            }
         ]
     });
 

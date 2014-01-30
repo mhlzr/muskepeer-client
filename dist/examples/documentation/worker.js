@@ -1,9 +1,7 @@
-var interval,
-    isRunning;
-
 /**********************************************
  * COMMUNICATION BLOCK START
  **********************************************/
+
 self.addEventListener('message', function (e) {
 
     if (!e.data.cmd) {
@@ -19,7 +17,7 @@ self.addEventListener('message', function (e) {
             start();
             break;
         case 'stop':
-            stop();
+            self.close();
             break;
         case 'job' :
             //e.data.job
@@ -35,9 +33,11 @@ self.addEventListener('message', function (e) {
             break;
     }
 });
+
 /**********************************************
  * COMMUNICATION BLOCK END
  **********************************************/
+
 
 function start() {
 
@@ -76,7 +76,7 @@ function start() {
     self.postMessage({ type: 'job:pull', data: {uuid: 'c25945fcf5508f52661464831d54de84a228bad76a9474222fb2aa1d7a7d5850'}});
     self.postMessage({ type: 'job:pull' });
 
-    self.postMessage({ type: 'file:pull', data: {url: 'https://dl.dropboxusercontent.com/u/959008/webstorm.pdf'} });
+    self.postMessage({ type: 'file:pull', data: {url: 'https://example.org/file.pdf'} });
     self.postMessage({ type: 'file:pull', data: {name: 'webstorm', type: 'localUrl', offset: 0} });
     self.postMessage({ type: 'file:pull', data: {name: 'webstorm', type: 'blob', offset: 1234} });
     self.postMessage({ type: 'file:pull', data: {name: 'webstorm', type: 'dataUrl'} });
@@ -87,9 +87,4 @@ function start() {
     self.postMessage({ type: 'file:push', data: {} });
 
 
-}
-
-
-function stop() {
-    self.close();
 }

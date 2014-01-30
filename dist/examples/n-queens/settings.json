@@ -26,10 +26,13 @@
     },
 
     "network": {
+        "broadcast": {
+            "messageTtl": 60000
+        },
         "services": [
             {
                 "enabled": false,
-                "url": "https://api.parse.com/1/classes/Queens/",
+                "url": "https://api.parse.com/1/classes/queens/",
                 "type": "REST",
                 "params": {},
                 "headers": [

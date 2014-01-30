@@ -1,4 +1,7 @@
-var interval;
+
+/**********************************************
+ * COMMUNICATION BLOCK START
+ **********************************************/
 
 self.addEventListener('message', function (e) {
 
@@ -32,10 +35,7 @@ self.addEventListener('message', function (e) {
     }
 });
 
-function start() {
+/**********************************************
+ * COMMUNICATION BLOCK END
+ **********************************************/
 
-    interval = setInterval(function () {
-        self.postMessage({type: 'job:push', data: parseInt(Math.random() * 1000)});
-    }, (Math.random() * 500) | 0);
-
-}

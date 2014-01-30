@@ -25,14 +25,17 @@
 
         "jobs": {
             "lock": true,
+            "maxLockTime": 2500,
             "expected": 3498,
-            "testIntervalTime": 60000
+            "testIntervalTime": 60000,
+            "autoSaveIntervalTime": 20000
         },
 
         "results": {
             "expected": 3498,
             "noJobRetryTime": 3000,
-            "testIntervalTime": 60000
+            "testIntervalTime": 60000,
+            "autoSaveIntervalTime": 20000
         }
     },
 
@@ -48,5 +51,30 @@
             "type": "application/json"
         }
 
-    ]
+    ],
+
+    "network": {
+        "broadcast": {
+            "messageTtl": 10000
+        },
+        "services": [
+            {
+                "enabled": false,
+                "url": "https://api.parse.com/1/classes/knn_digits/",
+                "type": "REST",
+                "params": {},
+                "headers": [
+                    {
+                        "key": "X-Parse-Application-Id",
+                        "value": "ZzIHMKfVQmIni0K5fBdYgXxTlXyoovbm4gm0Epdq"
+                    },
+                    {
+                        "key": "X-Parse-REST-API-Key",
+                        "value": "4Izw5bddA34RFUmOuGCYrMHn4zY5dz62ETAVb2g5"
+                    }
+                ]
+            }
+        ]
+    }
+
 }
